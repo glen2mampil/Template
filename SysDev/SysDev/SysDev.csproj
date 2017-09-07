@@ -275,6 +275,16 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\font-awesome.css" />
     <Content Include="Content\font-awesome.min.css" />
+    <Content Include="Content\sweetalert2\dist\sweetalert2.common.js" />
+    <Content Include="Content\sweetalert2\dist\sweetalert2.css" />
+    <Content Include="Content\sweetalert2\dist\sweetalert2.js" />
+    <Content Include="Content\sweetalert2\dist\sweetalert2.min.css" />
+    <Content Include="Content\sweetalert2\dist\sweetalert2.min.js" />
+    <Content Include="Content\sweetalert2\src\sweetalert2.js" />
+    <Content Include="Content\sweetalert2\src\utils\classes.js" />
+    <Content Include="Content\sweetalert2\src\utils\dom.js" />
+    <Content Include="Content\sweetalert2\src\utils\params.js" />
+    <Content Include="Content\sweetalert2\src\utils\utils.js" />
     <Content Include="Content\tether\tether-theme-arrows-dark.css" />
     <Content Include="Content\tether\tether-theme-arrows-dark.min.css" />
     <Content Include="Content\tether\tether-theme-arrows.css" />
@@ -308,6 +318,8 @@
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="admin-lte\css\adminlte.min.css.map" />
     <Content Include="admin-lte\css\adminlte.css.map" />
+    <Content Include="Content\sweetalert2\src\colors.scss" />
+    <Content Include="Content\sweetalert2\src\sweetalert2.scss" />
     <None Include="Scripts\jquery-3.1.1.intellisense.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
