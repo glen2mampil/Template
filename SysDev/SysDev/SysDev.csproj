@@ -269,6 +269,7 @@
     <Content Include="admin-lte\js\adminlte.min.js" />
     <Content Include="admin-lte\js\app.js" />
     <Content Include="admin-lte\js\app.min.js" />
+    <Content Include="favicon.ico" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
@@ -293,7 +294,7 @@
     <Content Include="Content\tether\tether-theme-basic.min.css" />
     <Content Include="Content\tether\tether.css" />
     <Content Include="Content\tether\tether.min.css" />
-    <Content Include="favicon.ico" />
+    <Content Include="favicon1.ico" />
     <Content Include="fonts\fontawesome-webfont.svg" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -375,6 +376,9 @@
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Shared\_PlainLayout.cshtml" />
+    <Content Include="Views\Shared\Partial\Navigation\_HeaderNav.cshtml" />
+    <Content Include="Views\Shared\Partial\Navigation\_LeftSide.cshtml" />
+    <Content Include="Views\Shared\Partial\Navigation\_RightSide.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
