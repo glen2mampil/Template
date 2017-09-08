@@ -199,6 +199,8 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Controllers\ReportsController.cs" />
+    <Compile Include="Controllers\UserProfileController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -206,10 +208,18 @@
     <Compile Include="Migrations\201709070459006_InitialCreationModel.Designer.cs">
       <DependentUpon>201709070459006_InitialCreationModel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201709080327419_AddedModels.cs" />
+    <Compile Include="Migrations\201709080327419_AddedModels.Designer.cs">
+      <DependentUpon>201709080327419_AddedModels.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\ReportModels.cs" />
+    <Compile Include="Models\ReportViewModel.cs" />
+    <Compile Include="Models\SettingsViewModel.cs" />
+    <Compile Include="Models\UserProfileViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -379,9 +389,44 @@
     <Content Include="Views\Shared\Partial\Navigation\_HeaderNav.cshtml" />
     <Content Include="Views\Shared\Partial\Navigation\_LeftSide.cshtml" />
     <Content Include="Views\Shared\Partial\Navigation\_RightSide.cshtml" />
+    <Content Include="Views\UserProfile\Create.cshtml" />
+    <Content Include="Views\UserProfile\Details.cshtml" />
+    <Content Include="Views\UserProfile\Edit.cshtml" />
+    <Content Include="Views\UserProfile\Index.cshtml" />
+    <Content Include="Views\Reports\AuditTrail.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Content\components\bootstrap-colorpicker\" />
+    <Folder Include="Content\components\bootstrap-datepicker\" />
+    <Folder Include="Content\components\bootstrap-daterangepicker\" />
+    <Folder Include="Content\components\bootstrap-slider\" />
+    <Folder Include="Content\components\bootstrap-timepicker\" />
+    <Folder Include="Content\components\bootstrap\" />
+    <Folder Include="Content\components\chart.js\" />
+    <Folder Include="Content\components\ckeditor\" />
+    <Folder Include="Content\components\datatables.net-bs\" />
+    <Folder Include="Content\components\datatables.net\" />
+    <Folder Include="Content\components\eve-raphael\" />
+    <Folder Include="Content\components\fastclick\" />
+    <Folder Include="Content\components\Flot\" />
+    <Folder Include="Content\components\font-awesome\" />
+    <Folder Include="Content\components\fullcalendar\" />
+    <Folder Include="Content\components\inputmask\" />
+    <Folder Include="Content\components\ion.rangeSlider\" />
+    <Folder Include="Content\components\Ionicons\" />
+    <Folder Include="Content\components\jquery-knob\" />
+    <Folder Include="Content\components\jquery-slimscroll\" />
+    <Folder Include="Content\components\jquery-sparkline\" />
+    <Folder Include="Content\components\jquery-ui\" />
+    <Folder Include="Content\components\jquery\" />
+    <Folder Include="Content\components\jvectormap\" />
+    <Folder Include="Content\components\mocha\" />
+    <Folder Include="Content\components\moment\" />
+    <Folder Include="Content\components\morris.js\" />
+    <Folder Include="Content\components\PACE\" />
+    <Folder Include="Content\components\raphael\" />
+    <Folder Include="Content\components\select2\" />
     <Folder Include="Content\plugins\" />
   </ItemGroup>
   <ItemGroup>
@@ -393,6 +438,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201709070459006_InitialCreationModel.resx">
       <DependentUpon>201709070459006_InitialCreationModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709080327419_AddedModels.resx">
+      <DependentUpon>201709080327419_AddedModels.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
