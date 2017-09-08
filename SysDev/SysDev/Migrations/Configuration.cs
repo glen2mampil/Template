@@ -18,6 +18,7 @@ namespace SysDev.Migrations
 
         protected override void Seed(SysDev.Models.ApplicationDbContext context)
         {
+            Console.WriteLine("Initial seeding");
             var roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(context));
             var userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(context));
 
@@ -25,16 +26,35 @@ namespace SysDev.Migrations
             if (!roleManager.RoleExists("SuperAdmin"))
             {
                 //Create Admin rool   
-                var role = new Microsoft.AspNet.Identity.EntityFramework.IdentityRole();
-                role.Name = "SuperAdmin";
+                var role = new Microsoft.AspNet.Identity.EntityFramework.IdentityRole {Name = "SuperAdmin"};
                 roleManager.Create(role);
 
                 //Create a Admin super user who will maintain the website                  
+                var profile = new UserProfile
+                {
+                    FirstName = "Glenn",
+                    LastName = "Tumampil",
+                    MiddleName = "Mendez",
+                    MaritalStatus = "Single",
+                    Address = "Makati City",
+                    Gender = "Male",
+                    ContactNo = "09770975881",
+                    CompanyName = "Bluebell corp",
+                    DateCreated = DateTime.Now.ToString(),
+                    CompanyId = "10000010"
+
+                };
+                context.UserProfiles.Add(profile);
+
 
                 var user = new ApplicationUser
                 {
                     UserName = "suadmin2017",
-                    Email = "SuAdmin@Bluebell.com"
+                    Email = "SuAdmin@Bluebell.com",
+                    UserProfileId = profile.Id,
+                    UserProfile = profile,
+                    PhoneNumber = profile.ContactNo,
+                    Status = "Active"
                 };
 
                 string userPWD = "admin123";
@@ -52,8 +72,7 @@ namespace SysDev.Migrations
             // creating Creating Manager role    
             if (!roleManager.RoleExists("Manager"))
             {
-                var role = new Microsoft.AspNet.Identity.EntityFramework.IdentityRole();
-                role.Name = "Manager";
+                var role = new Microsoft.AspNet.Identity.EntityFramework.IdentityRole {Name = "Manager"};
                 roleManager.Create(role);
 
             }
@@ -65,6 +84,8 @@ namespace SysDev.Migrations
                 roleManager.Create(role);
 
             }
+
+            context.SaveChanges();
             //  This method will be called after migrating to the latest version.
 
             //  You can use the DbSet<T>.AddOrUpdate() helper extension method 
