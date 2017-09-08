@@ -1,0 +1,60 @@
+﻿@model Template1.Models.ReportViewModel
+
+@{
+    ViewBag.Title = "Audit Trail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box flat">
+            <div class="box-header">
+                <h3 class="box-title">Responsive Hover Table</h3>
+
+                <div class="box-tools">
+                    <div class="input-group input-group-sm" style="width: 150px;">
+                        <input type="text" name="table_search" class="form-control pull-right" placeholder="Search">
+
+                        <div class="input-group-btn">
+                            <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body table-responsive no-padding">
+                <table class="table table-hover">
+                    <tr>
+                        <td width="30px"></td>
+                        <td width="200px">Date</td>
+                        <td width="250px">Commit by</td>
+                        <td width="100px">Module</td>
+                        <td width="100px">Action</td>
+                        <td>Description</td>
+                    </tr>
+
+                    @foreach (var audit in Model.AuditTrails)
+                    {
+                        <tr>
+                            <td></td>
+                            <td><p>@audit.DateCreated.ToString("MMM dd, yyyy") <small class="text-muted">@audit.DateCreated.ToString("hh:mm tt")</small></p></td>
+                            <td>
+                                <p>@audit.UserProfile.FirstName @audit.UserProfile.LastName</p>
+                            </td>
+                            <td><p>@audit.ModuleId</p></td>
+                            <td><p>@audit.Action</p></td>
+                            <td><p>@audit.Description</p></td>
+                        </tr>
+                    }
+
+
+                </table>
+            </div>
+            <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
+    </div>
+</div>
+
+

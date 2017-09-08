@@ -19,8 +19,10 @@
                 <div class="col-md-12">
                     <hr />
                     <p class="login-box-msg">Sign in to start your session</p>
-                    @using (Html.BeginForm("Login", "Account", new {ReturnUrl = ViewBag.ReturnUrl}, FormMethod.Post, new {role = "form"}))
+                    @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
                     {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary("", new { @class = "text-danger" })
                         <div class="form-group has-feedback">
                             @Html.TextBoxFor(m => m.UserName, new {@class = "form-control", placeholder = "Username"})
                             <span class="glyphicon glyphicon-user form-control-feedback"></span>

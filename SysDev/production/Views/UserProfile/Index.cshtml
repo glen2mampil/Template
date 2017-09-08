@@ -1,0 +1,167 @@
+﻿@model Template1.Models.UserProfileViewModel
+
+
+@{
+    ViewBag.Title = "Users";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.activePage = "Users";
+}
+
+<div class="row">
+
+    <div class="col-md-12" style="margin-bottom: 10px;">
+        <a id="btnCreate" class="pull-right" data-toggle="modal" href="#myModal"><i class="fa fa-user-plus fa-2x"></i></a>
+    </div>
+
+
+
+
+    <div class="col-xs-12">
+        <div class="box flat">
+            <div class="box-header">
+
+                <div class="box-tools">
+                    <div class="input-group input-group-sm" style="width: 150px;">
+                        <input type="text" name="table_search" class="form-control pull-right" placeholder="Search">
+
+                        <div class="input-group-btn">
+                            <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body table-responsive no-padding">
+                <table class="table table-hover">
+                    <tr>
+                        <td width="30px"></td>
+                        <td>ID</td>
+                        <td>User</td>
+                        <td>Date</td>
+                        <td>Status</td>
+                        <td>Action</td>
+                    </tr>
+
+                    @foreach (var account in Model.Accounts)
+                    {
+                        <tr>
+                            <td></td>
+                            <td width="40px"><img src="~/admin-lte/img/flat-face-male-o.png" class="user-image user user-menu" alt="User Image" style="width: 30px;"></td>
+                            <td>
+                                <a href="#myModal" id="btnDetails" class="lead text-black btnDetails" data-toggle="modal" data-id="@account.UserProfile.Id">@account.UserProfile.FirstName @account.UserProfile.LastName</a>
+                            </td>
+                            <td>11-7-2014</td>
+                            <td>
+                                @{
+                                    var status = account.Status == "Active" ? "label-success" : "label-danger";
+                                }
+                                <a href="#" id="btnStatus" class="label btnStatus @status" data-id="@account.UserProfile.Id">@account.Status</a>
+                            </td>
+                            <td>
+                                <a href="#myModal" class="text-black btnEdit" data-toggle="modal" data-id="@account.UserProfile.Id"><i class="fa fa-pencil"></i> Edit</a>
+                                <a id="btnDelete" class="label text-gray flat btnDelete" data-id="@account.UserProfile.Id"><i class="fa fa-close"></i></a>
+                            </td>
+                        </tr>
+                                    }
+
+
+                </table>
+            </div>
+            <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
+    </div>
+</div>
+
+<div id="myModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content" id="modal-content">
+
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    
+    <script>
+        $('#btnCreate').click(function (e) {
+            $("#modal-content").load("/UserProfile/Create");
+        });
+
+
+
+
+
+        $(".btnDetails").click(function (e) {
+            //alert("URL: /UserProfile/Details/" + $(this).data("id") + " | ID:" + $(this).data("id"));
+            $("#modal-content").load("/UserProfile/Details/" + $(this).data("id"));
+        });
+        $(".btnEdit").click(function (e) {
+            alert("URL: /UserProfile/Details/" + $(this).data("id") + " | ID:" + $(this).data("id"));
+            $("#modal-content").load("/UserProfile/Edit/" + $(this).data("id"));
+        });
+
+        $(".btnStatus").click(function (e) {
+            var btnStatus = $(this);
+            var requestStatus = (btnStatus.text() == "Active" ? "Inactive" : "Active");
+            //alert("URL: @Url.Action("UpdateStatus", "UserProfile") | ID:" + $(this).data("id") + " | Class: " + btnStatus.hasClass("label-success"));
+            //$("#modal-content").load("/UserProfile/UpdateStatus/" + $(this).data("id"));
+
+            swal({
+                    title: (requestStatus == "Active"? "Activate?" : "Diactivate?"),
+                    text: "Are you sure you want to do this?",
+                    type: "warning",
+                    showCancelButton: true,
+                    closeOnConfirm: false,
+                    showLoaderOnConfirm: true
+                },
+                function () {
+                    setTimeout(function () {
+
+                        $.ajax({
+                            url: "/UserProfile/UpdateStatus/" + btnStatus.data("id"),
+                            type: "Post",
+                            data: btnStatus.data("id"),
+                            success: function (result) {
+                                swal("Account is now " + (requestStatus));
+                                btnStatus.removeClass(btnStatus.hasClass("label-success") ? 'label-success' : 'label-danger');
+                                btnStatus.text( requestStatus == "Active" ? "Active" : "Inactive");
+                                btnStatus.addClass(btnStatus.text() == "Active" ? "label-success" : "label-danger");
+                            }
+                        });
+
+                    }, 1000);
+                });
+        });
+
+        $(".btnDelete").click(function (e) {
+            var btnStatus = $(this);
+
+            swal({
+                    title: "Remove this User?",
+                    text: "Are you sure you want to do this?",
+                    type: "warning",
+                    showCancelButton: true,
+                    closeOnConfirm: false,
+                    showLoaderOnConfirm: true
+                },
+                function () {
+                    setTimeout(function () {
+                        $.ajax({
+                            url: "/UserProfile/Delete/" + btnStatus.data("id"),
+                            type: "Post",
+                            data: btnStatus.data("id"),
+                            success: function (result) {
+                                swal("Account is now remove");
+                            }
+                        });
+
+                    }, 1000);
+                });
+        });
+
+
+    </script>
+@Scripts.Render("~/bundles/jqueryval")
+}

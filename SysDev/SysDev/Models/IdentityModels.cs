@@ -105,7 +105,7 @@ namespace SysDev.Models
         public DbSet<MasterData> MasterDatas { get; set; }
         public DbSet<MasterDetail> MasterDetails { get; set; }
         public ApplicationDbContext()
-            : base("DefaultConnection", throwIfV1Schema: false)
+            : base("name=DefaultConnection", throwIfV1Schema: false)
         {
         }
 
