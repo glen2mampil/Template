@@ -32,13 +32,13 @@ namespace SysDev
                 "~/admin-lte/css/AdminLTE.css",
                 "~/admin-lte/css/skins/skin-blue.css",
                 "~/Content/font-awesome.min.css",
-                "~/Content/sweetalert2/dist/sweetalert.min.css",
+                "~/Content/sweetalert2/dist/sweetalert2.min.css",
                 "~/Content/plugins/iCheck/square/blue.css",
                 "~/Content/Site.css"));
 
             bundles.Add(new ScriptBundle("~/admin-lte/js").Include(
                 "~/admin-lte/js/app.js",
-                "~/Content/sweetalert2/dist/sweetalert.min.js",
+                "~/Content/sweetalert2/dist/sweetalert2.min.js",
                 "~/Content/plugins/iCheck/icheck.min.js",
                 "~/admin-lte/plugins/fastclick/fastclick.js"));
         }

@@ -51,7 +51,9 @@
                 }
             }
 
-            <li class="@dashboard"><a href="#"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
+            <li class="@dashboard">
+                <a href="@Url.Action("Index", "Home")"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a>
+            </li>
             <li class="treeview @users">
                 <a href="#">
                     <i class="fa fa-users"></i> <span>Manage User</span>
@@ -64,7 +66,9 @@
                     <li class="@ViewBag.Lvl2ActivePage">@Html.ActionLink("User Permissions", "Index", "UserProfile")</li>
                 </ul>
             </li>
-            <li class="@settings"><a href="/Settings/"><i class="fa fa-sliders"></i> Settings</a></li>
+            <li class="@settings">
+                <a href="@Url.Action("Index", "Reports")"><i class="fa fa-sliders"></i> <span>Settings</span></a>
+            </li>
             <li class="treeview">
                 <a href="#">
                     <i class="fa fa-area-chart"></i> <span>Reports</span>

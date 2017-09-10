@@ -212,6 +212,14 @@
     <Compile Include="Migrations\201709080327419_AddedModels.Designer.cs">
       <DependentUpon>201709080327419_AddedModels.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201709100444330_AddOverridedApplicationUserProperties.cs" />
+    <Compile Include="Migrations\201709100444330_AddOverridedApplicationUserProperties.Designer.cs">
+      <DependentUpon>201709100444330_AddOverridedApplicationUserProperties.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709100453322_AddOverridedPropertiesApplicationUser.cs" />
+    <Compile Include="Migrations\201709100453322_AddOverridedPropertiesApplicationUser.Designer.cs">
+      <DependentUpon>201709100453322_AddOverridedPropertiesApplicationUser.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
@@ -447,6 +455,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201709080327419_AddedModels.resx">
       <DependentUpon>201709080327419_AddedModels.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709100444330_AddOverridedApplicationUserProperties.resx">
+      <DependentUpon>201709100444330_AddOverridedApplicationUserProperties.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709100453322_AddOverridedPropertiesApplicationUser.resx">
+      <DependentUpon>201709100453322_AddOverridedPropertiesApplicationUser.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

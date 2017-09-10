@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using SysDev.Models;
-
+ 
 namespace SysDev.Controllers
 {
     [Authorize]
@@ -88,6 +89,8 @@ namespace SysDev.Controllers
         [HttpPost]
         public ActionResult Save(AddUserViewModel model)
         {
+            //return Json(new { success = false, responseText = "Your message successfuly sent!" }, JsonRequestBehavior.AllowGet);
+        
             if (model.Profile.Id == 0)
             {
                 model.Profile.DateCreated = DateTime.Now.ToString("MMM-dd-yyyy hh:mm tt");

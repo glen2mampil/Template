@@ -23,7 +23,6 @@ namespace SysDev.Models
 
         public string Password { get; set; }
 
-        public string MaritalStatus { get; set; }
     }
 
     public class UserPermissionViewModel

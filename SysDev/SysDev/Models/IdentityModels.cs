@@ -13,6 +13,16 @@ namespace SysDev.Models
         public string Status { get; set; }
         public int UserProfileId { get; set; }
         public UserProfile UserProfile { get; set; }
+
+        [Required]
+        [EmailAddress]
+        public override string Email { get; set; }
+
+        [Required]
+        [MaxLength(50)]
+        [StringLength(5)]
+        public override string UserName { get; set; }
+
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {
             // Note the authenticationType must match the one defined in CookieAuthenticationOptions.AuthenticationType
