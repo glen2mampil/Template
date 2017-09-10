@@ -23,7 +23,7 @@ namespace SysDev.Controllers
         }
 
         // GET: Reports
-        public ActionResult Index()
+        public ActionResult Index() 
         {
             //things to be added soon...
             return View();

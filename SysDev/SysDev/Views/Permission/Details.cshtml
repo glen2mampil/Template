@@ -1,0 +1,89 @@
+﻿@model SysDev.Models.DetailedPermissionViewModel
+@{
+    ViewBag.Title = "";
+    Layout = null;
+    //Layout = "~/Views/Shared/_PlainLayout.cshtml";
+}
+
+<table class="table table-hover">
+    <tr>
+        <td width="30px"></td>
+        <td>Module</td>
+        <td width="75px">View</td>
+        <td width="75px">Create</td>
+        <td width="75px">Edit</td>
+        <td width="75px">Delete</td>
+        <td width="150px">Generate Report</td>
+    </tr>
+
+    @foreach (var permission in Model.Permissions)
+    {
+        <tr>
+            <td></td>
+            <td>@permission.MasterDetail.Name</td>
+            <td>
+                <a href="#" class="label action @(permission.AllowView == 1 ? "label-success" : "label-danger")" data-id="@permission.Id" data-action="View" data-value="@permission.AllowView">
+                    @(permission.AllowView == 1 ? "Allowed" : "Not Allowed")
+                </a>
+            </td>
+            <td>
+                <a href="#" class="label action @(permission.AllowCreate == 1 ? "label-success" : "label-danger")" data-id="@permission.Id" data-action="Create" data-value="@permission.AllowCreate">
+                    @(permission.AllowCreate == 1 ? "Allowed" : "Not Allowed")
+                </a>
+            </td>
+            <td>
+                <a href="#" class="label action @(permission.AllowEdit == 1 ? "label-success" : "label-danger")" data-id="@permission.Id" data-action="Edit" data-value="@permission.AllowEdit">
+                    @(permission.AllowEdit == 1 ? "Allowed" : "Not Allowed")
+                </a>
+            </td>
+            <td>
+                <a href="#" class="label action @(permission.AllowDelete == 1 ? "label-success" : "label-danger")" data-id="@permission.Id" data-action="Delete" data-value="@permission.AllowDelete">
+                    @(permission.AllowDelete == 1 ? "Allowed" : "Not Allowed" )
+                </a>
+            </td>
+            <td>
+                <a href="#" class="label action @(permission.AllowGenerateReport == 1 ? "label-success" : "label-danger")" data-id="@permission.Id" data-action="GenerateReport" data-value="@permission.AllowGenerateReport">
+                    @(permission.AllowGenerateReport == 1 ? "Allowed" : "Not Allowed")
+                </a>
+            </td>
+        </tr>
+    }
+</table>
+
+<script>
+    $(".action").click(function (e) {
+        var btnStatus = $(this);
+        var requestStatus = (btnStatus.data("value") == 1 ? "Not Allowed" : "Allowed");
+        //alert("URL:" + "/Permission/UpdateStatus/" + btnStatus.data("id") + "/" + btnStatus.data("action") + " |  request=" + requestStatus);
+        //$("#modal-content").load("/UserProfile/UpdateStatus/" + $(this).data("id"));
+        //alert("URL : @Url.Action("UpdateStatus","Permission")?id=7&action=Create");
+        //alert("URL : @Url.Action("UpdateStatus","Permission", new {id=7, actionName="Create"})");
+
+        swal({
+                title: (requestStatus == "Active" ? "Activate?" : "Diactivate?"),
+                text: "Are you sure you want to do this?",
+                type: "warning",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                showLoaderOnConfirm: true
+            },
+            function () {
+                setTimeout(function () {
+
+                    $.ajax({
+                        url: "/Permission/UpdateStatus/" + btnStatus.data("id") + "?actionName=" + btnStatus.data("action"),
+                        type: "Post",
+                        success: function (result) {
+                            swal("Permission is now " + (requestStatus));
+                            btnStatus.removeClass(btnStatus.hasClass("label-success") ? 'label-success' : 'label-danger');
+                            btnStatus.text(requestStatus == "Allowed" ? "Allowed" : "Not Allowed");
+                            btnStatus.addClass(btnStatus.text() == "Allowed" ? "label-success" : "label-danger");
+                        }
+                    });
+
+                }, 1000);
+            });
+
+
+        });
+</script>
