@@ -201,6 +201,7 @@
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\PermissionController.cs" />
     <Compile Include="Controllers\ReportsController.cs" />
+    <Compile Include="Controllers\SettingsController.cs" />
     <Compile Include="Controllers\UserProfileController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -407,6 +408,11 @@
     <Content Include="Views\Reports\AuditTrail.cshtml" />
     <Content Include="Views\Permission\Details.cshtml" />
     <Content Include="Views\Permission\Index.cshtml" />
+    <Content Include="Views\Settings\Create.cshtml" />
+    <Content Include="Views\Settings\Index.cshtml" />
+    <Content Include="Views\Settings\ViewMasterData.cshtml" />
+    <Content Include="Views\Settings\ViewMasterDetails.cshtml" />
+    <Content Include="Views\Settings\CreateDetail.cshtml" />
     <None Include="Web.Testing.config">
       <DependentUpon>Web.config</DependentUpon>
       <SubType>Designer</SubType>

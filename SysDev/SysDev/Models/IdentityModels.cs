@@ -20,7 +20,6 @@ namespace SysDev.Models
 
         [Required]
         [MaxLength(50)]
-        [StringLength(5)]
         public override string UserName { get; set; }
 
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)

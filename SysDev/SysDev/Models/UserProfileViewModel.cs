@@ -16,7 +16,7 @@ namespace SysDev.Models
     }
 
     public class AddUserViewModel
-    {
+    { 
         public UserProfile Profile { get; set; }
 
         public ApplicationUser Account { get; set; }

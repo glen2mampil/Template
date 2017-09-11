@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.Validation;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -56,15 +57,19 @@ namespace SysDev.Controllers
 
         public ActionResult UpdateStatus(int id)
         {
+            
             var account = _context.Users.SingleOrDefault(a => a.UserProfileId == id);
-            var user = _context.UserProfiles.SingleOrDefault(u => u.Id == account.UserProfileId);
-            if (account != null && user != null)
+            if (account != null)
             {
-                account.Status = account.Status == "Active" ? "Inactive" : "Active";
-                ReportsController.AddAuditTrail("Update User",
-                    "User named " + user.FirstName + " " + user.LastName + " was set to " + account.Status,
-                    User.Identity.GetUserId());
+                account.Status = (account.Status == "Active" ? "Inactive" : "Active");
                 _context.SaveChanges();
+                //return Json(new { success = false, responseText = "account: " + account.Email + " | Status: " + account.Status }, JsonRequestBehavior.AllowGet);
+                var user = _context.UserProfiles.SingleOrDefault(u => u.Id == id);
+                //ReportsController.AddAuditTrail("Update User",
+                //    "User named " + user.FirstName + " " + user.LastName + " was set to " + account.Status,
+                //    User.Identity.GetUserId());
+                return Json(new { success = false, responseText = "Model: " + user + " | account: " + account }, JsonRequestBehavior.AllowGet);
+
             }
             return RedirectToAction("Index", "UserProfile");
         }
@@ -138,9 +143,9 @@ namespace SysDev.Controllers
                     account.UserName = model.Account.UserName;
                 }
                 _context.SaveChanges();
-                ReportsController.AddAuditTrail("Update User",
-                    model.Profile.FirstName + " " + model.Profile.LastName + "'s information was Updated",
-                    User.Identity.GetUserId());
+                //ReportsController.AddAuditTrail("Update User",
+                //    model.Profile.FirstName + " " + model.Profile.LastName + "'s information was Updated",
+                //    User.Identity.GetUserId());
             }
 
             return RedirectToAction("Index", "UserProfile");
@@ -156,9 +161,9 @@ namespace SysDev.Controllers
             _context.UserProfiles.Remove(profile);
             _context.SaveChanges();
 
-            ReportsController.AddAuditTrail("Update User",
-               "User named " + profile.FirstName + " " + profile.LastName + " was Deleted",
-                User.Identity.GetUserId());
+            //ReportsController.AddAuditTrail("Update User",
+            //   "User named " + profile.FirstName + " " + profile.LastName + " was Deleted",
+            //    User.Identity.GetUserId());
 
             return RedirectToAction("Index", "UserProfile");
         }

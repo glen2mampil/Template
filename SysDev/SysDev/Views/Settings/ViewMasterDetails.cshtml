@@ -1,0 +1,140 @@
+﻿@model SysDev.Models.MasterDetailsViewModel
+
+@{
+    ViewBag.Title = "Create Master Data";
+    Layout = null;
+}
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box flat">
+            <div class="box-header">
+                <h3 class="box-title">Master Details</h3>
+
+                <div class="box-tools">
+                    <div class="box-tools">
+                        <a id="btnCreateDetails" class="pull-right" data-toggle="modal" href="#myModal"><i class="fa fa-plus fa-2x"></i></a>
+                    </div>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body table-responsive no-padding" id="masterDetailsTable">
+                <table class="table table-hover">
+                    <tr>
+                        <td></td>
+                        <td width="100px">Action</td>
+                    </tr>
+
+                    @foreach (var details in Model.MasterDetails)
+                    {
+                        <tr>
+                            <td>
+                                @{
+                                    var detailStatus = details.Status == "Active" ? "label-success" : "label-danger";
+
+                                }
+                                <p class="no-margin"><a class="lead"> @details.Name</a> <a href="#" class="label btnDetailStatus @detailStatus" data-id="@details.Id" data-action="detail">@details.Status</a>
+                                </p>
+                                <p class="no-margin label text-gray"><small>@details.DateTimeCreated.ToString("MMM dd, yyyy")</small>
+                                </p>
+                                <p class="no-margin">@details.Description</p>
+                            </td>
+                            <td>
+                                <p><a href="#myModal" class="label text-blue btnEdit" data-from="detail" data-toggle="modal" data-id="@details.Id"><i class="fa fa-pencil"></i> Edit</a></p>
+                                <p><a href="#" class="label text-red btnDelete" data-id="@details.Id"><i class="fa fa-close"></i> Delete</a></p>
+                            </td>
+
+                        </tr>
+                    }
+
+
+                </table>
+            </div>    
+            <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
+    </div>
+</div>
+
+<script>
+  
+    $('#btnCreateDetails').click(function (e) {
+        $("#modal-content").load("/Settings/CreateDetail/" + @Model.MasterData.Id);
+    });
+
+    $(".btnEdit").click(function (e) {
+        $("#modal-content").load("/Settings/Edit/" + $(this).data("id") + "?from=" + $(this).data("from"));
+    });
+    
+    $(".btnDetailStatus").click(function (e) {
+        var btnStatus = $(this);
+        var requestStatus = (btnStatus.text() === "Active" ? "Inactive" : "Active");
+
+
+        swal({
+            title: "Want to set it " + requestStatus,
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes'
+        }).then(function () {
+            swal('Please wait');
+            swal.showLoading();
+            $.ajax({
+                url: "/Settings/UpdateStatus/" + btnStatus.data("id") + "?actionName=" + btnStatus.data("action"),
+                type: "Post",
+                data: btnStatus.data("id"),
+                success: function (result) {
+                    swal({
+                        title: "Status was successfully change",
+                        timer: 3000,
+                        type: "success"
+                    }).then(function () {
+                        //$("#table-masterdetails").fadeOut(800, function () {
+                        //    $("#table-masterdetails").load("/Settings/ViewMasterData").fadeIn().delay(2000);
+                        //});
+                        btnStatus.removeClass(btnStatus.hasClass("label-success") ? 'label-success' : 'label-danger');
+                        btnStatus.text(requestStatus == "Active" ? "Active" : "Inactive");
+                        btnStatus.addClass(btnStatus.text() == "Active" ? "label-success" : "label-danger");
+                    }).catch(swal.noop);
+
+                }
+            });
+        }).catch(swal.noop);
+    });
+
+    $(".btnDelete").click(function (e) {
+        var btnDelete = $(this);
+        swal({
+            title: "Remove this MasterData?",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes'
+        }).then(function () {
+            swal('Please wait');
+            swal.showLoading();
+            $.ajax({
+                url: "/Settings/Delete/" + btnDelete.data("id"),
+                type: "Post",
+                data: btnDelete.data("id"),
+                success: function (result) {
+                    swal({
+                        title: "Account is now remove",
+                        timer: 3000,
+                        type: "success"
+                    }).then(function() {
+                        $("#masterDataTable").fadeOut(800, function () {
+                            $("#masterDataTable").load("/Settings/ViewMasterData").fadeIn().delay(2000);
+                        });
+                    }).catch(swal.noop);
+
+                }
+            });
+        }).catch(swal.noop);
+
+    });
+</script>
+

@@ -23,7 +23,7 @@
                     {
                         @Html.AntiForgeryToken()
                         @Html.ValidationSummary("", new { @class = "text-danger" })
-                        <div class="form-group has-feedback">
+                        <div class="form-group has-feedback"> 
                             @Html.TextBoxFor(m => m.UserName, new {@class = "form-control", placeholder = "Username"})
                             <span class="glyphicon glyphicon-user form-control-feedback"></span>
                             @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "text-danger" })

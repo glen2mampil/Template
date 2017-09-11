@@ -84,19 +84,18 @@
             $("#modal-content").load("/UserProfile/Details/" + $(this).data("id"));
         });
         $(".btnEdit").click(function(e) {
-            alert("URL: /UserProfile/Details/" + $(this).data("id") + " | ID:" + $(this).data("id"));
             $("#modal-content").load("/UserProfile/Edit/" + $(this).data("id"));
         });
         $(".btnStatus").click(function(e) {
             var btnStatus = $(this);
-            var requestStatus = (btnStatus.text() == "Active" ? "Inactive" : "Active");
+            var requestStatus = (btnStatus.text() === "Active" ? "Inactive" : "Active");
             swal({
                 title: (requestStatus === "Active" ? "Activate?" : "Diactivate?"),
                 type: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
+                confirmButtonText: 'Yes'
             }).then(function () {
                 swal('Please wait');
                 swal.showLoading();
