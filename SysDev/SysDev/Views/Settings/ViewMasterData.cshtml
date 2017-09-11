@@ -31,7 +31,7 @@
                 </td>
                 <td>
                     <p><a href="#myModal" class="label text-blue btnEdit" data-from="data" data-toggle="modal" data-id="@data.Id"><i class="fa fa-pencil"></i> Edit</a></p>
-                    <p><a href="#" class="label text-red btnDelete" data-id="@data.Id"><i class="fa fa-close"></i> Delete</a></p>
+                    <p><a href="#" class="label text-red btnDelete" data-from="data" data-id="@data.Id"><i class="fa fa-close"></i> Delete</a></p>
                 </td>
             </tr>
         }
@@ -104,7 +104,7 @@
             swal('Please wait');
             swal.showLoading();
             $.ajax({
-                url: "/Settings/Delete/" + btnDelete.data("id"),
+                url: "/Settings/Delete/" + btnDelete.data("id") + "?from=" + btnDelete.data("from"),
                 type: "Post",
                 data: btnDelete.data("id"),
                 success: function (result) {

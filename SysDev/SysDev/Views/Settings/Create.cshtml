@@ -31,7 +31,7 @@
                     @Html.TextBoxFor(m => m.Description, new { @class = "form-control input-sm" })
                 </div>
             </div>
-            
+            @Html.HiddenFor(m => m.Id)
         </div>
     </div>
     <div class="modal-footer">
@@ -54,7 +54,7 @@
              success: function (result) {
                  //$('#result').html(result);
                  swal({
-                     title: "Account is now remove",
+                     title: "Master Data " + $("#Name").text() + " has been added",
                      timer: 3000,
                      type: "success"
                  }).then(function () {
@@ -65,7 +65,7 @@
                  }).catch(swal.noop);
              },
              error : function(result) {
-                 swal("Data Save!", result, "error");
+                 swal("Opps! something went wrong try again. ", result, "error");
                  var data = JSON.parse(result);
                  console.log("Error : " + data);
              }

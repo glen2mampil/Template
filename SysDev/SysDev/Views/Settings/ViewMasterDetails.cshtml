@@ -41,7 +41,7 @@
                             </td>
                             <td>
                                 <p><a href="#myModal" class="label text-blue btnEdit" data-from="detail" data-toggle="modal" data-id="@details.Id"><i class="fa fa-pencil"></i> Edit</a></p>
-                                <p><a href="#" class="label text-red btnDelete" data-id="@details.Id"><i class="fa fa-close"></i> Delete</a></p>
+                                <p><a href="#" class="label text-red btnDetailDelete" data-masterdata="@details.MasterDataId" data-from="detail" data-id="@details.Id"><i class="fa fa-close"></i> Delete</a></p>
                             </td>
 
                         </tr>
@@ -104,7 +104,7 @@
         }).catch(swal.noop);
     });
 
-    $(".btnDelete").click(function (e) {
+    $(".btnDetailDelete").click(function (e) {
         var btnDelete = $(this);
         swal({
             title: "Remove this MasterData?",
@@ -117,7 +117,7 @@
             swal('Please wait');
             swal.showLoading();
             $.ajax({
-                url: "/Settings/Delete/" + btnDelete.data("id"),
+                url: "/Settings/Delete/" + btnDelete.data("id") + "?from=" + btnDelete.data("from"),
                 type: "Post",
                 data: btnDelete.data("id"),
                 success: function (result) {
@@ -126,8 +126,8 @@
                         timer: 3000,
                         type: "success"
                     }).then(function() {
-                        $("#masterDataTable").fadeOut(800, function () {
-                            $("#masterDataTable").load("/Settings/ViewMasterData").fadeIn().delay(2000);
+                        $("#table-masterdetails").fadeOut(800, function () {
+                            $("#table-masterdetails").load("/Settings/ViewMasterDetails/" + btnDelete.data("masterdata")).fadeIn().delay(2000);
                         });
                     }).catch(swal.noop);
 

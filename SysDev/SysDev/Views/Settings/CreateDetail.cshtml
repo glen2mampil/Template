@@ -36,7 +36,6 @@
         </div>
     </div>
     <div class="modal-footer">
-        @Model.MasterData.Id
         @Html.HiddenFor(m => m.MasterData.Id)
         @Html.HiddenFor(m => m.MasterDetail.Id)
         <p id="dialog-alert"></p>
@@ -54,7 +53,7 @@
              type: "Post",
              data: $(this).serialize(),
              success: function (result) {
-                 swal({
+                 swal({ 
                      title: "New master Details is now added",
                      timer: 3000,
                      type: "success"
