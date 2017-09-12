@@ -30,9 +30,9 @@
                         <td width="30px"></td>
                         <td>ID</td>
                         <td>User</td>
-                        <td>Date</td>
+                        <td>Date Created</td>
                         <td>Status</td>
-                        <td>Action</td>
+                        <td width="300px" class="text-center">Action</td>
                     </tr>
 
                     @foreach (var account in Model.Accounts)
@@ -43,7 +43,13 @@
                             <td>
                                 <a href="#myModal" id="btnDetails" class="lead text-black btnDetails" data-toggle="modal" data-id="@account.UserProfile.Id">@account.UserProfile.FirstName @account.UserProfile.LastName</a>
                             </td>
-                            <td>11-7-2014</td>
+                            <td>
+                                @{
+                                    var datetime = DateTime.Parse(account.UserProfile.DateCreated);
+                                }
+                                @datetime.ToShortDateString()
+                            </td>
+
                             <td>
                                 @{
                                     var status = account.Status == "Active" ? "label-success" : "label-danger";
@@ -51,8 +57,9 @@
                                 <a href="#" id="btnStatus" class="label btnStatus @status" data-id="@account.UserProfile.Id">@account.Status</a>
                             </td>
                             <td>
-                                <a href="#myModal" class="text-black btnEdit" data-toggle="modal" data-id="@account.UserProfile.Id"><i class="fa fa-pencil"></i> Edit</a>
-                                <a id="btnDelete" class="label text-gray flat btnDelete" data-id="@account.UserProfile.Id"><i class="fa fa-close"></i></a>
+                                <a href="#myModal" class="label text-black btnEdit" data-toggle="modal" data-id="@account.UserProfile.Id"><i class="fa fa-pencil"></i> Edit</a>
+                                | <a href="#" class="label text-black btnResetPwd" data-toggle="modal" data-id="@account.UserProfile.Id"> Reset Password</a>
+                                |<a id="btnDelete" class="label text-black btnDelete" data-id="@account.UserProfile.Id"><i class="fa fa-close"></i> Delete</a>
                             </td>
                         </tr>
                      }
@@ -90,7 +97,7 @@
             var btnStatus = $(this);
             var requestStatus = (btnStatus.text() === "Active" ? "Inactive" : "Active");
             swal({
-                title: (requestStatus === "Active" ? "Activate?" : "Diactivate?"),
+                title: (requestStatus === "Active" ? "Activate?" : "Deactivate?"),
                 type: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
@@ -116,7 +123,36 @@
                 });
             }).catch(swal.noop);
         });
-
+        $(".btnResetPwd").click(function (e) {
+            var btnStatus = $(this);
+            var requestStatus = (btnStatus.text() === "Active" ? "Inactive" : "Active");
+            swal({
+                title: "Continue on resseting password?",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes'
+            }).then(function () {
+                swal('Please wait');
+                swal.showLoading();
+                $.ajax({
+                    url: "/UserProfile/ResetPassword/" + btnStatus.data("id"),
+                    type: "Post",
+                    data: btnStatus.data("id"),
+                    success: function (result) {
+                        swal({
+                            title: "Password was reseted",
+                            timer: 3000,
+                            type: "success"
+                        });
+                        btnStatus.removeClass(btnStatus.hasClass("label-success") ? 'label-success' : 'label-danger');
+                        btnStatus.text(requestStatus === "Active" ? "Active" : "Inactive");
+                        btnStatus.addClass(btnStatus.text() === "Active" ? "label-success" : "label-danger");
+                    }
+                });
+            }).catch(swal.noop);
+        });
 
 
         $(".btnDelete").click(function(e) {

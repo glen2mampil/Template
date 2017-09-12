@@ -172,6 +172,14 @@ namespace SysDev.Controllers
 
         public ActionResult SaveMasterData(MasterData model)
         {
+            var duplicate = _context.MasterDatas.FirstOrDefault(m => m.Name.Equals(model.Name, StringComparison.OrdinalIgnoreCase));
+           
+            if (duplicate != null)
+            {
+                return Json(new { success = false, responseText = "Master Data named " + model.Name + " is already exist" }, JsonRequestBehavior.AllowGet);
+            }
+                
+
             if (model.Id == 0)
             {
                 model.DateTimeCreated = DateTime.Now;
@@ -205,6 +213,13 @@ namespace SysDev.Controllers
 
         public ActionResult SaveMasterDetail(NewMasterDetailsViewModel model)
         {
+            var duplicate = _context.MasterDetails.FirstOrDefault(m => m.Name.Equals(model.MasterDetail.Name, StringComparison.OrdinalIgnoreCase));
+
+            if (duplicate != null)
+            {
+                return Json(new { success = false, responseText = "Master Data named " + model.MasterDetail.Name + " is already exist" }, JsonRequestBehavior.AllowGet);
+            }
+
             if (model.MasterDetail.Id == 0)
             {
                 var masterData = _context.MasterDatas.SingleOrDefault(m => m.Id == model.MasterData.Id);

@@ -45,7 +45,7 @@ namespace SysDev.Controllers
 
         public static bool AddAuditTrail(string action, string descriptions, string id)
         {
-            /*
+            
             var context = new ApplicationDbContext();
             var account = context.Users.SingleOrDefault(a => a.Id == id);
             var profile = context.UserProfiles.SingleOrDefault(p => p.Id == account.UserProfileId);
@@ -62,7 +62,7 @@ namespace SysDev.Controllers
                 UserProfile = profile
             });
             context.SaveChanges();
-            */
+            
             return true;
         }
     }

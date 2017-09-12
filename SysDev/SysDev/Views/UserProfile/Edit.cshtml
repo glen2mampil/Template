@@ -8,7 +8,7 @@
     @Html.AntiForgeryToken()
     <div class="modal-header">
         <h4 id="exampleModalLongTitle">
-            Create User
+            Edit User
             <a class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </a>
@@ -33,27 +33,45 @@
                         @Html.TextBoxFor(m => m.Profile.LastName, new { @class = "form-control input-sm" })
                         @Html.ValidationMessageFor(m => m.Profile.LastName, "", new { @class = "has-error label text-red control-label" })
                     </div>
-                    <div class="col-md-6 form-group">
+                    <div class="col-md-12 form-group">
                         @Html.LabelFor(m => m.Profile.Gender, new { @class = "label text-black control-label" })
-                        @Html.TextBoxFor(m => m.Profile.Gender, new { @class = "form-control input-sm" })
+                        <select class="form-control" id="Profile_Gender" name="Profile.Gender">
+                            <option value="@Model.Profile.Gender">@Model.Profile.Gender</option>
+                            @if (Model.Profile.Gender == "Male")
+                            {
+                                <option value="Female">Female</option>
+                            }
+                            else
+                            {
+                                <option value="Male">Male</option>
+                            }
+                        </select>
+
+                        @*Html.TextBoxFor(m => m.Profile.Gender, new {@class = "form-control input-sm"})*@
                         @Html.ValidationMessageFor(m => m.Profile.Gender, "", new { @class = "has-error label text-red control-label" })
                     </div>
-                    <div class="col-md-6 form-group">
+                    <div class="col-md-12 form-group">
                         @Html.LabelFor(m => m.Profile.MaritalStatus, new { @class = "label text-black control-label" })
-                        @Html.TextBoxFor(m => m.Profile.MaritalStatus, new { @class = "form-control input-sm" })
+                        <select class="form-control" id="Profile_Gender" name="Profile.Gender">
+                            <option value="@Model.Profile.MaritalStatus">@Model.Profile.MaritalStatus</option>
+                            @if (Model.Profile.Gender == "Single")
+                            {
+                                <option value="Married">Married</option>
+                            }
+                            else
+                            {
+                                <option value="Single">Single</option>
+                            }
+                        </select>
                         @Html.ValidationMessageFor(m => m.Profile.MaritalStatus, "", new { @class = "has-error label text-red control-label" })
+                        @*Html.TextBoxFor(m => m.Profile.MaritalStatus, new {@class = "form-control input-sm"})*@
+
                     </div>
                     <div class="col-md-12 form-group">
                         @Html.LabelFor(m => m.Profile.Address, new { @class = "label text-black control-label" })
                         @Html.TextBoxFor(m => m.Profile.Address, new { @class = "form-control input-sm" })
                         @Html.ValidationMessageFor(m => m.Profile.Address, "", new { @class = "has-error label text-red control-label" })
                     </div>
-                    <div class="col-md-12 form-group">
-                        @Html.LabelFor(m => m.Account.Email, new { @class = "label text-black control-label" })
-                        @Html.TextBoxFor(m => m.Account.Email, new { @class = "form-control input-sm" })
-                        @Html.ValidationMessageFor(m => m.Account.Email, "", new { @class = "has-error label text-red control-label" })
-                    </div>
-
                 </div>
                 <div class="col-md-6">
                     <div class="col-md-12 form-group">
@@ -73,8 +91,8 @@
                     </div>
                     <div class="col-md-12 form-group">
                         @Html.LabelFor(m => m.Account.Email, new { @class = "label text-black control-label" })
-                        @Html.TextBoxFor(m => m.Account.Email, new { @class = "form-control input-sm" })
-                        @Html.ValidationMessageFor(m => m.Account.Email, "", new { @class = "has-error label text-red control-label" })
+                        @Html.TextBoxFor(m => m.Account.Email, new { type = "email", placeholder = "example@domain.com", @class = "form-control input-sm" })
+                        @Html.ValidationMessageFor(m => m.Account.Email, "", new {  @class = "has-error label text-red control-label" })
                     </div>
                     <div class="col-md-12 form-group">
                         @Html.LabelFor(m => m.Account.UserName, new { @class = "label text-black control-label" })

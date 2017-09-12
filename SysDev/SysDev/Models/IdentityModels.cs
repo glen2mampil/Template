@@ -15,7 +15,8 @@ namespace SysDev.Models
         public UserProfile UserProfile { get; set; }
 
         [Required]
-        [EmailAddress]
+        [EmailAddress(ErrorMessage = "Invalid Email Address")]
+        [RegularExpression("^[a-zA-Z0-9_\\.-]+@([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$", ErrorMessage = "E-mail is not valid")]
         public override string Email { get; set; }
 
         [Required]
@@ -67,16 +68,14 @@ namespace SysDev.Models
 
         [Required]
         [StringLength(50)]
-        [Display(Name = "Comapny Id")]
+        [Display(Name = "Company Id")]
         public string CompanyId { get; set; }
 
         [Required]
-        [StringLength(50)]
         [Display(Name = "Gender")]
         public string Gender { get; set; }
 
         [Required]
-        [StringLength(50)]
         [Display(Name = "Marital Status")]
         public string MaritalStatus { get; set; }
 

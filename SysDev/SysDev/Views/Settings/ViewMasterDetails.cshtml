@@ -33,15 +33,15 @@
                                     var detailStatus = details.Status == "Active" ? "label-success" : "label-danger";
 
                                 }
-                                <p class="no-margin"><a class="lead"> @details.Name</a> <a href="#" class="label btnDetailStatus @detailStatus" data-id="@details.Id" data-action="detail">@details.Status</a>
+                                <p class="no-margin"><a class="lead"> @details.Name</a> <a href="#" data-name="@details.Name" class="label btnDetailStatus @detailStatus" data-id="@details.Id" data-action="detail">@details.Status</a>
                                 </p>
                                 <p class="no-margin label text-gray"><small>@details.DateTimeCreated.ToString("MMM dd, yyyy")</small>
                                 </p>
                                 <p class="no-margin">@details.Description</p>
                             </td>
                             <td>
-                                <p><a href="#myModal" class="label text-blue btnEdit" data-from="detail" data-toggle="modal" data-id="@details.Id"><i class="fa fa-pencil"></i> Edit</a></p>
-                                <p><a href="#" class="label text-red btnDetailDelete" data-masterdata="@details.MasterDataId" data-from="detail" data-id="@details.Id"><i class="fa fa-close"></i> Delete</a></p>
+                                <p><a href="#myModal" class="label text-blue btnEdit" data-name="@details.Name" data-from="detail" data-toggle="modal" data-id="@details.Id"><i class="fa fa-pencil"></i> Edit</a></p>
+                                <p><a href="#" class="label text-red btnDetailDelete" data-name="@details.Name" data-masterdata="@details.MasterDataId" data-from="detail" data-id="@details.Id"><i class="fa fa-close"></i> Delete</a></p>
                             </td>
 
                         </tr>
@@ -72,7 +72,7 @@
 
 
         swal({
-            title: "Want to set it " + requestStatus,
+            title: "<small>Want to set</small> " + btnStatus.data("name") + " <small>into</small> " + requestStatus + "<small>?</small>",
             type: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -87,18 +87,24 @@
                 data: btnStatus.data("id"),
                 success: function (result) {
                     swal({
-                        title: "Status was successfully change",
+                        title: "<small>Status for</small> " + btnStatus.data("name")+ " <small>was successfully change.</small>",
                         timer: 3000,
                         type: "success"
-                    }).then(function () {
-                        //$("#table-masterdetails").fadeOut(800, function () {
-                        //    $("#table-masterdetails").load("/Settings/ViewMasterData").fadeIn().delay(2000);
-                        //});
-                        btnStatus.removeClass(btnStatus.hasClass("label-success") ? 'label-success' : 'label-danger');
-                        btnStatus.text(requestStatus == "Active" ? "Active" : "Inactive");
-                        btnStatus.addClass(btnStatus.text() == "Active" ? "label-success" : "label-danger");
                     }).catch(swal.noop);
+                    btnStatus.removeClass(btnStatus.hasClass("label-success") ? 'label-success' : 'label-danger');
+                    btnStatus.text(requestStatus === "Active" ? "Active" : "Inactive");
+                    btnStatus.addClass(btnStatus.text() === "Active" ? "label-success" : "label-danger");
 
+                },
+                error: function (jqXhr, textStatus, errorThrown) {
+                    swal({
+                        title: "Opps! <small>something went wrong tyr again later</small>.",
+                        text: "<small class='label label-error'> Status Code: " + jqXhr.status + "</small>" +
+                            "<small class='label label-error'> Error: " + jqXhr.responseText + "</small>" +
+                            "<small class='label label-error'>Status: " + textStatus + "</small>" +
+                            "<small class='label label-error'>Throws: " + errorThrown + "</small>",
+                        type: "error"
+                    }).catch(swal.noop);
                 }
             });
         }).catch(swal.noop);
@@ -107,7 +113,7 @@
     $(".btnDetailDelete").click(function (e) {
         var btnDelete = $(this);
         swal({
-            title: "Remove this MasterData?",
+            title: "<small>Remove MasterData</small> "+ btnDelete.data("name")+ "<small>?</small>",
             type: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -122,15 +128,23 @@
                 data: btnDelete.data("id"),
                 success: function (result) {
                     swal({
-                        title: "Account is now remove",
+                        title: "<small>MasterData</small> "+ btnDelete.data("name")+" <small>has been removed.</small>",
                         timer: 3000,
                         type: "success"
-                    }).then(function() {
-                        $("#table-masterdetails").fadeOut(800, function () {
-                            $("#table-masterdetails").load("/Settings/ViewMasterDetails/" + btnDelete.data("masterdata")).fadeIn().delay(2000);
-                        });
                     }).catch(swal.noop);
-
+                    $("#table-masterdetails").fadeOut(800, function () {
+                        $("#table-masterdetails").load("/Settings/ViewMasterDetails/" + btnDelete.data("masterdata")).fadeIn().delay(2000);
+                    });
+                },
+                error: function (jqXhr, textStatus, errorThrown) {
+                    swal({
+                        title: "Opps! <small>something went wrong tyr again later</small>.",
+                        text: "<small class='label label-error'> Status Code: " + jqXhr.status + "</small>" +
+                            "<small class='label label-error'> Error: " + jqXhr.responseText + "</small>" +
+                            "<small class='label label-error'>Status: " + textStatus + "</small>" +
+                            "<small class='label label-error'>Throws: " + errorThrown + "</small>",
+                        type: "error"
+                    }).catch(swal.noop);
                 }
             });
         }).catch(swal.noop);

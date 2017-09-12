@@ -26,6 +26,19 @@ namespace SysDev.Controllers
             _context.Dispose();
         }
 
+        public static ApplicationUser LoginUser()
+        {
+            var context = new ApplicationDbContext();
+            var controller = new UserProfileController();
+            var account = context.Users.First(a => a.Id == controller.LoginId());
+            return account;
+        }
+
+        public string LoginId()
+        {
+            return User.Identity.GetUserId();
+        }
+
         // GET: UserProfile
         public ActionResult Index()
         {
@@ -55,6 +68,19 @@ namespace SysDev.Controllers
             return View();
         }
 
+        public ActionResult ResetPassword(int id)
+        {
+            var account = _context.Users.SingleOrDefault(m=> m.UserProfileId == id);
+
+            var password = "password1";
+            var passwordHasher = new Microsoft.AspNet.Identity.PasswordHasher();
+
+            account.PasswordHash = passwordHasher.HashPassword(password);
+            _context.SaveChanges();
+
+            return RedirectToAction("Index", "UserProfile");
+        }
+
         public ActionResult UpdateStatus(int id)
         {
             
@@ -65,9 +91,9 @@ namespace SysDev.Controllers
                 _context.SaveChanges();
                 //return Json(new { success = false, responseText = "account: " + account.Email + " | Status: " + account.Status }, JsonRequestBehavior.AllowGet);
                 var user = _context.UserProfiles.SingleOrDefault(u => u.Id == id);
-                //ReportsController.AddAuditTrail("Update User",
-                //    "User named " + user.FirstName + " " + user.LastName + " was set to " + account.Status,
-                //    User.Identity.GetUserId());
+                ReportsController.AddAuditTrail("Update User",
+                    "User named " + user.FirstName + " " + user.LastName + " was set to " + account.Status,
+                    User.Identity.GetUserId());
                 return Json(new { success = false, responseText = "Model: " + user + " | account: " + account }, JsonRequestBehavior.AllowGet);
 
             }
