@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity.Validation;
 using System.Linq;
 using System.Web.Mvc;
+using System.Web.Security;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using SysDev.Models;
@@ -44,7 +45,11 @@ namespace SysDev.Controllers
                 Account = LoginUser(),
                 AccountRole = ""
             };
-            return View(useraccount);
+            if (User.IsInRole("SuperAdmin"))
+            {
+                return View(useraccount);
+            }
+            return View("NotAllowed", useraccount);
         }
 
         public ActionResult List()
@@ -142,7 +147,15 @@ namespace SysDev.Controllers
                 _context.UserProfiles.Add(model.Profile);
                 _context.SaveChanges();
 
+                //Temp code
+                //var roleStore = new RoleStore<IdentityRole>(_context);
+                //var roleManager = new RoleManager<IdentityRole>(roleStore);
+                //roleManager.Create(new IdentityRole("CanManageUsers"));
+                
+
+
                 var userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(_context));
+               
                 var user = new ApplicationUser
                 {
                     UserName = model.Account.UserName,

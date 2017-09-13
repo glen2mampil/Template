@@ -251,6 +251,7 @@
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\ReportModels.cs" />
     <Compile Include="Models\ReportViewModel.cs" />
+    <Compile Include="Models\RoleName.cs" />
     <Compile Include="Models\SettingsViewModel.cs" />
     <Compile Include="Models\UserProfileViewModel.cs" />
     <Compile Include="Models\ViewModelBase.cs" />
@@ -613,6 +614,7 @@
     <Content Include="Views\Settings\ViewMasterDetails.cshtml" />
     <Content Include="Views\Settings\CreateDetail.cshtml" />
     <Content Include="Views\UserProfile\List.cshtml" />
+    <Content Include="Views\UserProfile\NotAllowed.cshtml" />
     <None Include="Web.Testing.config">
       <DependentUpon>Web.config</DependentUpon>
       <SubType>Designer</SubType>
