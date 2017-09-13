@@ -9,7 +9,7 @@ using SysDev.Models;
  
 namespace SysDev.Controllers
 {
-    [Authorize]
+    
     public class UserProfileController : Controller
     {
         private ApplicationDbContext _context;

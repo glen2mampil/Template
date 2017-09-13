@@ -12,7 +12,7 @@ using SysDev.Models;
 
 namespace SysDev.Controllers
 {
-    [Authorize]
+    
     public class AccountController : Controller
     {
         private ApplicationSignInManager _signInManager;

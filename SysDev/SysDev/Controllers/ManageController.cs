@@ -10,7 +10,7 @@ using SysDev.Models;
 
 namespace SysDev.Controllers
 {
-    [Authorize]
+    
     public class ManageController : Controller
     {
         private ApplicationSignInManager _signInManager;

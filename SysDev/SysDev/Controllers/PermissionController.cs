@@ -8,7 +8,7 @@ using SysDev.Models;
 
 namespace SysDev.Controllers
 {
-    [Authorize]
+   
     public class PermissionController : Controller
     {
         private ApplicationDbContext _context;

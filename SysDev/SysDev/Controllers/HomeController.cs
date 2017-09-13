@@ -8,7 +8,6 @@ using SysDev.Models;
 
 namespace SysDev.Controllers
 {
-    [Authorize]
     public class HomeController : Controller
     {
         private ApplicationDbContext _context;
