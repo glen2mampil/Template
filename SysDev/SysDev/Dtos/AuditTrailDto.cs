@@ -15,7 +15,7 @@ namespace SysDev.Dtos
         public string Action { get; set; }
 
         public int UserProfileId { get; set; }
-        public UserProfile UserProfile { get; set; }
+        public UserProfileDto UserProfile { get; set; }
 
         public string Description { get; set; }
         public DateTime DateCreated { get; set; }

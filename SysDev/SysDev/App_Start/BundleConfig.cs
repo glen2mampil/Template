@@ -26,10 +26,6 @@ namespace SysDev
                       "~/Scripts/dataTables/datatables.bootstrap.js"
                       ));
 
-            bundles.Add(new StyleBundle("~/Content/css").Include(
-                      "~/Content/bootstrap.css",
-                      "~/Content/dataTables/css/datatables.bootstrap.css",
-                      "~/Content/site.css"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                 "~/Content/bootstrap.css",
@@ -38,6 +34,7 @@ namespace SysDev
                 "~/Content/font-awesome.min.css",
                 "~/Content/sweetalert2/dist/sweetalert2.min.css",
                 "~/Content/plugins/iCheck/square/blue.css",
+                "~/Content/dataTables/css/datatables.bootstrap.css",
                 "~/Content/Site.css"));
 
             bundles.Add(new ScriptBundle("~/admin-lte/js").Include(

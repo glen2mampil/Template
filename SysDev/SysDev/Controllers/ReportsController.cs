@@ -8,6 +8,7 @@ using SysDev.Models;
 
 namespace SysDev.Controllers
 {
+    [Authorize]
     public class ReportsController : Controller
     {
         private ApplicationDbContext _context;
