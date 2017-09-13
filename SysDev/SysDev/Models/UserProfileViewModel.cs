@@ -8,31 +8,28 @@ using Microsoft.AspNet.Identity.EntityFramework;
 namespace SysDev.Models
 {
     [Authorize]
-    public class UserProfileViewModel
+    public class UserProfileViewModel : ViewModelBase
     {
         public List<UserProfile> UserProfiles { get; set; }
 
         public List<ApplicationUser> Accounts { get; set; }
     }
 
-    public class AddUserViewModel
-    { 
+    public class AddUserViewModel : ViewModelBase
+     { 
         public UserProfile Profile { get; set; }
-
-        public ApplicationUser Account { get; set; }
-
         public string Password { get; set; }
-
     }
 
-    public class UserPermissionViewModel
+
+    public class UserPermissionViewModel : ViewModelBase
     {
         public List<Permission> Permissions { get; set; }
         public List<IdentityRole> Roles { get; set; }
         public List<MasterDetail> MasterDetails { get; set; }
     }
 
-    public class DetailedPermissionViewModel
+    public class DetailedPermissionViewModel : ViewModelBase
     {
         public IEnumerable<Permission> Permissions { get; set; }
         public IdentityRole Role { get; set; }

@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Data.Entity.Validation;
 using System.Linq;
-using System.Net;
-using System.Web;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
@@ -26,17 +24,12 @@ namespace SysDev.Controllers
             _context.Dispose();
         }
 
-        public static ApplicationUser LoginUser()
+        protected ApplicationUser LoginUser()
         {
-            var context = new ApplicationDbContext();
-            var controller = new UserProfileController();
-            var account = context.Users.First(a => a.Id == controller.LoginId());
+            string id = User.Identity.GetUserId();
+            var account = _context.Users.FirstOrDefault(p => p.Id == id);
+            var users = _context.UserProfiles.ToList();
             return account;
-        }
-
-        public string LoginId()
-        {
-            return User.Identity.GetUserId();
         }
 
         // GET: UserProfile
@@ -44,11 +37,26 @@ namespace SysDev.Controllers
         {
             var users = _context.UserProfiles.ToList();
             var accounts = _context.Users.ToList();
-
             var useraccount = new UserProfileViewModel
             {
                 UserProfiles = users,
-                Accounts = accounts
+                Accounts = accounts,
+                Account = LoginUser(),
+                AccountRole = ""
+            };
+            return View(useraccount);
+        }
+
+        public ActionResult List()
+        {
+            var users = _context.UserProfiles.ToList();
+            var accounts = _context.Users.ToList();
+            var useraccount = new UserProfileViewModel
+            {
+                UserProfiles = users,
+                Accounts = accounts,
+                Account = LoginUser(),
+                AccountRole = ""
             };
             return View(useraccount);
         }
@@ -56,11 +64,17 @@ namespace SysDev.Controllers
         public ActionResult Details(int id)
         {
             var profile = _context.UserProfiles.SingleOrDefault(p => p.Id == id);
+            var account = _context.Users.FirstOrDefault(a => a.UserProfileId == profile.Id);
 
             if (profile == null)
                 return HttpNotFound();
 
-            return View(profile);
+            var viewModel = new UserProfileViewModel
+            {
+                Account = account,
+            };
+
+            return View(viewModel);
         }
 
         public ActionResult Create()
@@ -158,7 +172,12 @@ namespace SysDev.Controllers
                     profile.FirstName = model.Profile.FirstName;
                     profile.LastName = model.Profile.LastName;
                     profile.MiddleName = model.Profile.MiddleName;
-
+                    profile.Gender = model.Profile.Gender;
+                    profile.ContactNo = model.Profile.ContactNo;
+                    profile.Address = model.Profile.Address;
+                    profile.CompanyId = model.Profile.CompanyId;
+                    profile.CompanyName = model.Profile.CompanyName;
+                    profile.MaritalStatus = model.Profile.MaritalStatus;
                 }
 
 
@@ -169,9 +188,9 @@ namespace SysDev.Controllers
                     account.UserName = model.Account.UserName;
                 }
                 _context.SaveChanges();
-                //ReportsController.AddAuditTrail("Update User",
-                //    model.Profile.FirstName + " " + model.Profile.LastName + "'s information was Updated",
-                //    User.Identity.GetUserId());
+                ReportsController.AddAuditTrail("Update User",
+                    model.Profile.FirstName + " " + model.Profile.LastName + "'s information was Updated",
+                    User.Identity.GetUserId());
             }
 
             return RedirectToAction("Index", "UserProfile");
@@ -187,9 +206,9 @@ namespace SysDev.Controllers
             _context.UserProfiles.Remove(profile);
             _context.SaveChanges();
 
-            //ReportsController.AddAuditTrail("Update User",
-            //   "User named " + profile.FirstName + " " + profile.LastName + " was Deleted",
-            //    User.Identity.GetUserId());
+            ReportsController.AddAuditTrail("Update User",
+               "User named " + profile.FirstName + " " + profile.LastName + " was Deleted",
+                User.Identity.GetUserId());
 
             return RedirectToAction("Index", "UserProfile");
         }

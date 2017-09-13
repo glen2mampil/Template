@@ -127,18 +127,32 @@
                 type: $this.attr('method'),
                 data: frmValues,
                 success: function (response) {
-                    swal({
-                        title: "User information was updated",
-                        timer: 3000,
-                        type: "success"
-                    }).catch(swal.noop);
-                    
+                    if (!response.success) {
+                        $("#myModal").modal("toggle");
+                        swal({
+                            title: $("#Profile_FirstName").val() + " " + $("#Profile_FirstName").val()  + " <small>'s information was updated.</small>",
+                            timer: 3000,
+                            type: "success"
+                        }).catch(swal.noop);
+                        $("#users-table").fadeOut(800, function () {
+                            $("#users-table").load("/UserProfile/List").fadeIn().delay(2000);
+                        });
+                    } else {
+                        swal({
+                            title: "Opps!",
+                            html: "<small>" + response.responseText + "</small>",
+                            type: "error"
+                        }).catch(swal.noop);
+                    }
                 },
-                error: function () {
+                error: function (jqXhr, textStatus, errorThrown) {
                     swal({
-                        title: "Error Occored",
-                        timer: 3000,
-                        type: "error"
+                        title: "Opps! <small>something went wrong tyr again later</small>.",
+                        text: "<small class='label label-error'> Status Code: " + jqXhr.status + "</small>" +
+                            "<small class='label label-error'> Error: " + jqXhr.responseText + "</small>" +
+                            "<small class='label label-error'>Status: " + textStatus + "</small>" +
+                            "<small class='label label-error'>Throws: " + errorThrown + "</small>",
+                        type: "error"
                     }).catch(swal.noop);
                 }
             });

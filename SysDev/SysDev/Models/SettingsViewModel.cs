@@ -5,7 +5,7 @@ using System.Web;
 
 namespace SysDev.Models
 {
-    public class SettingsViewModel
+    public class SettingsViewModel : ViewModelBase
     {
         public List<MasterData> MasterDatas { get; set; }
         public List<MasterDetail> MasterDetails { get; set; }
@@ -16,13 +16,13 @@ namespace SysDev.Models
         public List<MasterDetail> MasterDetails { get; set; }
     }
 
-    public class MasterDetailsViewModel
+    public class MasterDetailsViewModel : ViewModelBase
     {
         public MasterData MasterData { get; set; }
         public List<MasterDetail> MasterDetails { get; set; }
     }
 
-    public class NewMasterDetailsViewModel
+    public class NewMasterDetailsViewModel : ViewModelBase
     {
         public MasterData MasterData { get; set; }
         public MasterDetail MasterDetail { get; set; }

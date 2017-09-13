@@ -119,13 +119,34 @@
                 type: $this.attr('method'),
                 data: frmValues,
                 success: function (response) {
-                    if (response != null && response.success) {
-                        alert("succes: " + response.responseText);
+                    if (!response.success) {
+                        $("#myModal").modal("toggle");
+                        swal({
+                            title: $("#Profile_FirstName").val() + " " + $("#Profile_LastName").val() + " <small>was added.</small>",
+                            timer: 3000,
+                            type: "success"
+                        }).catch(swal.noop);
+                        $("#users-table").fadeOut(800, function () {
+                            $("#users-table").load("/UserProfile/List").fadeIn().delay(2000);
+                        });
                     } else {
-                        // DoSomethingElse()
-                        alert("else: " +response);
+                        swal({
+                            title: "Opps!",
+                            html: "<small>" + response.responseText + "</small>",
+                            type: "error"
+                        }).catch(swal.noop);
                     }
-                },                error: function (e) {                    swal({                        title: "Opps! something went wrong, try again later",                        timer: 3000,                        type: "error"                    }).catch(swal.noop);                }            });        }            });    
+                },
+                error: function (jqXhr, textStatus, errorThrown) {
+                    swal({
+                        title: "Opps! <small>something went wrong tyr again later</small>.",
+                        text: "<small class='label label-error'> Status Code: " + jqXhr.status + "</small>" +
+                            "<small class='label label-error'> Error: " + jqXhr.responseText + "</small>" +
+                            "<small class='label label-error'>Status: " + textStatus + "</small>" +
+                            "<small class='label label-error'>Throws: " + errorThrown + "</small>",
+                        type: "error"
+                    }).catch(swal.noop);
+                }            });        }            });    
 </script>    
 
 

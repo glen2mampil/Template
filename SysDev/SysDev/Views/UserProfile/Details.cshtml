@@ -1,4 +1,4 @@
-﻿@model SysDev.Models.UserProfile
+﻿@model SysDev.Models.UserProfileViewModel
 @{
     ViewBag.Title = "Details";
     Layout = null;
@@ -14,21 +14,33 @@
     </h4>
     <div class="row">
         <div class="col-md-4">
-            <img src="~/admin-lte/img/flat-face-male-o.png" class="user-image" alt="User Image" style="width: 150px;">
+            @if (Model.Account.UserProfile.Gender == "Male")
+            {
+                <img src="~/admin-lte/img/flat-face-male-o.png" class="user-image" alt="User Image" style="width: 150px;">
+            }
+            else
+            {
+                <img src="~/admin-lte/img/flat-face-female.png" class="user-image" alt="User Image" style="width: 150px;">
+            }
+
         </div>
-        <div class="col-md-6 v-devider">
+        <div class="col-md-8 v-devider">
             <p></p>
             <p></p>
-            <p class="lead user-details">@Model.FirstName <small class="text-muted">Mendez</small> @Model.LastName</p>
-            <p class="user-details m-b-10" id="position"><small>Developer</small></p>
+            <p class="lead user-details">
+                @Model.Account.UserProfile.FirstName
+                <small class="text-muted">@Model.Account.UserProfile.MiddleName</small>
+                @Model.Account.UserProfile.LastName
+            </p>
+            <p class="user-details m-b-10" id="position"><small></small></p>
             <p></p>
-            <p class="user-details"><span class="text-muted">Contact No:</span> 09770975881</p>
-            <p class="user-details"><span class="text-muted">Email:</span> glen2mampil.official@gmail.com</p>
-            <p class="user-details"><span class="text-muted">Gender:</span> Male</p>
+            <p class="user-details"><span class="text-muted">Contact No:</span> @Model.Account.UserProfile.ContactNo</p>
+            <p class="user-details"><span class="text-muted">Email:</span> </p>
+            <p class="user-details"><span class="text-muted">Gender:</span> @Model.Account.Email</p>
             <p class="user-details"><span class="text-muted">Marital Status:</span> Sigle</p>
             <p></p>
-            <p class="user-details"><span class="text-muted">Company:</span> Bluebell Corporation of the Philippines</p>
-            <p class="user-details"><span class="text-muted">Company ID:</span> BBX19592-1</p>
+            <p class="user-details"><span class="text-muted">Company:</span> @Model.Account.UserProfile.CompanyName</p>
+            <p class="user-details"><span class="text-muted">Company ID:</span> @Model.Account.UserProfile.CompanyId</p>
             <p></p>
             <h1></h1>
         </div>

@@ -22,6 +22,14 @@ namespace SysDev.Controllers
             _context.Dispose();
         }
 
+        protected ApplicationUser LoginUser()
+        {
+            string id = User.Identity.GetUserId();
+            var account = _context.Users.FirstOrDefault(p => p.Id == id);
+            var users = _context.UserProfiles.ToList();
+            return account;
+        }
+
         // GET: Reports
         public ActionResult Index() 
         {
@@ -37,7 +45,8 @@ namespace SysDev.Controllers
             var reportView = new ReportViewModel
             {
                 AuditTrails = audits,
-                UserProfiles = profile
+                UserProfiles = profile,
+                Account = LoginUser()
             };
 
             return View(reportView);

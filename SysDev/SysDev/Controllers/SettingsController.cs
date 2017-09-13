@@ -21,6 +21,15 @@ namespace SysDev.Controllers
         {
             _context.Dispose();
         }
+
+        protected ApplicationUser LoginUser()
+        {
+            string id = User.Identity.GetUserId();
+            var account = _context.Users.FirstOrDefault(p => p.Id == id);
+            var users = _context.UserProfiles.ToList();
+            return account;
+        }
+
         // GET: Settings
         public ActionResult Index()
         {
@@ -30,7 +39,8 @@ namespace SysDev.Controllers
             var viewModel = new SettingsViewModel
             {
                 MasterDatas = datas,
-                MasterDetails = details
+                MasterDetails = details,
+                Account = LoginUser()
             };
 
             return View(viewModel);

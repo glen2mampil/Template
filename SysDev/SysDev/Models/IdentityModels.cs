@@ -112,6 +112,9 @@ namespace SysDev.Models
 
         public DbSet<MasterData> MasterDatas { get; set; }
         public DbSet<MasterDetail> MasterDetails { get; set; }
+
+        public DbSet<IdentityUserRole> AspNetUserRole { get; set; }
+
         public ApplicationDbContext()
             : base("name=DefaultConnection", throwIfV1Schema: false)
         {

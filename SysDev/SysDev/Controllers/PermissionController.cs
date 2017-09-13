@@ -22,6 +22,15 @@ namespace SysDev.Controllers
         {
             _context.Dispose();
         }
+
+        protected ApplicationUser LoginUser()
+        {
+            string id = User.Identity.GetUserId();
+            var account = _context.Users.FirstOrDefault(p => p.Id == id);
+            var users = _context.UserProfiles.ToList();
+            return account;
+        }
+
         // GET: Permission
         public ActionResult Index()
         {
@@ -33,7 +42,8 @@ namespace SysDev.Controllers
             {
                 Permissions = permissions,
                 Roles = roles,
-                MasterDetails = masterDetails
+                MasterDetails = masterDetails,
+                Account = LoginUser()
             };
 
             return View(viewModel);

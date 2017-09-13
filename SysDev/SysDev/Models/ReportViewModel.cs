@@ -5,7 +5,7 @@ using System.Web;
 
 namespace SysDev.Models
 {
-    public class ReportViewModel
+    public class ReportViewModel : ViewModelBase
     {
         public List<AuditTrail> AuditTrails { get; set; }
         public List<UserProfile> UserProfiles { get; set; }
