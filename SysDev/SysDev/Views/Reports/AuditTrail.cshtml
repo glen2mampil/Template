@@ -9,9 +9,10 @@
 <div class="row">
     <div class="col-xs-12">
         <div class="box flat">
+            
             <div class="box-header">
-                <h3 class="box-title">Responsive Hover Table</h3>
-
+                <h3 class="box-title"> </h3>
+                @*
                 <div class="box-tools">
                     <div class="input-group input-group-sm" style="width: 150px;">
                         <input type="text" name="table_search" class="form-control pull-right" placeholder="Search">
@@ -21,33 +22,38 @@
                         </div>
                     </div>
                 </div>
+                *@
             </div>
+            
             <!-- /.box-header -->
             <div class="box-body table-responsive no-padding">
-                <table class="table table-hover">
-                    <tr>
-                        <td width="30px"></td>
-                        <td width="200px">Date</td>
-                        <td width="250px">Commit by</td>
-                        <td width="100px">Module</td>
-                        <td width="100px">Action</td>
-                        <td>Description</td>
-                    </tr>
+                <table class="table table-hover" id="audittrail-table">
 
-                    @foreach (var audit in Model.AuditTrails)
-                    {
+                    <thead>
                         <tr>
-                            <td></td>
-                            <td><p>@audit.DateCreated.ToString("MMM dd, yyyy") <small class="text-muted">@audit.DateCreated.ToString("hh:mm tt")</small></p></td>
-                            <td>
-                                <p>@audit.UserProfile.FirstName @audit.UserProfile.LastName</p>
-                            </td>
-                            <td><p>@audit.ModuleId</p></td>
-                            <td><p>@audit.Action</p></td>
-                            <td><p>@audit.Description</p></td>
+                            <th width="30px"></th>
+                            <th width="200px">Date</th>
+                            <th width="200px">Commit by</th>
+                            <th width="100px">Module</th>
+                            <th width="150px">Action</th>
+                            <th>Description</th>
                         </tr>
-                    }
-
+                    </thead>
+                    <tbody>
+                        @foreach (var audit in Model.AuditTrails)
+                        {
+                            <tr>
+                                <td></td>
+                                <td><p>@audit.DateCreated.ToString("MMM dd, yyyy") <small class="text-muted">@audit.DateCreated.ToString("hh:mm tt")</small></p></td>
+                                <td>
+                                    <p>@audit.UserProfile.FirstName @audit.UserProfile.LastName</p>
+                                </td>
+                                <td><p>@audit.ModuleId</p></td>
+                                <td><p>@audit.Action</p></td>
+                                <td><p>@audit.Description</p></td>
+                            </tr>
+                        }
+                    </tbody>
 
                 </table>
             </div>
@@ -57,4 +63,17 @@
     </div>
 </div>
 
-
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            $("#audittrail-table").DataTable(
+                /*{
+                    ajax: {
+                        url
+                    }
+                }*/
+            );
+        });
+    </script>
+}
