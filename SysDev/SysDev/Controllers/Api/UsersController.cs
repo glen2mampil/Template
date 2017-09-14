@@ -6,8 +6,11 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Routing;
+using AutoMapper;
 using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
 using SysDev.Models;
+using SysDev.Dtos;
 
 namespace SysDev.Controllers.Api
 {
@@ -50,20 +53,53 @@ namespace SysDev.Controllers.Api
 
         // POST /api/auditrails
         [HttpPost]
-        public IHttpActionResult CreateUser(ApplicationUser user)
+        public IHttpActionResult CreateUser(UserProfileDto user)
         {
-            if (!ModelState.IsValid)
-                return BadRequest();
+            
+            //if (!ModelState.IsValid)
+            //    return BadRequest();
 
-            //var auditTrail = Mapper.Map<AuditTrailDto, AuditTrail>(auditTrailDto);
 
-            //_context.Users.Add(user);
-            //_context.SaveChanges();
+            var profile = new UserProfile
+            {
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                MiddleName = user.MiddleName,
+                Address = user.Address,
+                ContactNo = user.ContactNo,
+                CompanyName = user.CompanyName,
+                CompanyId = user.CompanyId,
+                Gender = user.Gender,
+                MaritalStatus = user.MaritalStatus,
+                DateCreated = DateTime.Now.ToString("MMM-dd-yyyy hh:mm tt")
+            };
+            _context.UserProfiles.Add(profile);
+           
+            var userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(_context));
+            var account = new ApplicationUser
+            {
+                UserName = user.UserName,
+                UserProfileId = profile.Id,
+                UserProfile = profile,
+                Email = user.Email,
+                Status = "Active"
+            };
 
-            //auditTrailDto.Id = auditTrail.Id;
+            var chkUser = userManager.Create(account, "password1");
+            //Add default User to Role Admin   
+            if (chkUser.Succeeded)
+            {
+                userManager.AddToRole(account.Id, "SuperAdmin");
+            }
+            _context.SaveChanges();
 
-            //return Created(new Uri(Request.RequestUri + "/" + auditTrail.Id), auditTrailDto);
+            //ReportsController.AddAuditTrail("Add User",
+            //    user.FirstName + " " + user.LastName + " has been added.",
+            //    User.Identity.GetUserId());
+
+            //return Created(new Uri(Request.RequestUri + "/" + user.Id), user);
             return Ok(user);
+            
         }
 
         [HttpPut]

@@ -615,6 +615,7 @@
     <Content Include="Views\Settings\CreateDetail.cshtml" />
     <Content Include="Views\UserProfile\List.cshtml" />
     <Content Include="Views\UserProfile\NotAllowed.cshtml" />
+    <Content Include="Views\UserProfile\IndexReadOnly.cshtml" />
     <None Include="Web.Testing.config">
       <DependentUpon>Web.config</DependentUpon>
       <SubType>Designer</SubType>

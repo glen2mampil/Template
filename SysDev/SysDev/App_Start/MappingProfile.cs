@@ -15,6 +15,7 @@ namespace SysDev.App_Start
             // Domain to Dto
             Mapper.CreateMap<AuditTrail, AuditTrailDto>();
             Mapper.CreateMap<UserProfile, UserProfileDto>();
+            //Mapper.CreateMap<ApplicationUser, AccountDto>();
 
 
             // Dto to Domain
@@ -22,7 +23,7 @@ namespace SysDev.App_Start
                 .ForMember(ad => ad.Id, opt => opt.Ignore());
             Mapper.CreateMap<UserProfileDto, UserProfile>()
                 .ForMember(ad => ad.Id, opt => opt.Ignore());
-
+            //Mapper.CreateMap<AccountDto, ApplicationUser>();
         }
     }
 }
