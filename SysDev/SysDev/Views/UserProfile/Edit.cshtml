@@ -52,16 +52,9 @@
                     </div>
                     <div class="col-md-12 form-group">
                         @Html.LabelFor(m => m.Profile.MaritalStatus, new { @class = "label text-black control-label" })
-                        <select class="form-control" id="Profile_Gender" name="Profile.Gender">
-                            <option value="@Model.Profile.MaritalStatus">@Model.Profile.MaritalStatus</option>
-                            @if (Model.Profile.Gender == "Single")
-                            {
-                                <option value="Married">Married</option>
-                            }
-                            else
-                            {
-                                <option value="Single">Single</option>
-                            }
+                        <select class="form-control" id="Profile_MaritalStatus" name="Profile.MaritalStatus">
+                            <option value="Single">Single</option>
+                            <option value="Married">Married</option>
                         </select>
                         @Html.ValidationMessageFor(m => m.Profile.MaritalStatus, "", new { @class = "has-error label text-red control-label" })
                         @*Html.TextBoxFor(m => m.Profile.MaritalStatus, new {@class = "form-control input-sm"})*@
@@ -87,7 +80,7 @@
                     <div class="col-md-12 form-group">
                         @Html.LabelFor(m => m.Profile.ContactNo, new { @class = "label text-black control-label" })
                         @Html.TextBoxFor(m => m.Profile.ContactNo, new { @class = "form-control input-sm" })
-                        @Html.ValidationMessageFor(m => m.Profile.ContactNo, "", new { @class = "has-error label text-red control-label" })
+                        @Html.ValidationMessageFor(m => m.Profile.ContactNo, "", new { @class = "has-error label text-red control-label", placeholder = "977-097-5881" })
                     </div>
                     <div class="col-md-12 form-group">
                         @Html.LabelFor(m => m.Account.Email, new { @class = "label text-black control-label" })
@@ -99,11 +92,7 @@
                         @Html.TextBoxFor(m => m.Account.UserName, new { @class = "form-control input-sm" })
                         @Html.ValidationMessageFor(m => m.Account.UserName, "", new { @class = "has-error label text-red control-label" })
                     </div>
-                    <div class="col-md-12 form-group">
-                        @Html.LabelFor(m => m.Profile.MaritalStatus, new { @class = "label text-black control-label", })
-                        @Html.TextBoxFor(m => m.Profile.MaritalStatus, new { @class = "form-control input-sm" })
-                        @Html.ValidationMessageFor(m => m.Profile.MaritalStatus, "", new { @class = "has-error label text-red control-label" })
-                    </div>
+                    
                 </div>
             </fieldset>
             @Html.HiddenFor(m => m.Profile.Id);
@@ -146,9 +135,10 @@
                     }
                 },
                 error: function (jqXhr, textStatus, errorThrown) {
+                    console.log("Error in:" +jqXhr);
                     swal({
-                        title: "Opps! <small>something went wrong tyr again later</small>.",
-                        text: "<small class='label label-error'> Status Code: " + jqXhr.status + "</small>" +
+                        title: "Opps! <small>something went wrong try again later</small>.",
+                        html: "<small class='label label-error'> Status Code: " + jqXhr.status + "</small>" +
                             "<small class='label label-error'> Error: " + jqXhr.responseText + "</small>" +
                             "<small class='label label-error'>Status: " + textStatus + "</small>" +
                             "<small class='label label-error'>Throws: " + errorThrown + "</small>",

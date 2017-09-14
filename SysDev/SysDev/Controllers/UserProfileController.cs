@@ -178,29 +178,52 @@ namespace SysDev.Controllers
             }
             else
             {
-                var profile = _context.UserProfiles.SingleOrDefault(p => p.Id == model.Profile.Id);
-                //TryUpdateModel(prifle);
-                if (profile != null)
+                
+                
+
+                try
                 {
-                    profile.FirstName = model.Profile.FirstName;
-                    profile.LastName = model.Profile.LastName;
-                    profile.MiddleName = model.Profile.MiddleName;
-                    profile.Gender = model.Profile.Gender;
-                    profile.ContactNo = model.Profile.ContactNo;
-                    profile.Address = model.Profile.Address;
-                    profile.CompanyId = model.Profile.CompanyId;
-                    profile.CompanyName = model.Profile.CompanyName;
-                    profile.MaritalStatus = model.Profile.MaritalStatus;
-                }
+                    var profile = _context.UserProfiles.SingleOrDefault(p => p.Id == model.Profile.Id);
+                    //TryUpdateModel(prifle);
+                    if (profile != null)
+                    {
+                        profile.FirstName = model.Profile.FirstName;
+                        profile.LastName = model.Profile.LastName;
+                        profile.MiddleName = model.Profile.MiddleName;
+                        profile.Gender = model.Profile.Gender;
+                        profile.ContactNo = model.Profile.ContactNo;
+                        profile.Address = model.Profile.Address;
+                        profile.CompanyId = model.Profile.CompanyId;
+                        profile.CompanyName = model.Profile.CompanyName;
+                        profile.MaritalStatus = model.Profile.MaritalStatus;
+                    }
 
 
-                var account = _context.Users.SingleOrDefault(a => a.UserProfileId == model.Profile.Id);
-                if (account != null)
-                {
-                    account.Email = model.Account.Email;
-                    account.UserName = model.Account.UserName;
+                    var account = _context.Users.SingleOrDefault(a => a.UserProfileId == model.Profile.Id);
+                    if (account != null)
+                    {
+                        account.Email = model.Account.Email;
+                        account.UserName = model.Account.UserName;
+                    }
+                    _context.SaveChanges();
                 }
-                _context.SaveChanges();
+                catch (DbEntityValidationException ex)
+                {
+                    var errorMessages = ex.EntityValidationErrors
+                        .SelectMany(x => x.ValidationErrors)
+                        .Select(x => x.ErrorMessage);
+
+                    // Join the list to a single string.
+                    var fullErrorMessage = string.Join("; ", errorMessages);
+
+                    // Combine the original exception message with the new one.
+                    var exceptionMessage = string.Concat(ex.Message, " The validation errors are: ", fullErrorMessage);
+
+                    throw new DbEntityValidationException(exceptionMessage, ex.EntityValidationErrors);
+                    //return Json(new { success = false, responseText = "Error @" + ((System.Data.Entity.Validation.DbEntityValidationException)ex).EntityValidationErrors }, JsonRequestBehavior.AllowGet);
+                    
+                }
+                
                 ReportsController.AddAuditTrail("Update User",
                     model.Profile.FirstName + " " + model.Profile.LastName + "'s information was Updated",
                     User.Identity.GetUserId());

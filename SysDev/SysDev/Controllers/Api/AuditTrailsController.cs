@@ -24,7 +24,7 @@ namespace SysDev.Controllers.Api
         {
             return _context.AuditTrails
                 .Include(c => c.UserProfile)
-                .ToList()
+                .ToList().OrderByDescending(c => c.DateCreated)
                 .Select(Mapper.Map<AuditTrail, AuditTrailDto>);
         }
 

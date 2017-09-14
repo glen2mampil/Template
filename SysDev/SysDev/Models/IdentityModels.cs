@@ -58,6 +58,7 @@ namespace SysDev.Models
 
         [Required]
         [StringLength(50)]
+        [RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Invalid Phone number")]
         [Display(Name = "Contact No.")]
         public string ContactNo { get; set; }
 
@@ -68,6 +69,7 @@ namespace SysDev.Models
 
         [Required]
         [StringLength(50)]
+        [RegularExpression(@"(\d|[-](?![-]))*", ErrorMessage = "Invalid format: it should be number or number with -")]
         [Display(Name = "Company Id")]
         public string CompanyId { get; set; }
 
