@@ -38,10 +38,12 @@ namespace SysDev
                 "~/Content/Site.css"));
 
             bundles.Add(new ScriptBundle("~/admin-lte/js").Include(
-                "~/admin-lte/js/app.js",
+                
                 "~/Content/sweetalert2/dist/sweetalert2.min.js",
                 "~/Content/plugins/iCheck/icheck.min.js",
-                "~/admin-lte/plugins/fastclick/fastclick.js"));
+                "~/Content/components/fastclick/lib/fastclick.js",
+                "~/Content/components/jquery-slimscroll/jquery.slimscroll.min.js",
+                "~/admin-lte/js/app.js"));
         }
     }
 }

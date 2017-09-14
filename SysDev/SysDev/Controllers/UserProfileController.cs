@@ -47,8 +47,8 @@ namespace SysDev.Controllers
             };
             if (User.IsInRole("SuperAdmin"))
             {
-                return View("IndexReadOnly",useraccount);
-                //return View(useraccount);
+                //return View("IndexReadOnly",useraccount);
+                return View(useraccount);
             }
             return View("NotAllowed", useraccount);
         }

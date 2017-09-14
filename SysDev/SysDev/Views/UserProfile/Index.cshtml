@@ -1,58 +1,166 @@
-﻿
-
-@{
+﻿@{
     ViewBag.Title = "Users";
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.activePage = "Users";
 }
 
-<div class="row">
 
-    <div class="col-md-12" style="margin-bottom: 10px;">
-        <a id="btnCreate" class="pull-right" data-toggle="modal" href="#myModal"><i class="fa fa-user-plus fa-2x"></i></a>
-    </div>
-
-
-
-
-    <div class="col-xs-12">
-        <div class="box flat">
+        <div class="box">
             <div class="box-header">
-
-                <div class="box-tools">
-                    
-                </div>
+                <h3 class="box-title">Data Table With Full Features</h3>
             </div>
             <!-- /.box-header -->
-            <div id="users-table" class="box-body table-responsive no-padding">
-                
+            <div class="box-body">
+                <table id="table-user-profile" class="table table-bordered table-hover table-responsive table-striped">
+                    <thead>
+                        <tr>
+                            <th width="20"></th>
+                            <th>Full Name</th>
+                            <th>Date Created</th>
+                            <th>Address</th>
+                            <th>Status</th>
+                            <th width="200" class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    
+                    <tbody></tbody>
+                    <tfoot>
+                        <tr>
+                            <th></th>
+                            <th>Full Name</th>
+                            <th>Date Created</th>
+                            <th>Address</th>
+                            <th>Status</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </tfoot>
+                </table>
             </div>
             <!-- /.box-body -->
         </div>
         <!-- /.box -->
-    </div>
-</div>
+    
+
+
+
+
 
 <div id="myModal" class="modal fade" tabindex="-1" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content" id="modal-content">
-
         </div>
     </div>
 </div>
 
+
+
+
+
+
 @section scripts
 {
-    <script>
-        $(document).ready(function () {
-            $("#users-table").fadeOut(800, function () {
-                $("#users-table").load("/UserProfile/List").fadeIn().delay(2000);
+        <script>
+            $(document).ready(function () {
+                $('#table-user-profile').css('width', '100%');
+                var table = $("#table-user-profile").DataTable({
+                    ajax: {
+                        url: "/api/users",
+                        dataSrc: ""
+                    },
+                    order: [[1, "asc"]],
+                    responsive: true,
+                    columns: [
+                        {
+                            data: "UserProfile.Gender",
+                            render: function (data, type, object) {
+                                var genderImage = object.UserProfile.Gender === "Male"
+                                    ? "<img src='admin-lte/img/flat-face-male-o.png' class='user-image' alt='User Image' width='30px' /><span class='hidden'>" + object.UserProfile.Gender + "</span>"
+                                    : "<img src='admin-lte/img/flat-face-female.png' class='img-circle' alt='User Image' width='30px' /><span class='hidden'>" + object.UserProfile.Gender + "</span>";
+                                return genderImage;
+                            }
+                        },
+                        {
+                            data: "UserProfile.FirstName",
+                            render: function (data, type, object) {
+                                return "<a class='lead no-margin'>" + object.UserProfile.LastName +
+                                    ", <span class='text-sm'>" + object.UserProfile.FirstName + "</span></a>";
+                            }
+
+                        },
+                        {
+                            data: "DateCreated",
+                            render: function (data, type, object) {
+                                var date = new Date(object.UserProfile.DateCreated);
+                                var options = {
+                                    weekday: "short", year: "numeric", month: "short",
+                                    day: "numeric", hour: "2-digit", minute: "2-digit"
+                                };
+                                return "<small>" + date.toLocaleTimeString("en-us", options) + "</small>";
+                            }
+
+                        },
+                        {
+                            data: "UserProfile.Address",
+                            render: function (data, type, object) {
+                                return "<p class='text-sm no-margin'>" + object.UserProfile.Address + "</p>";
+                            }
+
+                        },
+                        {
+                            data: "Status",
+                            render: function (data, type, object) {
+                                var bsClass = data === "Active" ? "label-success" : "label-danger";
+                                return "<a class='label js-update-status " + bsClass + "'>" + data + "</a>";
+                            }
+
+                        },
+                        {
+                            data: "id",
+                            render: function (data, type, object) {
+
+                                var accountId = object.Id;
+                                var fullName = object.UserProfile.FirstName + " " + object.LastName;
+
+                                var deleteAction = "<a id='btnDelete' class='label text-black btnDelete' data-fullname=" + fullName + " data-id='" + accountId + "'><i class='fa fa-close'></i> Delete</a>";
+                                var editAction = "<a href='#myModal' class='label text-black btnEdit' data-toggle='modal' data-id='" + accountId + "'><i class='fa fa-pencil'></i> Edit</a>";
+                                var resetPasswordAction = "<a class='label text-black btnResetPwd' data-fullname='" + fullName + "' data-toggle='modal' data-id='" + accountId + "'> Reset Password</a>";
+
+                                return "<p>" + editAction + " | " + resetPasswordAction + " | " + deleteAction + "</p>";
+
+                            }
+                        }
+
+                    ]
+
+                });
+
+                $(window).bind('resize', function () {
+                    /*the line below was causing the page to keep loading.
+                    $('#tableData').dataTable().fnAdjustColumnSizing();
+                    Below is a workaround. The above should automatically work.*/
+                    $('#table-user-profile').css('width', '100%');
+                });
+
+
+                /*
+                $('#table-user-profile #filter th').each(function (i) {
+                    var title = $('#table-user-profile #filter th').eq($(this).index()).text();
+                    $(this).html('<input type="text" placeholder="Filter ' + title + '" data-index="' + i + '" />');
+                });
+
+                // Filter event handler
+
+                $(table.table().container()).on('keyup', '#filter input', function () {
+                    table
+                        .column($(this).data('index'))
+                        .search(this.value)
+                        .draw();
+                });
+                */
+
+
             });
-            $('#btnCreate').click(function (e) {
-                $("#modal-content").load("/UserProfile/Create");
-            });
-        });
-        
-    </script>
-    @Scripts.Render("~/bundles/jqueryval")
-}
+        </script>
+
+        @Scripts.Render("~/bundles/jqueryval")
+    }
