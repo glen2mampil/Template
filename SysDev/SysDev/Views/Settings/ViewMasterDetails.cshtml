@@ -19,12 +19,16 @@
             </div>
             <!-- /.box-header -->
             <div class="box-body table-responsive no-padding" id="masterDetailsTable">
-                <table class="table table-hover">
+                <table class="table table-hover" id="masterDetails-table">
+        
+                    <thead>
                     <tr>
-                        <td></td>
-                        <td width="100px">Action</td>
+                        <th></th>
+                        <th width="100px">Action</th>
                     </tr>
-
+                    </thead>
+                    
+                    <tbody>
                     @foreach (var details in Model.MasterDetails)
                     {
                         <tr>
@@ -47,6 +51,7 @@
                         </tr>
                     }
 
+                    </tbody>
 
                 </table>
             </div>    
@@ -57,7 +62,18 @@
 </div>
 
 <script>
-  
+    $(document).ready(function () {
+        var table = $("#masterDetails-table").DataTable({
+            order: [[0, "asc"]],
+            "paging": true,
+            "ordering": true,
+            "info": false
+        });
+
+       
+
+    });
+
     $('#btnCreateDetails').click(function (e) {
         $("#modal-content").load("/Settings/CreateDetail/" + @Model.MasterData.Id);
     });

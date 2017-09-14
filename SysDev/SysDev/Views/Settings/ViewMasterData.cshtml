@@ -8,38 +8,58 @@
 
 
 <div class="box-body table-responsive no-padding" id="masterDataTable">
-    <table class="table table-hover">
+    <table class="table table-hover" id="masterData-table">
+        
+        <thead>
         <tr>
-            <td></td>
-            <td width="100px">Action</td>
+            <th></th>
+            <th width="100px">Action</th>
         </tr>
-        @foreach (var data in Model)
-        {
-            <tr>
-                <td>
-                    @{
-                        var status = data.Status == "Active" ? "label-success" : "label-danger";
-                    }
-                    <p class="no-margin">
-                        <a href="#" data-id="@data.Id" class="lead masterData">@data.Name</a>
-                        <a href="#" class="label btnStatus @status" data-name="@data.Name" data-id="@data.Id" data-action="data">@data.Status</a>
-                    </p>
-                    <p class="no-margin label text-gray">
-                        <small class="text-muted">@data.DateTimeCreated.ToString("MMM dd, yyyy hh:mm ff")</small>
-                    </p>
-                    <p class="no-margin">@data.Description</p>
-                </td>
-                <td>
-                    <p><a href="#myModal" class="label text-blue btnEdit" data-name="@data.Name" data-from="data" data-toggle="modal" data-id="@data.Id"><i class="fa fa-pencil"></i> Edit</a></p>
-                    <p><a href="#" class="label text-red btnDelete" data-name="@data.Name" data-from="data" data-id="@data.Id"><i class="fa fa-close"></i> Delete</a></p>
-                </td>
-            </tr>
-        }
+        </thead>
+                    
+        <tbody>
+            @foreach (var data in Model)
+            {
+                <tr>
+                    <td>
+                        @{
+                            var status = data.Status == "Active" ? "label-success" : "label-danger";
+                        }
+                        <p class="no-margin">
+                            <a href="#" data-id="@data.Id" class="lead masterData">@data.Name</a>
+                            <a href="#" class="label btnStatus @status" data-name="@data.Name" data-id="@data.Id" data-action="data">@data.Status</a>
+                        </p>
+                        <p class="no-margin label text-gray">
+                            <small class="text-muted">@data.DateTimeCreated.ToString("MMM dd, yyyy hh:mm ff")</small>
+                        </p>
+                        <p class="no-margin">@data.Description</p>
+                    </td>
+                    <td>
+                        <p><a href="#myModal" class="label text-blue btnEdit" data-name="@data.Name" data-from="data" data-toggle="modal" data-id="@data.Id"><i class="fa fa-pencil"></i> Edit</a></p>
+                        <p><a href="#" class="label text-red btnDelete" data-name="@data.Name" data-from="data" data-id="@data.Id"><i class="fa fa-close"></i> Delete</a></p>
+                    </td>
+                </tr>
+                
+            }
+        </tbody>
     </table>
 </div>
 
 <script>
-    
+    $(document).ready(function () {
+        var table = $("#masterData-table").DataTable({
+            order: [[0, "asc"]],
+            "paging": true,
+            "ordering": true,
+            "info": false
+        });
+
+       
+
+    });
+
+
+
     $(".masterData").click(function () {
         var id = $(this).data("id");
         $("#table-masterdetails").fadeOut(800, function () {
@@ -50,7 +70,7 @@
     $(".btnEdit").click(function (e) {
         $("#modal-content").load("/Settings/Edit/" + $(this).data("id") + "?from=" + $(this).data("from"));
     });
-
+     
     $(".btnStatus").click(function (e) {
         var btnStatus = $(this);
         var requestStatus = (btnStatus.text() === "Active" ? "Inactive" : "Active");
