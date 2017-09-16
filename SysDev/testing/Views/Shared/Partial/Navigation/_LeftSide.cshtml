@@ -4,10 +4,17 @@
         <!-- Sidebar user panel (optional) -->
         <div class="user-panel">
             <div class="pull-left image">
-                <img src="~/admin-lte/img/flat-face-male-o.png" class="img-circle" alt="User Image">
+                @if (@Model.Account.UserProfile.Gender == "Male")
+                {
+                    <img src="~/admin-lte/img/flat-face-male-o.png" class="img-circle" alt="User Image">
+                }
+                else
+                {
+                    <img src="~/admin-lte/img/flat-face-male-o.png" class="img-circle" alt="User Image">
+                }
             </div>
             <div class="pull-left info">
-                <p>Alexander Pierce</p>
+                <p>@Model.Account.UserProfile.FirstName @Model.Account.UserProfile.LastName</p>
                 <!-- Status -->
                 <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
             </div>
@@ -51,7 +58,9 @@
                 }
             }
 
-            <li class="@dashboard"><a href="#"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
+            <li class="@dashboard">
+                <a href="@Url.Action("Index", "Home")"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a>
+            </li>
             <li class="treeview @users">
                 <a href="#">
                     <i class="fa fa-users"></i> <span>Manage User</span>
@@ -61,10 +70,12 @@
                 </a>
                 <ul class="treeview-menu">
                     <li class="@userList">@Html.ActionLink("Users", "Index", "UserProfile")</li>
-                    <li class="@ViewBag.Lvl2ActivePage">@Html.ActionLink("User Permissions", "Index", "UserProfile")</li>
+                    <li class="@ViewBag.Lvl2ActivePage">@Html.ActionLink("User Permissions", "Index", "Permission")</li>
                 </ul>
             </li>
-            <li class="@settings"><a href="/Settings/"><i class="fa fa-sliders"></i> Settings</a></li>
+            <li class="@settings">
+                <a href="@Url.Action("Index", "Settings")"><i class="fa fa-sliders"></i> <span>Settings</span></a>
+            </li>
             <li class="treeview">
                 <a href="#">
                     <i class="fa fa-area-chart"></i> <span>Reports</span>
@@ -72,9 +83,13 @@
                         <i class="fa fa-angle-left pull-right"></i>
                     </span>
                 </a>
-                <ul class="treeview-menu">
-                    <li><a href="#">@Html.ActionLink("Audit Trail", "AuditTrail", "Reports")</a></li>
-                </ul>
+                @if (Model.Permission.AllowGenerateReport == 1)
+                {
+                    <ul class="treeview-menu">
+                        <li><a href="#">@Html.ActionLink("Audit Trail", "AuditTrail", "Reports")</a></li>
+                    </ul> 
+                }
+                
             </li>
 
 

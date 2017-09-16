@@ -1,167 +1,365 @@
-﻿@model Template1.Models.UserProfileViewModel
-
-
+﻿@model SysDev.Models.UserProfileViewModel
 @{
     ViewBag.Title = "Users";
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.activePage = "Users";
 }
 
-<div class="row">
 
-    <div class="col-md-12" style="margin-bottom: 10px;">
-        <a id="btnCreate" class="pull-right" data-toggle="modal" href="#myModal"><i class="fa fa-user-plus fa-2x"></i></a>
+<div class="box">
+    <div class="box-header">
+        <h3 class="box-title"></h3>
+        @if(Model.Permission.AllowCreate == 1)
+        {
+            <a href="#myModal" class="btn btn-primary pull-right flat" id="new-user" data-toggle="modal"><i class="fa fa-user-plus"></i> </a>
+        }
     </div>
+    <!-- /.box-header -->
+    <div class="box-body">
+        <table id="users-table" class="table table-bordered table-hover table-responsive table-striped">
+            <thead>
+                <tr>
+                    <th width="20"></th>
+                    <th>Full Name</th>
+                    <th>Date Created</th>
+                    <th id="Address">Address</th>
+                    <th>Status</th>
+                    <th width="200" class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var account in Model.Accounts)
+            {
+                <tr>
+                    
+                    <td width="40px">
+                        @if (account.UserProfile.Gender == "Male")
+                        {
+                            <img src="~/admin-lte/img/flat-face-male-o.png" class="user-image" alt="User Image" width="30px">
+                        }
+                        else
+                        {
+                            <img src="~/admin-lte/img/flat-face-female.png" class="img-circle" alt="User Image" width="30px">
+                        }
+                        <p class="hidden">@account.UserProfile.Gender</p>
+                    </td>
+                    <td>
+                        <a href="#myModal" id="btnDetails" class="lead text-black btnDetails" data-toggle="modal" data-id="@account.UserProfile.Id">@account.UserProfile.LastName, @account.UserProfile.FirstName</a>
+                    </td>
+                    <td>
+                        @{
+                            var datetime = DateTime.Parse(account.UserProfile.DateCreated);
+                        }
+                        @datetime.ToShortDateString()
+                    </td>
+                    <td>
+                        <p>@account.UserProfile.Address</p>
+                    </td>
 
+                    <td>
+                        @{
+                            var status = account.Status == "Active" ? "label-success" : "label-danger";
+                        }
+                        @if (Model.Permission.AllowEdit == 1 && !Model.Account.UserName.Equals(account.UserName))
+                        {
+                            <a href="#" id="btnStatus" data-fullname="@account.UserProfile.FirstName @account.UserProfile.LastName" class="label btnStatus @status" data-id="@account.UserProfile.Id">@account.Status</a>
+                        }
+                        else{ <p class="label @status">@account.Status</p>}
+                        
+                    </td>
+                    <td>
+                        
+                        @if (Model.Permission.AllowEdit == 1)
+                        {
+                            <a href="#myModal" class="label text-black btnEdit" data-toggle="modal" data-id="@account.UserProfile.Id"><i class="fa fa-pencil"></i> Edit</a>
+                            <a href="#" class="label text-black btnResetPwd" data-fullname="@account.UserProfile.FirstName @account.UserProfile.LastName" data-toggle="modal" data-id="@account.UserProfile.Id"> Reset Password</a>
+                        }
+                        @if (Model.Permission.AllowDelete == 1)
+                        {
+                            <a id="btnDelete" class="label text-black btnDelete" data-fullname="@account.UserProfile.FirstName @account.UserProfile.LastName" data-id="@account.UserProfile.Id"><i class="fa fa-close"></i> Delete</a>
+                        }
+                        @if (Model.Permission.AllowDelete == 0 && Model.Permission.AllowEdit == 0)
+                        {
+                            <p class="text-sm no-margin">You don't have any permission to modify this</p>
+                        }
+                    </td>
+                </tr>
+              }
 
-
-
-    <div class="col-xs-12">
-        <div class="box flat">
-            <div class="box-header">
-
-                <div class="box-tools">
-                    <div class="input-group input-group-sm" style="width: 150px;">
-                        <input type="text" name="table_search" class="form-control pull-right" placeholder="Search">
-
-                        <div class="input-group-btn">
-                            <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- /.box-header -->
-            <div class="box-body table-responsive no-padding">
-                <table class="table table-hover">
-                    <tr>
-                        <td width="30px"></td>
-                        <td>ID</td>
-                        <td>User</td>
-                        <td>Date</td>
-                        <td>Status</td>
-                        <td>Action</td>
-                    </tr>
-
-                    @foreach (var account in Model.Accounts)
-                    {
-                        <tr>
-                            <td></td>
-                            <td width="40px"><img src="~/admin-lte/img/flat-face-male-o.png" class="user-image user user-menu" alt="User Image" style="width: 30px;"></td>
-                            <td>
-                                <a href="#myModal" id="btnDetails" class="lead text-black btnDetails" data-toggle="modal" data-id="@account.UserProfile.Id">@account.UserProfile.FirstName @account.UserProfile.LastName</a>
-                            </td>
-                            <td>11-7-2014</td>
-                            <td>
-                                @{
-                                    var status = account.Status == "Active" ? "label-success" : "label-danger";
-                                }
-                                <a href="#" id="btnStatus" class="label btnStatus @status" data-id="@account.UserProfile.Id">@account.Status</a>
-                            </td>
-                            <td>
-                                <a href="#myModal" class="text-black btnEdit" data-toggle="modal" data-id="@account.UserProfile.Id"><i class="fa fa-pencil"></i> Edit</a>
-                                <a id="btnDelete" class="label text-gray flat btnDelete" data-id="@account.UserProfile.Id"><i class="fa fa-close"></i></a>
-                            </td>
-                        </tr>
-                                    }
-
-
-                </table>
-            </div>
-            <!-- /.box-body -->
-        </div>
-        <!-- /.box -->
+            </tbody>
+            
+        </table>
     </div>
+    <!-- /.box-body -->
 </div>
+<!-- /.box -->
+
+    
+
+
+
+
 
 <div id="myModal" class="modal fade" tabindex="-1" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content" id="modal-content">
-
+           
+            
         </div>
     </div>
 </div>
 
+
+
+
 @section scripts
 {
-    
     <script>
-        $('#btnCreate').click(function (e) {
-            $("#modal-content").load("/UserProfile/Create");
+        $(document).ready(function() {
+            $('#users-table').css('width', '100%');
+            var table = $("#users-table").DataTable({
+                order: [[1, "asc"]]
+            });
+            /*
+            var table = $("#table-user-profile").DataTable({
+                ajax: {
+                    url: "/api/users",
+                    dataSrc: ""
+                },
+                select : true,
+                order: [[1, "asc"]],
+                responsive: true,
+                columns: [
+                    {
+                        data: "UserProfile.Gender",
+                        render: function (data, type, object) {
+                            var genderImage = object.UserProfile.Gender === "Male"
+                                ? "<img src='admin-lte/img/flat-face-male-o.png' class='user-image' alt='User Image' width='30px' /><span class='hidden'>" + object.UserProfile.Gender + "</span>"
+                                : "<img src='admin-lte/img/flat-face-female.png' class='img-circle' alt='User Image' width='30px' /><span class='hidden'>" + object.UserProfile.Gender + "</span>";
+                            return genderImage;
+                        }
+                    },
+                    {
+                        data: "UserProfile.FirstName",
+                        render: function (data, type, object) {
+                            return "<a href='/api/users/"+ object.Id+"' class='lead user-detail no-margin' data-id='" + object.Id + "'>" + object.UserProfile.LastName +
+                                ", <span class='text-sm'>" + object.UserProfile.FirstName + "</span></a>";
+                            //return '<a href="#myModal" data-toggle="modal" data-target="#myModal" class="user-detail">test</a>';
+                        }
+
+                    },  
+                    {
+                        data: "DateCreated",
+                        render: function (data, type, object) {
+                            var date = new Date(object.UserProfile.DateCreated);
+                            var options = {
+                                weekday: "short", year: "numeric", month: "short",
+                                day: "numeric", hour: "2-digit", minute: "2-digit"
+                            };
+                            return "<small>" + date.toLocaleTimeString("en-us", options) + "</small>";
+                        }
+
+                    },
+                    {
+                        data: "UserProfile.Address",
+                        render: function (data, type, object) {
+                            return "<p class='text-sm no-margin'>" + object.UserProfile.Address + "</p>";
+                        }
+
+                    },
+                    {
+                        data: "Status",
+                        render: function (data, type, object) {
+                            var bsClass = data === "Active" ? "label-success" : "label-danger";
+                            return "<a class='label js-update-status " + bsClass + "'>" + data + "</a>";
+                        }
+
+                    },
+                    {
+                        data: "id",
+                        render: function (data, type, object) {
+
+                            var accountId = object.Id;
+                            var fullName = object.UserProfile.FirstName + " " + object.LastName;
+
+                            var deleteAction = "<a id='btnDelete' class='label text-black btnDelete' data-fullname=" + fullName + " data-id='" + accountId + "'><i class='fa fa-close'></i> Delete</a>";
+                            var editAction = "<a href='#myModal' class='label text-black btnEdit' data-toggle='modal' data-id='" + accountId + "'><i class='fa fa-pencil'></i> Edit</a>";
+                            var resetPasswordAction = "<a class='label text-black btnResetPwd' data-fullname='" + fullName + "' data-toggle='modal' data-id='" + accountId + "'> Reset Password</a>";
+
+                            return "<p>" + editAction + " | " + resetPasswordAction + " | " + deleteAction + "</p>";
+
+                        }
+                    }
+
+                ]
+              
+
+        });
+        */
+        // When windows resize - DataTable will automatically resize
+        $(window).bind('resize',
+            function() {
+                $('#table-user').css('width', '100%');
+            });
+
+
+        /*
+        $('#table-user-profile #filter th').each(function (i) {
+            var title = $('#table-user-profile #filter th').eq($(this).index()).text();
+            $(this).html('<input type="text" placeholder="Filter ' + title + '" data-index="' + i + '" />');
         });
 
+        // Filter event handler
 
-
-
-
+        $(table.table().container()).on('keyup', '#filter input', function () {
+            table
+                .column($(this).data('index'))
+                .search(this.value)
+                .draw();
+        });
+        */
+        /*$('#table-user-profile tbody').on('click', 'tr', function () {
+            var data = table.row(this).data();
+            console.log(table.row(this));
+            alert('You clicked on ' + data[1] + '\'s row');
+        });*/
+        
+        $("#new-user").click(function (e) {
+            $("#modal-content").load("/UserProfile/Create");
+        });
         $(".btnDetails").click(function (e) {
-            //alert("URL: /UserProfile/Details/" + $(this).data("id") + " | ID:" + $(this).data("id"));
             $("#modal-content").load("/UserProfile/Details/" + $(this).data("id"));
         });
         $(".btnEdit").click(function (e) {
-            alert("URL: /UserProfile/Details/" + $(this).data("id") + " | ID:" + $(this).data("id"));
             $("#modal-content").load("/UserProfile/Edit/" + $(this).data("id"));
         });
-
         $(".btnStatus").click(function (e) {
             var btnStatus = $(this);
-            var requestStatus = (btnStatus.text() == "Active" ? "Inactive" : "Active");
-            //alert("URL: @Url.Action("UpdateStatus", "UserProfile") | ID:" + $(this).data("id") + " | Class: " + btnStatus.hasClass("label-success"));
-            //$("#modal-content").load("/UserProfile/UpdateStatus/" + $(this).data("id"));
-
+            var requestStatus = (btnStatus.text() === "Active" ? "Inactive" : "Active");
             swal({
-                    title: (requestStatus == "Active"? "Activate?" : "Diactivate?"),
-                    text: "Are you sure you want to do this?",
-                    type: "warning",
-                    showCancelButton: true,
-                    closeOnConfirm: false,
-                    showLoaderOnConfirm: true
-                },
-                function () {
-                    setTimeout(function () {
-
-                        $.ajax({
-                            url: "/UserProfile/UpdateStatus/" + btnStatus.data("id"),
-                            type: "Post",
-                            data: btnStatus.data("id"),
-                            success: function (result) {
-                                swal("Account is now " + (requestStatus));
-                                btnStatus.removeClass(btnStatus.hasClass("label-success") ? 'label-success' : 'label-danger');
-                                btnStatus.text( requestStatus == "Active" ? "Active" : "Inactive");
-                                btnStatus.addClass(btnStatus.text() == "Active" ? "label-success" : "label-danger");
-                            }
-                        });
-
-                    }, 1000);
+                title: "<small>" + (requestStatus === "Active" ? "Activate" : "Deactivate") + "</small> " + btnStatus.data("fullname") + "<small>'s account?</small>",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes'
+            }).then(function () {
+                swal('Please wait');
+                swal.showLoading();
+                $.ajax({
+                    url: "/UserProfile/UpdateStatus/" + btnStatus.data("id"),
+                    type: "Post",
+                    data: btnStatus.data("id"),
+                    success: function (result) {
+                        swal({
+                            title: btnStatus.data("fullname") + "<small>'s is now </small>" + (requestStatus),
+                            timer: 3000,
+                            type: "success"
+                        }).catch(swal.noop);
+                        btnStatus.removeClass(btnStatus.hasClass("label-success") ? 'label-success' : 'label-danger');
+                        btnStatus.text(requestStatus === "Active" ? "Active" : "Inactive");
+                        btnStatus.addClass(btnStatus.text() === "Active" ? "label-success" : "label-danger");
+                    }
                 });
+            }).catch(swal.noop);
         });
-
-        $(".btnDelete").click(function (e) {
+        $(".btnResetPwd").click(function (e) {
             var btnStatus = $(this);
+            swal({
+                title: "<small>Continue on resetting </small>" + btnStatus.data("fullname") + "<small>'s password?</small>",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes'
+            }).then(function () {
+                swal('Please wait');
+                swal.showLoading();
+                $.ajax({
+                    url: "/UserProfile/ResetPassword/" + btnStatus.data("id"),
+                    type: "Post",
+                    data: btnStatus.data("id"),
+                    success: function (response) {
+                        if (!response.success) {
+                            swal({
+                                title: btnStatus.data("fullname") + " <small>'s password was resetted.</small>",
+                                timer: 3000,
+                                type: "success"
+                            }).catch(swal.noop);
+                        } else {
+                            swal({
+                                title: "Opps!",
+                                html: "<small>" + response.responseText + "</small>",
+                                type: "error"
+                            }).catch(swal.noop);
+                        }
+                    },
+                    error: function (jqXhr, textStatus, errorThrown) {
+                        swal({
+                            title: "Opps! <small>something went wrong try again later</small>.",
+                            text: "<small class='label label-error'> Status Code: " + jqXhr.status + "</small>" +
+                                "<small class='label label-error'> Error: " + jqXhr.responseText + "</small>" +
+                                "<small class='label label-error'>Status: " + textStatus + "</small>" +
+                                "<small class='label label-error'>Throws: " + errorThrown + "</small>",
+                            type: "error"
+                        }).catch(swal.noop);
+                    }
+                });
+            }).catch(swal.noop);
+        });
+        $(".btnDelete").click(function (e) {
+            var btnDelete = $(this);
 
             swal({
-                    title: "Remove this User?",
-                    text: "Are you sure you want to do this?",
-                    type: "warning",
-                    showCancelButton: true,
-                    closeOnConfirm: false,
-                    showLoaderOnConfirm: true
-                },
-                function () {
-                    setTimeout(function () {
-                        $.ajax({
-                            url: "/UserProfile/Delete/" + btnStatus.data("id"),
-                            type: "Post",
-                            data: btnStatus.data("id"),
-                            success: function (result) {
-                                swal("Account is now remove");
-                            }
-                        });
-
-                    }, 1000);
+                title: "<small>Remove</small> " + btnDelete.data("fullname") + "<small> in the users list?</small>",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes'
+            }).then(function () {
+                swal('Please wait');
+                swal.showLoading();
+                $.ajax({
+                    url: "/UserProfile/Delete/" + btnDelete.data("id"),
+                    type: "Post",
+                    data: btnDelete.data("id"),
+                    success: function (response) {
+                        if (!response.success) {
+                            swal({
+                                title: btnDelete.data("fullname") + " <small>was removed.</small>",
+                                timer: 3000,
+                                type: "success"
+                            }).catch(swal.noop);
+                            $("#users-table").fadeOut(800, function () {
+                                $("#users-table").load("/UserProfile/List").fadeIn().delay(2000);
+                            });
+                            
+                        } else {
+                            swal({
+                                title: "Opps!",
+                                html: "<small>" + response.responseText + "</small>",
+                                type: "error"
+                            }).catch(swal.noop);
+                        }
+                    },
+                    error: function (jqXhr, textStatus, errorThrown) {
+                        swal({
+                            title: "Opps! <small>something went wrong tyr again later</small>.",
+                            text: "<small class='label label-error'> Status Code: " + jqXhr.status + "</small>" +
+                                "<small class='label label-error'> Error: " + jqXhr.responseText + "</small>" +
+                                "<small class='label label-error'>Status: " + textStatus + "</small>" +
+                                "<small class='label label-error'>Throws: " + errorThrown + "</small>",
+                            type: "error"
+                        }).catch(swal.noop);
+                    }
                 });
+            }).catch(swal.noop);
+
         });
-
-
+     
+        });
     </script>
-@Scripts.Render("~/bundles/jqueryval")
+
+    @Scripts.Render("~/bundles/jqueryval")
 }

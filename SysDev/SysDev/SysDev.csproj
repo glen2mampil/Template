@@ -251,7 +251,7 @@
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\ReportModels.cs" />
     <Compile Include="Models\ReportViewModel.cs" />
-    <Compile Include="Models\RoleName.cs" />
+    <Compile Include="Models\RoleModels.cs" />
     <Compile Include="Models\SettingsViewModel.cs" />
     <Compile Include="Models\UserProfileViewModel.cs" />
     <Compile Include="Models\ViewModelBase.cs" />
@@ -566,9 +566,11 @@
     </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />

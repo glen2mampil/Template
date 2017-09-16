@@ -1,12 +1,13 @@
-﻿@model Template1.Models.AddUserViewModel
+﻿@model SysDev.Models.AddUserViewModel
 @{
     ViewBag.Title = "Create";
     Layout = null;
 }
 
-@using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "form-horizontal", role = "form", id = "register-user" }))
-{
 
+
+@using (Html.BeginForm("Save", "UserProfile", FormMethod.Post, new { @class = "form-horizontal", role = "form", id = "register-user" }))
+{
     @Html.AntiForgeryToken()
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
@@ -21,94 +22,128 @@
     </div>
     <div class="modal-body" id="modal-content">
         <div class="row">
-            <div class="col-md-6">
-                <div class="col-md-12 form-group">
-                    @Html.LabelFor(m => m.Profile.FirstName, new { @class = "label text-black control-label", })
-                    @Html.TextBoxFor(m => m.Profile.FirstName, new { @class = "form-control input-sm" })
-                </div>
-                <div class="col-md-12 form-group">
-                    @Html.LabelFor(m => m.Profile.MiddleName, new { @class = "label text-black control-label" })
-                    @Html.TextBoxFor(m => m.Profile.MiddleName, new { @class = "form-control input-sm" })
-                </div>
-                <div class="col-md-12 form-group">
-                    @Html.LabelFor(m => m.Profile.LastName, new { @class = "label text-black control-label" })
-                    @Html.TextBoxFor(m => m.Profile.LastName, new { @class = "form-control input-sm" })
-                </div>
-                <div class="col-md-6 form-group">
-                    @Html.LabelFor(m => m.Profile.Gender, new { @class = "label text-black control-label" })
-                    @Html.TextBoxFor(m => m.Profile.Gender, new { @class = "form-control input-sm" })
-                </div>
-                <div class="col-md-6 form-group">
-                    @Html.LabelFor(m => m.Profile.MaritalStatus, new { @class = "label text-black control-label" })
-                    @Html.TextBoxFor(m => m.Profile.MaritalStatus, new { @class = "form-control input-sm" })
-                </div>
-                <div class="col-md-12 form-group">
-                    @Html.LabelFor(m => m.Profile.Address, new { @class = "label text-black control-label" })
-                    @Html.TextBoxFor(m => m.Profile.Address, new { @class = "form-control input-sm" })
-                </div>
-                <div class="col-md-12 form-group">
-                    @Html.LabelFor(m => m.Account.Email, new { @class = "label text-black control-label" })
-                    @Html.TextBoxFor(m => m.Account.Email, new { @class = "form-control input-sm" })
-                </div>
+            <fieldset>
+                <div class="col-md-6">
+                    <div  class="col-md-12 form-group">
+                        @Html.LabelFor(m => m.Profile.FirstName, new { @class = "label text-black control-label", })
+                        @Html.TextBoxFor(m => m.Profile.FirstName, new { @class = "form-control input-sm" })
+                        @Html.ValidationMessageFor(m => m.Profile.FirstName, "", new { @class = "has-error label text-red control-label" })
+                    </div>
+                    <div class="col-md-12 form-group">
+                        @Html.LabelFor(m => m.Profile.MiddleName, new { @class = "label text-black control-label" })
+                        @Html.TextBoxFor(m => m.Profile.MiddleName, new { @class = "form-control input-sm" })
+                        @Html.ValidationMessageFor(m => m.Profile.MiddleName, "", new { @class = "has-error label text-red control-label" })
+                    </div>
+                    <div class="col-md-12 form-group">
+                        @Html.LabelFor(m => m.Profile.LastName, new { @class = "label text-black control-label" })
+                        @Html.TextBoxFor(m => m.Profile.LastName, new { @class = "form-control input-sm" })
+                        @Html.ValidationMessageFor(m => m.Profile.LastName, "", new { @class = "has-error label text-red control-label" })
+                    </div>
+                    <div class="col-md-12 form-group">
+                        @Html.LabelFor(m => m.Profile.Gender, new { @class = "label text-black control-label" })
+                        <select class="form-control" id="Profile_Gender" name="Profile.Gender">
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                        @*Html.TextBoxFor(m => m.Profile.Gender, new {@class = "form-control input-sm"})*@
+                        @Html.ValidationMessageFor(m => m.Profile.Gender, "", new {@class = "has-error label text-red control-label"})
+                    </div>
+                    <div class="col-md-12 form-group">
+                        @Html.LabelFor(m => m.Profile.MaritalStatus, new { @class = "label text-black control-label" })
+                        <select class="form-control" id="Profile_MaritalStatus" name="Profile.MaritalStatus">
+                            <option value="Single">Single</option>
+                            <option value="Married">Married</option>
+                        </select>
+                        @Html.ValidationMessageFor(m => m.Profile.MaritalStatus, "", new { @class = "has-error label text-red control-label" })
+                        @*Html.TextBoxFor(m => m.Profile.MaritalStatus, new {@class = "form-control input-sm"})*@
+                        
+                    </div>
+                    <div class="col-md-12 form-group">
+                        @Html.LabelFor(m => m.Profile.Address, new { @class = "label text-black control-label" })
+                        @Html.TextBoxFor(m => m.Profile.Address, new { @class = "form-control input-sm" })
+                        @Html.ValidationMessageFor(m => m.Profile.Address, "", new { @class = "has-error label text-red control-label" })
+                    </div>
+                    
 
-            </div>
-            <div class="col-md-6">
-                <div class="col-md-12 form-group">
-                    @Html.LabelFor(m => m.Profile.CompanyName, new { @class = "label text-black control-label" })
-                    @Html.TextBoxFor(m => m.Profile.CompanyName, new { @class = "form-control input-sm" })
                 </div>
-                <div class="col-md-12 form-group">
-                    @Html.LabelFor(m => m.Profile.CompanyId, new { @class = "label text-black control-label" })
-                    @Html.TextBoxFor(m => m.Profile.CompanyId, new { @class = "form-control input-sm" })
+                <div class="col-md-6">
+                    <div class="col-md-12 form-group"> 
+                        @Html.LabelFor(m => m.Profile.CompanyName, new { @class = "label text-black control-label" })
+                        @Html.TextBoxFor(m => m.Profile.CompanyName, new { @class = "form-control input-sm" })
+                        @Html.ValidationMessageFor(m => m.Profile.CompanyName, "", new { @class = "has-error label text-red control-label" })
+                    </div>
+                    <div class="col-md-12 form-group">
+                        @Html.LabelFor(m => m.Profile.CompanyId, new { @class = "label text-black control-label" })
+                        @Html.TextBoxFor(m => m.Profile.CompanyId, new { @class = "form-control input-sm" })
+                        @Html.ValidationMessageFor(m => m.Profile.CompanyId, "", new { @class = "has-error label text-red control-label" })
+                    </div>
+                    <div class="col-md-12 form-group">
+                        @Html.LabelFor(m => m.Profile.ContactNo, new { @class = "label text-black control-label" })
+                        @Html.EditorFor(m => m.Profile.ContactNo, new { @class = "form-control input-sm" })
+                        @Html.ValidationMessageFor(m => m.Profile.ContactNo, "", new { @class = "has-error label text-red control-label", placeholder="977-097-5881" })
+                    </div>
+                    <div class="col-md-12 form-group">
+                        @Html.LabelFor(m => m.Account.Email, new { @class = "label text-black control-label" })
+                        @Html.TextBoxFor(m => m.Account.Email, new { type = "email", placeholder = "example@domain.com", @class = "form-control input-sm" })
+                        @Html.ValidationMessageFor(m => m.Account.Email, "", new {  @class = "has-error label text-red control-label" })
+                    </div>
+                    <div class="col-md-12 form-group">
+                        @Html.LabelFor(m => m.Account.UserName, new { @class = "label text-black control-label" })
+                        @Html.TextBoxFor(m => m.Account.UserName, new { @class = "form-control input-sm" })
+                        @Html.ValidationMessageFor(m => m.Account.UserName, "", new { @class = "has-error label text-red control-label" })
+                    </div>
+                    
                 </div>
-                <div class="col-md-12 form-group">
-                    @Html.LabelFor(m => m.Profile.ContactNo, new { @class = "label text-black control-label" })
-                    @Html.TextBoxFor(m => m.Profile.ContactNo, new { @class = "form-control input-sm" })
-                </div>
-                <div class="col-md-12 form-group">
-                    @Html.LabelFor(m => m.Account.Email, new { @class = "label text-black control-label" })
-                    @Html.TextBoxFor(m => m.Account.Email, new { @class = "form-control input-sm" })
-                </div>
-                <div class="col-md-12 form-group">
-                    @Html.LabelFor(m => m.Account.UserName, new { @class = "label text-black control-label" })
-                    @Html.TextBoxFor(m => m.Account.UserName, new { @class = "form-control input-sm" })
-                </div>
-                <div class="col-md-12 form-group">
-                    @Html.LabelFor(m => m.MaritalStatus, new { @class = "label text-black control-label", })
-                    @Html.TextBoxFor(m => m.MaritalStatus, new { @class = "form-control input-sm" })
-                </div>
-            </div>
+            </fieldset>
         </div>
     </div>
     <div class="modal-footer">
-        <p id="dialog-alert"></p>
+        <div id="info" class="callout callout-danger" style="display:none">
+            <p id="dialog-alert"></p>
+        </div>
         <button type="button" class="btn " data-dismiss="modal">Close</button>
         <button type="submit" id="save" class="btn btn-primary">Save changes</button>
     </div>
 }
-
+@Scripts.Render("~/bundles/jqueryval");
 <script>
-
-
-     $('#register-user').submit(function (e) {
-         e.preventDefault();
-         //swal("Data Save!", "New user has been added", "success");
-         $.ajax({
-             url: "UserProfile/Save/",
-             type: "Post",
-             data: $(this).serialize(),
-             success: function (result) {
-                 //$('#result').html(result);
-                 swal("Data Save!", "New User has been added", "success");
-             },
-             error : function(result) {
-                 swal("Data Save!", result, "error");
-                 var data = JSON.parse(result);
-                 console.log("Error : " + data);
-             }
-         });
-     });
-
-</script>
+    $("#register-user").on("submit", function (event) {
+        event.preventDefault();
+        var $this = $(this);
+        var frmValues = $this.serialize();
+        if($("#register-user").valid()) {            $.ajax({                url: $this.attr('action'),
+                type: $this.attr('method'),
+                data: frmValues,
+                success: function (response) {
+                    if (!response.success) {
+                        $("#myModal").modal("toggle");
+                        swal({
+                            title: $("#Profile_FirstName").val() + " " + $("#Profile_LastName").val() + " <small>was added.</small>",
+                            timer: 3000,
+                            type: "success"
+                        }).catch(swal.noop);
+                        $("#users-table").fadeOut(800, function () {
+                            $("#users-table").load("/UserProfile/List").fadeIn().delay(2000);
+                        });
+                        
+                    } else {
+                        swal({
+                            title: "Opps!",
+                            html: "<small>" + response.responseText + "</small>",
+                            type: "error"
+                        }).catch(swal.noop);
+                    }
+                },
+                error: function (jqXhr, textStatus, errorThrown) {
+                    swal({
+                        title: "Opps! <small>something went wrong try again later</small>.",
+                        html: "<small class='label label-error'> Status Code: " + jqXhr.status + "</small>" +
+                            "<small class='label label-error'> Error: " + jqXhr.responseText + "</small>" +
+                            "<small class='label label-error'>Status: " + textStatus + "</small>" +
+                            "<small class='label label-error'>Throws: " + errorThrown + "</small>",
+                        type: "error"
+                    }).catch(swal.noop);
+                }            });        }            });    
+</script>    
 
 

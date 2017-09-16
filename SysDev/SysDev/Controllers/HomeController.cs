@@ -29,13 +29,20 @@ namespace SysDev.Controllers
             var users = _context.UserProfiles.ToList();
             return account;
         }
+        protected Permission LoginUserPermission()
+        {
+            var role = User.IsInRole("SuperAdmin") ? "SuperAdmin" : "Employee";
+            var userPermission = _context.Permissions.SingleOrDefault(m => m.IdentityRole.Name == role && m.MasterDetail.Name == "Users");
+            return userPermission;
+        }
 
         public ActionResult Index()
         {
            
             var viewModel = new DashboardViewModel
             {
-                Account = LoginUser()
+                Account = LoginUser(),
+                Permission = LoginUserPermission()
             };
             return View(viewModel);
         }

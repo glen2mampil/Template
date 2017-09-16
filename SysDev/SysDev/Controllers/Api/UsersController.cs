@@ -33,10 +33,11 @@ namespace SysDev.Controllers.Api
                 .ToList();
 
         }
-
+            
         // GET /api/users/1
         public IHttpActionResult GetUser(string id)
         {
+            
             var user = _context.Users
                 .Include(u => u.UserProfile)
                 .Include(u => u.Roles)
@@ -45,7 +46,13 @@ namespace SysDev.Controllers.Api
 
             if (user == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
-            
+
+            var role = User.IsInRole("SuperAdmin")? "SuperAdmin" : "Employee";
+
+            var permission = _context.Permissions
+                .Include(p => p.MasterDetail)
+                .Include(p => p.IdentityRole)
+                .Where(p => p.IdentityRole.Name == role);
 
             //return Mapper.Map<AuditTrail, AuditTrailDto>(audit);
             return Ok(user);

@@ -33,6 +33,13 @@ namespace SysDev.Controllers
             return account;
         }
 
+        protected Permission LoginUserPermission()
+        {
+            var role = User.IsInRole("SuperAdmin") ? "SuperAdmin" : "Employee";
+            var userPermission = _context.Permissions.SingleOrDefault(m => m.IdentityRole.Name == role && m.MasterDetail.Name =="Users");
+            return userPermission;
+        }
+
         // GET: UserProfile
         public ActionResult Index()
         {
@@ -43,7 +50,8 @@ namespace SysDev.Controllers
                 UserProfiles = users,
                 Accounts = accounts,
                 Account = LoginUser(),
-                AccountRole = ""
+                AccountRole = "",
+                Permission = LoginUserPermission()
             };
             if (User.IsInRole("SuperAdmin"))
             {
@@ -99,6 +107,26 @@ namespace SysDev.Controllers
             _context.SaveChanges();
 
             return RedirectToAction("Index", "UserProfile");
+        }
+
+        [HttpPost]
+        public ActionResult ChangePassword(string newpassword)
+        {
+            var user = LoginUser();
+
+
+            var account = _context.Users.SingleOrDefault(m => m.Id == user.Id);
+
+            var password = newpassword;
+            var passwordHasher = new Microsoft.AspNet.Identity.PasswordHasher();
+
+            account.PasswordHash = passwordHasher.HashPassword(password);
+
+
+
+            _context.SaveChanges();
+
+            return Json(new { success = true, responseText = "Password successfuly Change!" }, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult UpdateStatus(int id)

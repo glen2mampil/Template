@@ -197,7 +197,7 @@ namespace SysDev.Controllers
         //
         // POST: /Manage/RemovePhoneNumber
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]  
         public async Task<ActionResult> RemovePhoneNumber()
         {
             var result = await UserManager.SetPhoneNumberAsync(User.Identity.GetUserId(), null);

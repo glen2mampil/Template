@@ -1,60 +1,121 @@
-﻿@model Template1.Models.ReportViewModel
+﻿@model SysDev.Models.ReportViewModel
 
 @{
     ViewBag.Title = "Audit Trail";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
-
 <div class="row">
     <div class="col-xs-12">
-        <div class="box flat">
+       
+        <div class="box">
             <div class="box-header">
-                <h3 class="box-title">Responsive Hover Table</h3>
-
-                <div class="box-tools">
-                    <div class="input-group input-group-sm" style="width: 150px;">
-                        <input type="text" name="table_search" class="form-control pull-right" placeholder="Search">
-
-                        <div class="input-group-btn">
-                            <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
-                        </div>
-                    </div>
-                </div>
+                <h3 class="box-title">Data Table With Full Features</h3>
             </div>
             <!-- /.box-header -->
-            <div class="box-body table-responsive no-padding">
-                <table class="table table-hover">
+            <div class="box-body">
+                <table id="audittrail-table" class="table table-bordered table-hover table-striped">
+                    <thead>
                     <tr>
-                        <td width="30px"></td>
-                        <td width="200px">Date</td>
-                        <td width="250px">Commit by</td>
-                        <td width="100px">Module</td>
-                        <td width="100px">Action</td>
-                        <td>Description</td>
+                        <th>Date</th>
+                        <th>Commit by</th>
+                        <th>Module</th>
+                        <th>Action</th>
+                        <th>Description</th>
                     </tr>
+                    </thead>
+                    
+                    <thead id="filter">
+                    <tr>
+                        <th>Date</th>
+                        <th>Commit by</th>
+                        <th>Module</th>
+                        <th>Action</th>
+                        <th>Description</th>
+                    </tr>
+                    </thead>
+                    <tbody>
 
-                    @foreach (var audit in Model.AuditTrails)
-                    {
-                        <tr>
-                            <td></td>
-                            <td><p>@audit.DateCreated.ToString("MMM dd, yyyy") <small class="text-muted">@audit.DateCreated.ToString("hh:mm tt")</small></p></td>
-                            <td>
-                                <p>@audit.UserProfile.FirstName @audit.UserProfile.LastName</p>
-                            </td>
-                            <td><p>@audit.ModuleId</p></td>
-                            <td><p>@audit.Action</p></td>
-                            <td><p>@audit.Description</p></td>
-                        </tr>
-                    }
-
-
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <th>Date</th>
+                        <th>Commit by</th>
+                        <th>Module</th>
+                        <th>Action</th>
+                        <th>Description</th>
+                    </tr>
+                    </tfoot>
                 </table>
             </div>
             <!-- /.box-body -->
         </div>
         <!-- /.box -->
     </div>
+    <!-- /.col -->
 </div>
 
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            
+            var table = $("#audittrail-table").DataTable({
+                    ajax: {
+                        url: "/api/audittrails",
+                        dataSrc: ""
+                    },
+                    order: [[ 0, "desc" ]],
+                    columns: [
 
+                        {
+                            data: "DateCreated",
+                            render: function (data, type, full) {
+                                var date = new Date(full.DateCreated);
+                                var options = {
+                                    weekday: "long", year: "numeric", month: "short",
+                                    day: "numeric", hour: "2-digit", minute: "2-digit"
+                                };
+                                return "<small class=''>" + date.toLocaleTimeString("en-us", options) + "</small>";
+                            }
+                            
+                        },
+                        {
+                            data: "UserProfile.FirstName",
+                            render: function (data, type, full, meta) {
+                                return full.UserProfile.FirstName + full.UserProfile.LastName;
+                            }
+
+                        }, {
+                            data: "UserProfileId"
+
+                        },
+                        {
+                            data: "Action"
+                        },
+                        {
+                            data: "Description"
+
+                        }
+                    
+                    ]
+                    
+            });
+
+            $('#audittrail-table #filter th').each(function (i) {
+                var title = $('#audittrail-table #filter th').eq($(this).index()).text();
+                $(this).html('<input type="text" placeholder="Filter ' + title + '" data-index="' + i + '" />');
+            });
+
+            // Filter event handler
+            $(table.table().container()).on('keyup', '#filter input', function () {
+                table
+                    .column($(this).data('index'))
+                    .search(this.value)
+                    .draw();
+            });
+            
+            
+
+        });
+    </script>
+}

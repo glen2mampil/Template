@@ -31,6 +31,13 @@ namespace SysDev.Controllers
             return account;
         }
 
+        protected Permission LoginUserPermission()
+        {
+            var role = User.IsInRole("SuperAdmin") ? "SuperAdmin" : "Employee";
+            var userPermission = _context.Permissions.SingleOrDefault(m => m.IdentityRole.Name == role && m.MasterDetail.Name == "Users");
+            return userPermission;
+        }
+
         // GET: Reports
         public ActionResult Index() 
         {
@@ -47,7 +54,8 @@ namespace SysDev.Controllers
             {
                 AuditTrails = audits,
                 UserProfiles = profile,
-                Account = LoginUser()
+                Account = LoginUser(),
+                Permission = LoginUserPermission()
             };
 
             return View(reportView);

@@ -8,6 +8,8 @@ namespace SysDev.Models
     public abstract class ViewModelBase
     {
         public ApplicationUser Account { get; set; }
-        public string AccountRole { get; set; }        
+        public string AccountRole { get; set; }
+
+        public Permission Permission { get; set; }      
     }
 }
