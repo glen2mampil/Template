@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -26,8 +27,8 @@ namespace SysDev.Controllers
         protected ApplicationUser LoginUser()
         {
             string id = User.Identity.GetUserId();
-            var account = _context.Users.FirstOrDefault(p => p.Id == id);
-            var users = _context.UserProfiles.ToList();
+            var account = _context.Users.Include(a => a.UserProfile).FirstOrDefault(p => p.Id == id);
+            //var users = _context.UserProfiles.ToList();
             return account;
         }
 
@@ -61,23 +62,24 @@ namespace SysDev.Controllers
             return View(reportView);
         }
 
-        public static bool AddAuditTrail(string action, string descriptions, string id)
+        public static bool AddAuditTrail(string action, string descriptions, string id, string activeModule)
         {
             
             var context = new ApplicationDbContext();
-            var account = context.Users.SingleOrDefault(a => a.Id == id);
-            var profile = context.UserProfiles.SingleOrDefault(p => p.Id == account.UserProfileId);
-            
-            
+            var account = context.Users.Include(m => m.UserProfile).SingleOrDefault(a => a.Id == id);
+            //var profile = context.UserProfiles.SingleOrDefault(p => p.Id == account.UserProfileId);
+            var module = context.MasterDetails.SingleOrDefault(m => m.Name.Equals(activeModule, StringComparison.OrdinalIgnoreCase));
+
+         
             context.AuditTrails.Add(new AuditTrail
             {
-                UserProfileId = profile.Id,
-                ModuleId = 1,
-                PageId = 1,
+                UserProfileId = account.UserProfile.Id,
+                ModuleId = module.Id,
+                PageId = module.Id,
                 Action = action,
                 Description = descriptions,
                 DateCreated = DateTime.Now,
-                UserProfile = profile
+                UserProfile = account.UserProfile
             });
             context.SaveChanges();
             

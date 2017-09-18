@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -25,8 +26,7 @@ namespace SysDev.Controllers
         protected ApplicationUser LoginUser()
         {
             string id = User.Identity.GetUserId();
-            var account = _context.Users.FirstOrDefault(p => p.Id == id);
-            var users = _context.UserProfiles.ToList();
+            var account = _context.Users.Include(a => a.UserProfile).FirstOrDefault(p => p.Id == id);
             return account;
         }
 
@@ -90,15 +90,13 @@ namespace SysDev.Controllers
             if (from.Equals("detail"))
             {
                 
-                var masterDetails = _context.MasterDetails.SingleOrDefault(p => p.Id == id);
-                var masterData = _context.MasterDatas.SingleOrDefault(md => md.Id == masterDetails.MasterDataId);
-                //var masterDetails = _context.MasterDetails.SingleOrDefault(p => p.MasterDataId == masterData.Id);
+                var masterDetails = _context.MasterDetails.Include(md => md.MasterData).SingleOrDefault(p => p.Id == id);
                 if (masterDetails == null)
                     return HttpNotFound();
 
                 var viewModel = new NewMasterDetailsViewModel
                 {
-                    MasterData = masterData,
+                    MasterData = masterDetails.MasterData,
                     MasterDetail = masterDetails
                 };
 
@@ -117,11 +115,13 @@ namespace SysDev.Controllers
                 var masterData = _context.MasterDatas.SingleOrDefault(d => d.Id == id);
                 if (masterData != null)
                 {
-                    masterData.Status = masterData.Status == "Active" ? "Inactive" : "Active";
-                    ReportsController.AddAuditTrail("Update",
-                        "MasterData [ " + masterData.Name + "] was set to " + masterData.Status,
-                        User.Identity.GetUserId());
+                    string status = masterData.Status == "Active" ? "Inactive" : "Active";
+                    masterData.Status = status;
                     _context.SaveChanges();
+
+                    string description = "[Master Data] <strong>" + masterData.Name + "</strong> was set to " + status;
+                    ReportsController.AddAuditTrail(UserAction.Update, description, User.Identity.GetUserId(), Page.Settings);
+                    return Json(new { success = true, responseText = description }, JsonRequestBehavior.AllowGet);
                 }
             }
             else if (actionName.Equals("detail"))
@@ -129,11 +129,13 @@ namespace SysDev.Controllers
                 var masterDetail = _context.MasterDetails.SingleOrDefault(d => d.Id == id);
                 if (masterDetail != null)
                 {
-                    masterDetail.Status = masterDetail.Status == "Active" ? "Inactive" : "Active";
-                    ReportsController.AddAuditTrail("Update",
-                        "MasterDetail [ " + masterDetail.Name + "] was set to " + masterDetail.Status,
-                        User.Identity.GetUserId());
+                    string status = masterDetail.Status == "Active" ? "Inactive" : "Active";
+                    masterDetail.Status = status;
                     _context.SaveChanges();
+
+                    string description = "[Master Detail] <strong>" + masterDetail.Name + "</strong> was set to " + status;
+                    ReportsController.AddAuditTrail(UserAction.Update, description, User.Identity.GetUserId(), Page.Settings);
+                    return Json(new { success = true, responseText = description }, JsonRequestBehavior.AllowGet);
                 }
             }
 
@@ -152,9 +154,9 @@ namespace SysDev.Controllers
                 _context.MasterDatas.Remove(masterData);
                 _context.SaveChanges();
 
-                ReportsController.AddAuditTrail("Delete",
-                    "MasterData [" + masterData.Name + "] was Deleted",
-                    User.Identity.GetUserId());
+                string description = "[Master Data] <strong>" + masterData.Name + "</strong> was deleted ";
+                ReportsController.AddAuditTrail(UserAction.Delete, description, User.Identity.GetUserId(), Page.Settings);
+                return Json(new { success = true, responseText = description }, JsonRequestBehavior.AllowGet);
 
             }
             if(from.Equals("detail"))
@@ -165,6 +167,10 @@ namespace SysDev.Controllers
 
                 _context.MasterDetails.Remove(masterDetail);
                 _context.SaveChanges();
+
+                string description = "[Master Detail] <strong>" + masterDetail.Name + "</strong> was deleted";
+                ReportsController.AddAuditTrail(UserAction.Delete, description, User.Identity.GetUserId(), Page.Settings);
+                return Json(new { success = true, responseText = description }, JsonRequestBehavior.AllowGet);
             }
             return RedirectToAction("Index", "Settings");
         }
@@ -185,6 +191,7 @@ namespace SysDev.Controllers
                 MasterData = masterData
             };
 
+           
             return View(viewModel);
         }
 
@@ -194,20 +201,20 @@ namespace SysDev.Controllers
            
             if (duplicate != null)
             {
-                return Json(new { success = false, responseText = "Master Data named " + model.Name + " is already exist" }, JsonRequestBehavior.AllowGet);
+                return Json(new { success = false, responseText = "Master Data named " + model.Name + " already exist" }, JsonRequestBehavior.AllowGet);
             }
-                
 
+            string description = "";
             if (model.Id == 0)
             {
                 model.DateTimeCreated = DateTime.Now;
                 model.DateTimeUpdated = DateTime.Now;
                 model.Status = "Active";
                 _context.MasterDatas.Add(model);
-                _context.SaveChanges();
-                ReportsController.AddAuditTrail("Add MasterData",
-                    model.Name + " has been added.",
-                    User.Identity.GetUserId());
+                //_context.SaveChanges();
+
+                description = "[Master Data] <strong>" + model.Name + "</strong> has been added";
+                ReportsController.AddAuditTrail(UserAction.Create, description, User.Identity.GetUserId(), Page.Settings);
             }
             else
             {
@@ -218,15 +225,16 @@ namespace SysDev.Controllers
 
                     mData.Description = model.Description;
                     mData.DateTimeUpdated = DateTime.Now;
-                    ReportsController.AddAuditTrail("Update",
-                        "MasterData [" + model.Name + "] has been added.",
-                        User.Identity.GetUserId());
+                    
                 }
-
+                description = "[Master Data] <strong>" + model.Name + "</strong>'s information has been updated.";
+                ReportsController.AddAuditTrail(UserAction.Update, description, User.Identity.GetUserId(), Page.Settings);
             }
             _context.SaveChanges();
 
-            return RedirectToAction("Index", "Settings");
+            return Json(new { success = true, responseText = description }, JsonRequestBehavior.AllowGet);
+
+            //return RedirectToAction("Index", "Settings");
         }
 
         public ActionResult SaveMasterDetail(NewMasterDetailsViewModel model)
@@ -235,7 +243,7 @@ namespace SysDev.Controllers
 
             if (duplicate != null)
             {
-                return Json(new { success = false, responseText = "Master Data named " + model.MasterDetail.Name + " is already exist" }, JsonRequestBehavior.AllowGet);
+                return Json(new { success = false, responseText = "Master Data named " + model.MasterDetail.Name + " already exist" }, JsonRequestBehavior.AllowGet);
             }
 
             if (model.MasterDetail.Id == 0)

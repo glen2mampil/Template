@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -25,8 +26,8 @@ namespace SysDev.Controllers
         protected ApplicationUser LoginUser()
         {
             string id = User.Identity.GetUserId();
-            var account = _context.Users.FirstOrDefault(p => p.Id == id);
-            var users = _context.UserProfiles.ToList();
+            var account = _context.Users.Include(a => a.UserProfile).FirstOrDefault(p => p.Id == id);
+            //var users = _context.UserProfiles.ToList();
             return account;
         }
         protected Permission LoginUserPermission()

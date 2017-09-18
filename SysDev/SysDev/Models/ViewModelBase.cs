@@ -12,4 +12,5 @@ namespace SysDev.Models
 
         public Permission Permission { get; set; }      
     }
+
 }

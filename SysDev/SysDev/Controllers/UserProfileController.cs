@@ -7,7 +7,8 @@ using System.Web.Security;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using SysDev.Models;
- 
+using System.Data.Entity;
+
 namespace SysDev.Controllers
 {
     
@@ -28,8 +29,8 @@ namespace SysDev.Controllers
         protected ApplicationUser LoginUser()
         {
             string id = User.Identity.GetUserId();
-            var account = _context.Users.FirstOrDefault(p => p.Id == id);
-            var users = _context.UserProfiles.ToList();
+            var account = _context.Users.Include(a => a.UserProfile).FirstOrDefault(p => p.Id == id);
+            //var users = _context.UserProfiles.ToList();
             return account;
         }
 
@@ -45,7 +46,7 @@ namespace SysDev.Controllers
         {
             List<UserProfile> users = _context.UserProfiles.ToList();
             List<IdentityRole> roles = _context.Roles.ToList();
-            var accounts = _context.Users.ToList();
+            var accounts = _context.Users.Include(a => a.UserProfile).ToList();
             var useraccount = new UserProfileViewModel
             {
                 UserProfiles = users,
@@ -86,7 +87,7 @@ namespace SysDev.Controllers
 
             var viewModel = new UserProfileViewModel
             {
-                Account = account,
+                Account = account
             };
 
             return View(viewModel);
@@ -99,13 +100,21 @@ namespace SysDev.Controllers
 
         public ActionResult ResetPassword(string id)
         {
-            var account = _context.Users.SingleOrDefault(m=> m.Id == id);
+            var account = _context.Users.Include(a => a.UserProfile).SingleOrDefault(m=> m.Id == id);
 
-            var password = "password1";
+
+            if (account == null)
+                return HttpNotFound();
+
             var passwordHasher = new Microsoft.AspNet.Identity.PasswordHasher();
 
-            account.PasswordHash = passwordHasher.HashPassword(password);
+            account.PasswordHash = passwordHasher.HashPassword("password1");
             _context.SaveChanges();
+
+            string fullName = account.UserProfile.FirstName + " " + account.UserProfile.LastName;
+            ReportsController.AddAuditTrail(UserAction.Update,
+                "<strong>" + fullName + "</strong>'s password was reseted ",
+                User.Identity.GetUserId(), Page.Users);
 
             return Json(new { success = true, responseText = "Password successfuly Change!" }, JsonRequestBehavior.AllowGet);
         }
@@ -114,18 +123,21 @@ namespace SysDev.Controllers
         public ActionResult ChangePassword(string newpassword)
         {
             var user = LoginUser();
-
-
             var account = _context.Users.SingleOrDefault(m => m.Id == user.Id);
+
+            if (account == null)
+                return HttpNotFound();
 
             var password = newpassword;
             var passwordHasher = new Microsoft.AspNet.Identity.PasswordHasher();
 
             account.PasswordHash = passwordHasher.HashPassword(password);
-
-
-
             _context.SaveChanges();
+
+            string fullName = account.UserProfile.FirstName + " " + account.UserProfile.LastName;
+            ReportsController.AddAuditTrail(UserAction.Update,
+                "<strong>" + fullName + "</strong> reset his/her password ",
+                User.Identity.GetUserId(), Page.Users);
 
             return Json(new { success = true, responseText = "Password successfuly Change!" }, JsonRequestBehavior.AllowGet);
         }
@@ -134,19 +146,21 @@ namespace SysDev.Controllers
         {
             
             var account = _context.Users.SingleOrDefault(a => a.Id == id);
-            if (account != null)
+            var user = _context.UserProfiles.SingleOrDefault(u => u.Id == account.UserProfileId);
+
+            if (account != null && user != null)
             {
                 account.Status = (account.Status == "Active" ? "Inactive" : "Active");
                 _context.SaveChanges();
-                //return Json(new { success = false, responseText = "account: " + account.Email + " | Status: " + account.Status }, JsonRequestBehavior.AllowGet);
-                var user = _context.UserProfiles.SingleOrDefault(u => u.Id == account.UserProfileId);
-                ReportsController.AddAuditTrail("Update User",
-                    "User named " + user.FirstName + " " + user.LastName + " was set to " + account.Status,
-                    User.Identity.GetUserId());
-                return Json(new { success = false, responseText = "Model: " + user + " | account: " + account }, JsonRequestBehavior.AllowGet);
+
+                string fullName = user.FirstName + " " + user.LastName;
+                ReportsController.AddAuditTrail(UserAction.Update,
+                    "<strong>" + fullName + "</strong> was set to " + account.Status,
+                    User.Identity.GetUserId(), Page.Users);
+                return Json(new { success = true, responseText = user + " has set to " + account.Status }, JsonRequestBehavior.AllowGet);
 
             }
-            return RedirectToAction("Index", "UserProfile");
+            return Json(new { success = false, responseText = "Nothings happen, Try again later." }, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult Edit(int id)
@@ -203,9 +217,9 @@ namespace SysDev.Controllers
 
                 }
                 string fullName = model.EditProfile.FirstName + " " + model.EditProfile.LastName;
-                ReportsController.AddAuditTrail("Add User",
-                    fullName + " has been added.",
-                    User.Identity.GetUserId());
+                ReportsController.AddAuditTrail(UserAction.Create,
+                    "<strong>" +fullName + "</strong> has been added." ,
+                    User.Identity.GetUserId(), Page.Users);
                 return Json(new { success = true, responseText = fullName + " <small>was added.</small>" }, JsonRequestBehavior.AllowGet);
             }
             else
@@ -256,10 +270,10 @@ namespace SysDev.Controllers
                     
                 }
                 string fullName = model.EditProfile.FirstName + " " + model.EditProfile.LastName;
-                ReportsController.AddAuditTrail("Update User",
-                    fullName + "'s information was Updated",
-                    User.Identity.GetUserId());
-                return Json(new { success = true, responseText = fullName + " has been Updated." }, JsonRequestBehavior.AllowGet);
+                ReportsController.AddAuditTrail(UserAction.Update,
+                    "<strong>" + fullName + "</strong>'s information has been updated.",
+                    User.Identity.GetUserId(), Page.Users);
+                return Json(new { success = true, responseText = fullName + " <small>has been Updated.</small>" }, JsonRequestBehavior.AllowGet);
             }
 
             //return RedirectToAction("Index", "UserProfile");
@@ -268,26 +282,26 @@ namespace SysDev.Controllers
         public ActionResult Delete(string id)
         {
             var account = _context.Users
+                .Include(a => a.UserName)
                 .SingleOrDefault(p => p.Id == id);
 
             if (account == null)
                 return HttpNotFound();
 
-            var profile = _context.UserProfiles.SingleOrDefault(p=> p.Id == account.UserProfileId);
-            if (profile == null)
-                return HttpNotFound();
+            //var profile = _context.UserProfiles.SingleOrDefault(p=> p.Id == account.UserProfileId);
+            //if (profile == null)
+            //    return HttpNotFound();
 
-            string fullName = profile.FirstName + " " + profile.LastName;
+            string fullName = account.UserProfile.FirstName + " " + account.UserProfile.LastName;
 
             _context.Users.Remove(account);
             _context.SaveChanges();
 
-            ReportsController.AddAuditTrail("Update User",
-               "User named " + fullName + " was Deleted",
-                User.Identity.GetUserId());
+            ReportsController.AddAuditTrail(UserAction.Delete,
+                "<strong>" + fullName + "</strong> has been Deleted.",
+                User.Identity.GetUserId(), Page.Users);
 
-            //return RedirectToAction("Index", "UserProfile");
-            return Json(new { success = true, responseText = "User " + fullName + " has been removed." }, JsonRequestBehavior.AllowGet);
+            return Json(new { success = true, responseText = "<small>User </small>" + fullName + "<small> has been removed.</small>" }, JsonRequestBehavior.AllowGet);
         }
     }
 }

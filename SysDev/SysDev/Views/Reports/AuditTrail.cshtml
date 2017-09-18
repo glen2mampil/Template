@@ -4,13 +4,48 @@
     ViewBag.Title = "Audit Trail";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
+
+
+
+
+
 <div class="row">
     <div class="col-xs-12">
        
         <div class="box">
+            
             <div class="box-header">
-                <h3 class="box-title">Data Table With Full Features</h3>
+                <label class="col-md-12">Filter by:</label>
+                <hr />
+                <div class="col-md-3">
+                    Date Range
+                    <select id="filterr" class="form-control input-sm">
+                        <option value="">All</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    Commit by
+                    <select id="filterby_commit" class="form-control input-sm">
+                        <option value="">All</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    Module
+                    <select id="filterby_module" class="form-control input-sm">
+                        <option value="">All</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    Action
+                    <select id="filterby_action" class="form-control input-sm">
+                        <option value="">All</option>
+                    </select>
+                </div>
+
             </div>
+            <hr />
+
             <!-- /.box-header -->
             <div class="box-body">
                 <table id="audittrail-table" class="table table-bordered table-hover table-striped">
@@ -24,15 +59,7 @@
                     </tr>
                     </thead>
                     
-                    <thead id="filter">
-                    <tr>
-                        <th>Date</th>
-                        <th>Commit by</th>
-                        <th>Module</th>
-                        <th>Action</th>
-                        <th>Description</th>
-                    </tr>
-                    </thead>
+                    
                     <tbody>
 
                     </tbody>
@@ -54,6 +81,8 @@
     <!-- /.col -->
 </div>
 
+
+
 @section scripts
 {
     <script>
@@ -64,6 +93,7 @@
                         url: "/api/audittrails",
                         dataSrc: ""
                     },
+                    
                     order: [[ 0, "desc" ]],
                     columns: [
 
@@ -75,23 +105,44 @@
                                     weekday: "long", year: "numeric", month: "short",
                                     day: "numeric", hour: "2-digit", minute: "2-digit"
                                 };
+
+                                if ($("#filterr option[value='" + date.toLocaleTimeString("en-us", options) + "']").length < 1) {
+                                    $("#filterr").append("<option value='" + date.toLocaleTimeString("en-us", options) + "'>" + date.toLocaleTimeString("en-us", options) + "</option>");
+                                }
+
                                 return "<small class=''>" + date.toLocaleTimeString("en-us", options) + "</small>";
                             }
                             
                         },
                         {
                             render: function (data, type, full, meta) {
-                                return full.UserProfile.FirstName + full.UserProfile.LastName;
+                                var fullName = full.UserProfile.FirstName + " " + full.UserProfile.LastName;
+                                if ($("#filterby_commit option[value='" + fullName + "']").length < 1) {
+                                    $("#filterby_commit").append("<option value='" + fullName + "'>" + fullName + "</option>");
+                                }
+                                return fullName;
                             }
 
                         }, {
                             render: function (info, type, data, meta) {
-                                return data.Module.Name;
+                                var moduleName = data.Module.Name;
+                                if ($("#filterby_module option[value='" + moduleName + "']").length < 1) {
+                                    $("#filterby_module").append("<option value='" + moduleName + "'>" + moduleName + "</option>");
+                                }
+                                
+                                return moduleName;
                             }
 
                         },
                         {
-                            data: "Action"
+                            render: function (info, type, data, meta) {
+                                var action = data.Action;
+                                if ($("#filterby_action option[value='" + action + "']").length < 1) {
+                                    $("#filterby_action").append("<option value='" + action + "'>" + action + "</option>");
+                                }
+
+                                return action;
+                            }
                         },
                         {
                             data: "Description"
@@ -100,9 +151,31 @@
                     
                     ]
                     
-                    
             });
 
+            
+            $('#filterr').on('change', function () {
+                table.columns(0).search(this.value).draw();
+            });
+
+            $('#filterby_commit').on('change', function () {
+                table.columns(1).search(this.value).draw();
+            });
+
+            $('#filterby_module').on('change', function () {
+                table.columns(2).search(this.value).draw();
+            });
+            $('#filterby_action').on('change', function () {
+                table.columns(3).search(this.value).draw();
+            });
+
+            /*
+            $('#SecondDropdownId').on('change', function () {
+                table.columns(7).search(this.value).draw();
+            });
+            */
+
+            
             /*
             $('#audittrail-table #filter th').each(function (i) {
                 var title = $('#audittrail-table #filter th').eq($(this).index()).text();
