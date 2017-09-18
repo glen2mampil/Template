@@ -39,7 +39,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -244,6 +244,10 @@
     <Compile Include="Migrations\201709100453322_AddOverridedPropertiesApplicationUser.Designer.cs">
       <DependentUpon>201709100453322_AddOverridedPropertiesApplicationUser.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201709180409488_AddedMasterDetailNavigationInAuditTrail.cs" />
+    <Compile Include="Migrations\201709180409488_AddedMasterDetailNavigationInAuditTrail.Designer.cs">
+      <DependentUpon>201709180409488_AddedMasterDetailNavigationInAuditTrail.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\DashboardViewModel.cs" />
@@ -256,6 +260,11 @@
     <Compile Include="Models\UserProfileViewModel.cs" />
     <Compile Include="Models\ViewModelBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -676,6 +685,13 @@
     <EmbeddedResource Include="Migrations\201709100453322_AddOverridedPropertiesApplicationUser.resx">
       <DependentUpon>201709100453322_AddOverridedPropertiesApplicationUser.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709180409488_AddedMasterDetailNavigationInAuditTrail.resx">
+      <DependentUpon>201709180409488_AddedMasterDetailNavigationInAuditTrail.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -683,12 +699,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Testing|AnyCPU'">
     <OutputPath>bin\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
     <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
+    <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />

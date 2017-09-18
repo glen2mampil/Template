@@ -18,7 +18,7 @@ namespace SysDev.Controllers
         }
 
         protected override void Dispose(bool disposing)
-        {
+        { 
             _context.Dispose();
         }
 

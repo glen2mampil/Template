@@ -20,12 +20,21 @@ namespace SysDev.Controllers.Api
         }
 
         // GET /api/audittrails
-        public IEnumerable<AuditTrailDto> GetAuditTrails()
+        public IEnumerable<AuditTrail> GetAuditTrails()
         {
+
+            /*
+             * return _context.AuditTrails
+                .Include(c => c.UserProfile)
+                .Include(c => c.MasterDetails)
+                .ToList().OrderByDescending(c => c.DateCreated)
+                .Select(Mapper.Map<AuditTrail, AuditTrailDto>); */
+
             return _context.AuditTrails
                 .Include(c => c.UserProfile)
-                .ToList().OrderByDescending(c => c.DateCreated)
-                .Select(Mapper.Map<AuditTrail, AuditTrailDto>);
+                .Include(c => c.Module)
+                .OrderByDescending(c => c.DateCreated)
+                .ToList();
         }
 
         // GET /api/audittrail/1

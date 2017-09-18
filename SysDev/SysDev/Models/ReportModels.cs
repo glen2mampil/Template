@@ -15,7 +15,10 @@ namespace SysDev.Models
     {
         public int Id { get; set; }
         public int ModuleId { get; set; }
+        public MasterDetail Module { get; set; }
+
         public int PageId { get; set; }
+
         public string Action { get; set; }
 
         public int UserProfileId { get; set; }

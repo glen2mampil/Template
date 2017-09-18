@@ -24,7 +24,7 @@ namespace SysDev.Controllers.Api
         }
 
         // GET /api/customers
-        public IEnumerable<ApplicationUser> GetAuditTrails()
+        public IEnumerable<ApplicationUser> GetUsers()
         {
             return _context.Users
                 .Include(u => u.UserProfile)
@@ -55,7 +55,7 @@ namespace SysDev.Controllers.Api
                 .Where(p => p.IdentityRole.Name == role);
 
             //return Mapper.Map<AuditTrail, AuditTrailDto>(audit);
-            return Ok(user);
+            return Ok(permission);
         }
 
         // POST /api/auditrails
@@ -123,9 +123,10 @@ namespace SysDev.Controllers.Api
             //_context.SaveChanges();
         }
 
+        // DELETE /api/user
         [HttpDelete]
         public void DeleteUser(string id)
-        {
+        { 
             var user = _context.Users.SingleOrDefault(a => a.Id == id);
             if (user == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);

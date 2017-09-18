@@ -80,13 +80,14 @@
                             
                         },
                         {
-                            data: "UserProfile.FirstName",
                             render: function (data, type, full, meta) {
                                 return full.UserProfile.FirstName + full.UserProfile.LastName;
                             }
 
                         }, {
-                            data: "UserProfileId"
+                            render: function (info, type, data, meta) {
+                                return data.Module.Name;
+                            }
 
                         },
                         {
@@ -99,8 +100,10 @@
                     
                     ]
                     
+                    
             });
 
+            /*
             $('#audittrail-table #filter th').each(function (i) {
                 var title = $('#audittrail-table #filter th').eq($(this).index()).text();
                 $(this).html('<input type="text" placeholder="Filter ' + title + '" data-index="' + i + '" />');
@@ -113,8 +116,7 @@
                     .search(this.value)
                     .draw();
             });
-            
-            
+            */
 
         });
     </script>

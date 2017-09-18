@@ -43,20 +43,21 @@ namespace SysDev.Controllers
         // GET: UserProfile
         public ActionResult Index()
         {
-            var users = _context.UserProfiles.ToList();
+            List<UserProfile> users = _context.UserProfiles.ToList();
+            List<IdentityRole> roles = _context.Roles.ToList();
             var accounts = _context.Users.ToList();
             var useraccount = new UserProfileViewModel
             {
                 UserProfiles = users,
                 Accounts = accounts,
                 Account = LoginUser(),
-                AccountRole = "",
+                Roles = roles,
                 Permission = LoginUserPermission()
             };
             if (User.IsInRole("SuperAdmin"))
             {
-                //return View("IndexReadOnly",useraccount);
-                return View(useraccount);
+                return View("IndexReadOnly",useraccount);
+                //return View(useraccount);
             }
             return View("NotAllowed", useraccount);
         }
@@ -96,9 +97,9 @@ namespace SysDev.Controllers
             return View();
         }
 
-        public ActionResult ResetPassword(int id)
+        public ActionResult ResetPassword(string id)
         {
-            var account = _context.Users.SingleOrDefault(m=> m.UserProfileId == id);
+            var account = _context.Users.SingleOrDefault(m=> m.Id == id);
 
             var password = "password1";
             var passwordHasher = new Microsoft.AspNet.Identity.PasswordHasher();
@@ -106,7 +107,7 @@ namespace SysDev.Controllers
             account.PasswordHash = passwordHasher.HashPassword(password);
             _context.SaveChanges();
 
-            return RedirectToAction("Index", "UserProfile");
+            return Json(new { success = true, responseText = "Password successfuly Change!" }, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
@@ -129,16 +130,16 @@ namespace SysDev.Controllers
             return Json(new { success = true, responseText = "Password successfuly Change!" }, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult UpdateStatus(int id)
+        public ActionResult UpdateStatus(string id)
         {
             
-            var account = _context.Users.SingleOrDefault(a => a.UserProfileId == id);
+            var account = _context.Users.SingleOrDefault(a => a.Id == id);
             if (account != null)
             {
                 account.Status = (account.Status == "Active" ? "Inactive" : "Active");
                 _context.SaveChanges();
                 //return Json(new { success = false, responseText = "account: " + account.Email + " | Status: " + account.Status }, JsonRequestBehavior.AllowGet);
-                var user = _context.UserProfiles.SingleOrDefault(u => u.Id == id);
+                var user = _context.UserProfiles.SingleOrDefault(u => u.Id == account.UserProfileId);
                 ReportsController.AddAuditTrail("Update User",
                     "User named " + user.FirstName + " " + user.LastName + " was set to " + account.Status,
                     User.Identity.GetUserId());
@@ -166,14 +167,14 @@ namespace SysDev.Controllers
         }
 
         [HttpPost]
-        public ActionResult Save(AddUserViewModel model)
+        public ActionResult Save(UserProfileViewModel model)
         {
             //return Json(new { success = false, responseText = "Your message successfuly sent!" }, JsonRequestBehavior.AllowGet);
         
-            if (model.Profile.Id == 0)
+            if (model.EditProfile.Id == 0 && model.EditAccount.Id == null)
             {
-                model.Profile.DateCreated = DateTime.Now.ToString("MMM-dd-yyyy hh:mm tt");
-                _context.UserProfiles.Add(model.Profile);
+                model.EditProfile.DateCreated = DateTime.Now.ToString("MMM-dd-yyyy hh:mm tt");
+                _context.UserProfiles.Add(model.EditProfile);
                 _context.SaveChanges();
 
                 //Temp code
@@ -187,10 +188,10 @@ namespace SysDev.Controllers
                
                 var user = new ApplicationUser
                 {
-                    UserName = model.Account.UserName,
-                    UserProfileId = model.Profile.Id,
-                    UserProfile = model.Profile,
-                    Email = model.Account.Email,
+                    UserName = model.EditAccount.UserName,
+                    UserProfileId = model.EditProfile.Id,
+                    UserProfile = model.EditProfile,
+                    Email = model.EditAccount.Email,
                     Status = "Active"
                 };
 
@@ -198,12 +199,14 @@ namespace SysDev.Controllers
                 //Add default User to Role Admin   
                 if (chkUser.Succeeded)
                 {
-                    var result1 = userManager.AddToRole(user.Id, "SuperAdmin");
+                    var result1 = userManager.AddToRole(user.Id, "Employee");
 
                 }
+                string fullName = model.EditProfile.FirstName + " " + model.EditProfile.LastName;
                 ReportsController.AddAuditTrail("Add User",
-                    model.Profile.FirstName + " " + model.Profile.LastName + " has been added.",
+                    fullName + " has been added.",
                     User.Identity.GetUserId());
+                return Json(new { success = true, responseText = fullName + " <small>was added.</small>" }, JsonRequestBehavior.AllowGet);
             }
             else
             {
@@ -212,27 +215,27 @@ namespace SysDev.Controllers
 
                 try
                 {
-                    var profile = _context.UserProfiles.SingleOrDefault(p => p.Id == model.Profile.Id);
+                    var profile = _context.UserProfiles.SingleOrDefault(p => p.Id == model.EditProfile.Id);
                     //TryUpdateModel(prifle);
                     if (profile != null)
                     {
-                        profile.FirstName = model.Profile.FirstName;
-                        profile.LastName = model.Profile.LastName;
-                        profile.MiddleName = model.Profile.MiddleName;
-                        profile.Gender = model.Profile.Gender;
-                        profile.ContactNo = model.Profile.ContactNo;
-                        profile.Address = model.Profile.Address;
-                        profile.CompanyId = model.Profile.CompanyId;
-                        profile.CompanyName = model.Profile.CompanyName;
-                        profile.MaritalStatus = model.Profile.MaritalStatus;
+                        profile.FirstName = model.EditProfile.FirstName;
+                        profile.LastName = model.EditProfile.LastName;
+                        profile.MiddleName = model.EditProfile.MiddleName;
+                        profile.Gender = model.EditProfile.Gender;
+                        profile.ContactNo = model.EditProfile.ContactNo;
+                        profile.Address = model.EditProfile.Address;
+                        profile.CompanyId = model.EditProfile.CompanyId;
+                        profile.CompanyName = model.EditProfile.CompanyName;
+                        profile.MaritalStatus = model.EditProfile.MaritalStatus;
                     }
 
 
-                    var account = _context.Users.SingleOrDefault(a => a.UserProfileId == model.Profile.Id);
+                    var account = _context.Users.SingleOrDefault(a => a.UserProfileId == model.EditProfile.Id);
                     if (account != null)
                     {
-                        account.Email = model.Account.Email;
-                        account.UserName = model.Account.UserName;
+                        account.Email = model.EditAccount.Email;
+                        account.UserName = model.EditAccount.UserName;
                     }
                     _context.SaveChanges();
                 }
@@ -252,30 +255,39 @@ namespace SysDev.Controllers
                     //return Json(new { success = false, responseText = "Error @" + ((System.Data.Entity.Validation.DbEntityValidationException)ex).EntityValidationErrors }, JsonRequestBehavior.AllowGet);
                     
                 }
-                
+                string fullName = model.EditProfile.FirstName + " " + model.EditProfile.LastName;
                 ReportsController.AddAuditTrail("Update User",
-                    model.Profile.FirstName + " " + model.Profile.LastName + "'s information was Updated",
+                    fullName + "'s information was Updated",
                     User.Identity.GetUserId());
+                return Json(new { success = true, responseText = fullName + " has been Updated." }, JsonRequestBehavior.AllowGet);
             }
 
-            return RedirectToAction("Index", "UserProfile");
+            //return RedirectToAction("Index", "UserProfile");
         }
 
-        public ActionResult Delete(int id)
+        public ActionResult Delete(string id)
         {
-            var profile = _context.UserProfiles.SingleOrDefault(p => p.Id == id);
+            var account = _context.Users
+                .SingleOrDefault(p => p.Id == id);
 
+            if (account == null)
+                return HttpNotFound();
+
+            var profile = _context.UserProfiles.SingleOrDefault(p=> p.Id == account.UserProfileId);
             if (profile == null)
                 return HttpNotFound();
 
-            _context.UserProfiles.Remove(profile);
+            string fullName = profile.FirstName + " " + profile.LastName;
+
+            _context.Users.Remove(account);
             _context.SaveChanges();
 
             ReportsController.AddAuditTrail("Update User",
-               "User named " + profile.FirstName + " " + profile.LastName + " was Deleted",
+               "User named " + fullName + " was Deleted",
                 User.Identity.GetUserId());
 
-            return RedirectToAction("Index", "UserProfile");
+            //return RedirectToAction("Index", "UserProfile");
+            return Json(new { success = true, responseText = "User " + fullName + " has been removed." }, JsonRequestBehavior.AllowGet);
         }
     }
 }

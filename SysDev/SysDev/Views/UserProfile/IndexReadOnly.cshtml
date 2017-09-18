@@ -1,76 +1,275 @@
-﻿
-
+﻿@model SysDev.Models.UserProfileViewModel
 @{
     ViewBag.Title = "Users";
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.activePage = "Users";
 }
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+<style>
+    .color-palette {
+        height: 35px;
+        line-height: 35px;
+        text-align: center;
+    }
 
-<div class="row">
-    <div class="col-xs-12">
+    .color-palette-set {
+        margin-bottom: 15px;
+    }
 
-        <div class="box">
-            <div class="box-header">
-                <h3 class="box-title">Data Table With Full Features</h3>
-            </div>
-            <!-- /.box-header -->
-            <div class="box-body">
-                <table id="audittrail-table" class="table table-bordered table-hover table-striped">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Commit by</th>
-                            <th>Module</th>
-                            <th>Action</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
+    .color-palette span {
+        display: none;
+        font-size: 12px;
+    }
 
-                    <thead id="filter">
-                        <tr>
-                            <th>Date</th>
-                            <th>Commit by</th>
-                            <th>Module</th>
-                            <th>Action</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                    <tfoot>
-                        <tr>
-                            <th>Date</th>
-                            <th>Commit by</th>
-                            <th>Module</th>
-                            <th>Action</th>
-                            <th>Description</th>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-            <!-- /.box-body -->
-        </div>
-        <!-- /.box -->
+    .color-palette:hover span {
+        display: block;
+    }
+
+    .color-palette-box h4 {
+        position: absolute;
+        top: 100%;
+        left: 25px;
+        margin-top: -40px;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 12px;
+        display: block;
+        z-index: 7;
+    }
+</style>
+
+<!--User list table-->
+<div class="box">
+    <div class="box-header">
+        <h3 class="box-title"></h3>
+        @if (Model.Permission.AllowCreate == 1)
+        {
+            <a href="#editing-modal" class="btn btn-primary pull-right flat" id="user-create" data-toggle="modal"><i class="fa fa-user-plus"></i> </a>
+        }
     </div>
-    <!-- /.col -->
+    <!-- /.box-header -->
+    <div class="box-body">
+        <table id="table-userlist" class="display table table-striped table-bordered table-hover table-condensed table-responsive" width="100%">
+            <thead>
+            <tr>
+                <th width="30px"></th>
+                <th>Full Name</th>
+                <th>Date Created</th>
+                <th>Address</th>
+                <th>Status</th>
+                <th width="200" class="text-center">Actions</th>
+            </tr>
+            </thead>
+            
+        </table>
+    </div>
+    <!-- /.box-body -->
 </div>
 
+<!--User Details Modal-->
+<div id="myModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content" id="modal-content">
+            <div class="modal-header">
+                <h4 id="exampleModalLongTitle">
+                    <a class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </a>
+                </h4>
+                <div class="row">
+                    <div class="col-md-4">
+                        <p></p>
+                        <p>
+                        <div class="col-md-4" id="profile-img"></div>
+                    </div>
+                    
+                    <div class="col-md-8 v-devider">
+                        <p class="user-details">
+                            <span class="profile-username" id="lastname"></span>
+                            <span class="lead text-muted" id="middlename"></span>
+                            <span class="profile-username" id="firstname"></span>
+                        </p>
+                        <p class="user-details m-b-10" id="position"><small></small>
+                        </p>
+                        <p></p>
+                        <p class="user-details"><span class="text-muted">Contact No:</span> <span class="text-bold" id="contactno"></span></p>
+                        <p class="user-details"><span class="text-muted">Email:</span> <span class="text-bold" id="email"></span></p>
+                        <p class="user-details"><span class="text-muted">Gender:</span> <span class="text-bold" id="gender"> </span></p>
+                        <p class="user-details"><span class="text-muted">Marital Status:</span> <span class="text-bold" id="maritalstatus"></span></p>
+                        <p class="user-details"><span class="text-muted">Address:</span> <span class="text-bold" id="address"></span></p>
+                        <p></p>
+                        <p class="user-details"><span class="text-muted">Company:</span> <span class="text-bold" id="companyname"></span></p>
+                        <p class="user-details"><span class="text-muted">Company ID:</span> <span class="text-bold" id="companyid"></span></p>
+                        <p></p>
+                        <h1></h1>
+                    </div>
+                    <div class="col-md-4">
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body" id="modal-content">
+                Recent Activities
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create / Edit User Modal-->
+<div id="editing-modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            @using (Html.BeginForm("Save", "UserProfile", FormMethod.Post, new {role = "form", id = "edit-user" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h4 id="exampleModalLongTitle">
+                        Edit User
+                        <a class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </a>
+                    </h4>
+                </div>
+                <div class="modal-body" id="modal-content">
+                    <div class="row">
+                        <fieldset>
+                            <div class="col-md-6">
+                                <div class="col-md-12 form-group">
+                                    @Html.LabelFor(m => m.EditProfile.FirstName, new { @class = "label text-black control-label", })
+                                    @Html.TextBoxFor(m => m.EditProfile.FirstName, new { @class = "form-control input-sm" })
+                                    @Html.ValidationMessageFor(m => m.EditProfile.FirstName, "", new { @class = "has-error label text-red control-label" })
+                                </div>
+                                <div class="col-md-12 form-group">
+                                    @Html.LabelFor(m => m.EditProfile.MiddleName, new { @class = "label text-black control-label" })
+                                    @Html.TextBoxFor(m => m.EditProfile.MiddleName, new { @class = "form-control input-sm" })
+                                    @Html.ValidationMessageFor(m => m.EditProfile.MiddleName, "", new { @class = "has-error label text-red control-label" })
+                                </div>
+                                <div class="col-md-12 form-group">
+                                    @Html.LabelFor(m => m.EditProfile.LastName, new { @class = "label text-black control-label" })
+                                    @Html.TextBoxFor(m => m.EditProfile.LastName, new { @class = "form-control input-sm" })
+                                    @Html.ValidationMessageFor(m => m.EditProfile.LastName, "", new { @class = "has-error label text-red control-label" })
+                                </div>
+                                <div class="col-md-12 form-group">
+                                    @Html.LabelFor(m => m.EditProfile.Gender, new { @class = "label text-black control-label" })
+                                    <select class="form-control input-sm" id="EditProfile_Gender" name="EditProfile.Gender">
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select>
+                                    @*Html.TextBoxFor(m => m.Profile.Gender, new {@class = "form-control input-sm"})*@
+                                    @Html.ValidationMessageFor(m => m.EditProfile.Gender, "", new { @class = "has-error label text-red control-label" })
+                                </div>
+                                <div class="col-md-12 form-group">
+                                    @Html.LabelFor(m => m.EditProfile.MaritalStatus, new { @class = "label text-black control-label" })
+                                    <select class="form-control input-sm" id="EditProfile_MarialStatus" name="EditProfile.MaritalStatus">
+                                        <option value="Single">Single</option>
+                                        <option value="Married">Married</option>
+                                    </select>
+                                    @Html.ValidationMessageFor(m => m.EditProfile.MaritalStatus, "", new { @class = "has-error label text-red control-label" })
+                                    @*Html.TextBoxFor(m => m.Profile.MaritalStatus, new {@class = "form-control input-sm"})*@
+
+                                </div>
+                                <div class="col-md-12 form-group">
+                                    @Html.LabelFor(m => m.EditProfile.Address, new { @class = "label text-black control-label" })
+                                    @Html.TextBoxFor(m => m.EditProfile.Address, new { @class = "form-control input-sm" })
+                                    @Html.ValidationMessageFor(m => m.EditProfile.Address, "", new { @class = "has-error label text-red control-label" })
+                                </div>
+
+
+                            </div>
+                            <div class="col-md-6">
+                                <div class="col-md-12 form-group">
+                                    @Html.LabelFor(m => m.EditProfile.CompanyName, new { @class = "label text-black control-label" })
+                                    @Html.TextBoxFor(m => m.EditProfile.CompanyName, new { @class = "form-control input-sm" })
+                                    @Html.ValidationMessageFor(m => m.EditProfile.CompanyName, "", new { @class = "has-error label text-red control-label" })
+                                </div>
+                                <div class="col-md-12 form-group">
+                                    @Html.LabelFor(m => m.EditProfile.CompanyId, new { @class = "label text-black control-label" })
+                                    @Html.TextBoxFor(m => m.EditProfile.CompanyId, new { @class = "form-control input-sm" })
+                                    @Html.ValidationMessageFor(m => m.EditProfile.CompanyId, "", new { @class = "has-error label text-red control-label" })
+                                </div>
+                                <div class="col-md-12 form-group">
+                                    @Html.LabelFor(m => m.EditProfile.ContactNo, new { @class = "label text-black control-label" })
+                                    @Html.TextBoxFor(m => m.EditProfile.ContactNo, new { @class = "form-control input-sm" })
+                                    @Html.ValidationMessageFor(m => m.EditProfile.ContactNo, "", new { @class = "has-error label text-red control-label" })
+                                </div>
+                                
+                                <div class="col-md-12 form-group">
+                                    @Html.LabelFor(m => m.EditAccount.Email, new { @class = "label text-black control-label" })
+                                    @Html.TextBoxFor(m => m.EditAccount.Email, new { type = "email", placeholder = "example@domain.com", @class = "form-control input-sm" })
+                                    @Html.ValidationMessageFor(m => m.EditAccount.Email, "", new { @class = "has-error label text-red control-label" })
+                                </div>
+                                <div class="col-md-12 form-group">
+                                    @Html.LabelFor(m => m.EditAccount.UserName, new { @class = "label text-black control-label" })
+                                    @Html.TextBoxFor(m => m.EditAccount.UserName, new { @class = "form-control input-sm" })
+                                    @Html.ValidationMessageFor(m => m.EditAccount.UserName, "", new { @class = "has-error label text-red control-label" })
+                                </div>
+                                <div class="col-md-12 form-group">
+                                    @Html.LabelFor(m => m.EditAccount.Roles, new { @class = "label text-black control-label" })
+                                    
+                                    @Html.ValidationMessageFor(m => m.EditAccount.Roles, "", new { @class = "has-error label text-red control-label" })
+                                    @*Html.TextBoxFor(m => m.Profile.MaritalStatus, new {@class = "form-control input-sm"})*@
+                                    
+                                    <select class="form-control input-sm" id="roles" name="Roles">
+                                        <option value=""> -- Select Role --</option>
+                                        @foreach (var role in Model.Roles)
+                                        {
+                                            <option value="@role.Id">@role.Name</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            @Html.HiddenFor(m => m.EditAccount.Id)
+                            @Html.HiddenFor(m => m.EditProfile.Id)
+                        </fieldset>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <p id="dialog-alert"></p>
+                    <button type="button" class="btn " data-dismiss="modal">Close</button>
+                    <button type="submit" id="save" class="btn btn-primary">Save changes</button>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+
+
+@Scripts.Render("~/bundles/jqueryval")
 @section scripts
 {
+
     <script>
         $(document).ready(function () {
-
-            var table = $("#audittrail-table").DataTable({
+            var table = $("#table-userlist").DataTable({
                     ajax: {
                         url: "/api/users",
                         dataSrc: ""
                     },
-                    order: [[ 0, "desc" ]],
+                    order: [[1, "asc"]],
+                    responsive: true,
                     columns: [
-
                         {
-                            data: "DateCreated",
-                            render: function (data, type, full) {
-                                var date = new Date(full.DateCreated);
+                           render: function(info, type, data) {
+                               var img = data.UserProfile.Gender === "Male" ?
+                                   "<img src='/admin-lte/img/flat-face-male-o.png' class='user-image' alt='User Image' width='30px'>" :
+                                   "<img src='/admin-lte/img/flat-face-female.png' class='user-image' alt='User Image' width='30px'>";
+
+                               return "<div width='20px'>" + img+" <p class='hidden'>"+ data.UserProfile.Gender+"</p></div>";
+                           }
+                        },
+                        {
+                            render: function (info, type, data) {
+
+                                return "<h4 class='no-margin timeline-header'><a href='#myModal' class='user-details btnDetails box-title text-black' data-toggle='modal'>" +
+                                    data.UserProfile.LastName + ", " + data.UserProfile.FirstName +
+                                    "</em></a></h4>";
+                            }
+
+                        },
+                        {
+                            render: function (info, type, data) {
+                                var date = new Date(data.UserProfile.DateCreated);
                                 var options = {
                                     weekday: "long", year: "numeric", month: "short",
                                     day: "numeric", hour: "2-digit", minute: "2-digit"
@@ -80,40 +279,289 @@
 
                         },
                         {
-                            data: "UserProfile.FirstName",
-                            render: function (data, type, full, meta) {
-                                return full.UserProfile.FirstName + full.UserProfile.LastName;
+                            render: function (info, type, data) {
+                                return "<p>" + data.UserProfile.Address + "</p>";
+                            }
+                        },
+                        {
+                            render: function (info, type, data) {
+                                var statusClass = data.Status === "Active" ? "label-success" : "label-danger";
+                                return "<a href='#' class='user-status label " + statusClass + "'>" + data.Status + "</a>";
                             }
 
-                        }, {
-                            data: "UserName"
-
                         },
                         {
-                            data: "UserName"
-                        },
-                        {
-                            data: "UserName"
-
+                            render: function (info, type, data) {
+                                var editBtn = "<a href='#editing-modal' class='label label-primary user-edit' data-toggle='modal'><i class='fa fa-pencil'></i> Edit</a>";
+                                var resetPw = "<a href='#' class='label label-primary user-resetpass'> Reset Password</a>";
+                                var deleteBtn = "<a href='#' class='label label-danger user-delete'><i class='fa fa-close'></i> Delete</a>";
+                                return editBtn + " | " + resetPw + " | " + deleteBtn;
+                            }
                         }
-
                     ]
 
             });
 
-            $('#audittrail-table #filter th').each(function (i) {
-                var title = $('#audittrail-table #filter th').eq($(this).index()).text();
-                $(this).html('<input type="text" placeholder="Filter ' + title + '" data-index="' + i + '" />');
+            $("#table-userlist tbody").on('click', '.user-details', function (e) {
+                var row = $(this).parent().closest("tr");
+                var userData = table.row(row).data();
+
+                var img = userData.UserProfile.Gender === "Male" ?
+                    "<img src='/admin-lte/img/flat-face-male-o.png' class='user-image' alt='User Image' width='150px'>" :
+                    "<img src='/admin-lte/img/flat-face-female.png' class='user-image' alt='User Image' width='150px'>";
+
+                $("#profile-img").html(img);
+                $("#firstname").text(userData.UserProfile.FirstName);
+                $("#middlename").text(userData.UserProfile.MiddleName);
+                $("#lastname").text(userData.UserProfile.LastName);
+                $("#contactno").text(userData.UserProfile.ContactNo);
+                $("#email").text(userData.Email);
+                $("#gender").text(userData.UserProfile.Gender);
+                $("#maritalstatus").text(userData.UserProfile.MaritalStatus);
+                $("#companyname").text(userData.UserProfile.CompanyName);
+                $("#companyid").text(userData.UserProfile.CompanyId);
+                $("#address").text(userData.UserProfile.Address);
+                //console.log(userData.UserProfile.FirstName);
             });
 
+            $("#table-userlist tbody").on('click', '.user-edit', function (e) {
+
+                var row = $(this).parent().closest("tr");
+                var userData = table.row(row).data();
+
+                var img = userData.UserProfile.Gender === "Male" ?
+                    "<img src='/admin-lte/img/flat-face-male-o.png' class='user-image' alt='User Image' width='150px'>" :
+                    "<img src='/admin-lte/img/flat-face-female.png' class='user-image' alt='User Image' width='150px'>";
+
+                $("#profile-img").html(img);
+                $("#EditProfile_FirstName").val(userData.UserProfile.FirstName);
+                $("#EditProfile_MiddleName").val(userData.UserProfile.MiddleName);
+                $("#EditProfile_LastName").val(userData.UserProfile.LastName);
+                $("#EditProfile_ContactNo").val(userData.UserProfile.ContactNo);
+                $("#EditAccount_Email").val(userData.Email);
+                $("#EditProfile_Gender").val(userData.UserProfile.Gender);
+                $("#EditProfile_MarialStatus").val(userData.UserProfile.MaritalStatus);
+                $("#EditProfile_CompanyName").val(userData.UserProfile.CompanyName);
+                $("#EditProfile_CompanyId").val(userData.UserProfile.CompanyId);
+                $("#EditProfile_Address").val(userData.UserProfile.Address);
+                $("#EditAccount_UserName").val(userData.UserName);
+                $("#EditAccount_Roles").val(userData.Roles.RoleId);
+                $("#EditAccount_Id").val(userData.Id);
+                $("#EditProfile_Id").val(userData.UserProfile.Id);
+                $("#roles").remove();
+
+
+                
+                
+
+
+                //console.log(userData.UserProfile.FirstName);
+            });
+
+            $("#table-userlist tbody").on('click', '.user-status', function (e) {
+                var row = $(this).parent().closest("tr");
+                var userData = table.row(row).data();
+                var fullname = userData.UserProfile.FirstName + " " + userData.UserProfile.LastName;
+
+                var btnStatus = $(this);
+                //console.log("error:" + btnStatus);
+                var requestStatus = (btnStatus.text() === "Active" ? "Inactive" : "Active");
+                swal({
+                    title: "<small>" + (requestStatus === "Active" ? "Activate" : "Deactivate") + "</small> "
+                        + fullname + "<small>'s account?</small>",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes'
+                }).then(function () {
+                    swal('Please wait');
+                    swal.showLoading();
+                    $.ajax({
+                        url: "/UserProfile/UpdateStatus/" + userData.Id,
+                        type: "Post",
+                        data: userData.Id,
+                        success: function (result) {
+                            swal({
+                                title: fullname + "<small>'s is now </small>" + (requestStatus),
+                                timer: 3000,
+                                type: "success"
+                            }).catch(swal.noop);
+                            btnStatus.removeClass(btnStatus.hasClass("label-success") ? 'label-success' : 'label-danger');
+                            btnStatus.text(requestStatus === "Active" ? "Active" : "Inactive");
+                            btnStatus.addClass(btnStatus.text() === "Active" ? "label-success" : "label-danger");
+                        }
+                    });
+                }).catch(swal.noop);
+            });
+
+            $("#table-userlist tbody").on('click', '.user-resetpass', function (e) {
+                var row = $(this).parent().closest("tr");
+                var userData = table.row(row).data();
+                var fullname = userData.UserProfile.FirstName + " " + userData.UserProfile.LastName;
+
+                swal({
+                    title: "<small>Continue on resetting </small>" + fullname + "<small>'s password?</small>",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes'
+                }).then(function () {
+                    swal('Please wait');
+                    swal.showLoading();
+                    $.ajax({
+                        url: "/UserProfile/ResetPassword/" + userData.Id,
+                        type: "Post",
+                        data: userData.Id,
+                        success: function (response) {
+                            if (response.success) {
+                                swal({
+                                    title: fullname + " <small>'s password was resetted.</small>",
+                                    timer: 3000,
+                                    type: "success"
+                                }).catch(swal.noop);
+                            } else {
+                                swal({
+                                    title: "Opps!",
+                                    html: "<small>" + response.responseText + "</small>",
+                                    type: "error"
+                                }).catch(swal.noop);
+                            }
+                        },
+                        error: function (jqXhr, textStatus, errorThrown) {
+                            swal({
+                                title: "Opps! <small>something went wrong try again later</small>.",
+                                text: "<small class='label label-error'> Status Code: " + jqXhr.status + "</small>" +
+                                    "<small class='label label-error'> Error: " + jqXhr.responseText + "</small>" +
+                                    "<small class='label label-error'>Status: " + textStatus + "</small>" +
+                                    "<small class='label label-error'>Throws: " + errorThrown + "</small>",
+                                type: "error"
+                            }).catch(swal.noop);
+                        }
+                    });
+                }).catch(swal.noop);
+            });
+
+            $("#table-userlist tbody").on('click', '.user-delete', function (e) {
+                var row = $(this).parent().closest("tr");
+                var userData = table.row(row).data();
+                var fullname = userData.UserProfile.FirstName + " " + userData.UserProfile.LastName;
+                swal({
+                    title: "<small>Remove</small> " + fullname + "<small> in the users list?</small>",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes'
+                }).then(function () {
+                    swal('Please wait');
+                    swal.showLoading();
+                    $.ajax({
+                        url: "/UserProfile/Delete/" + userData.Id,
+                        type: "Post",
+                        data: userData.Id,
+                        success: function (response) {
+                            if (response.success) {
+                                swal({
+                                    title: fullname + " <small>was removed.</small>",
+                                    timer: 3000,
+                                    type: "success"
+                                }).catch(swal.noop);
+                                table.ajax.reload();
+                                //$("#users-table").fadeOut(800, function () {
+                                //    $("#users-table").load("/UserProfile/List").fadeIn().delay(2000);
+                                //});
+
+                            } else {
+                                swal({
+                                    title: "Opps!",
+                                    html: "<small>" + response.responseText + "</small>",
+                                    type: "error"
+                                }).catch(swal.noop);
+                            }
+                        },
+                        error: function (jqXhr, textStatus, errorThrown) {
+                            swal({
+                                title: "Opps! <small>something went wrong tyr again later</small>.",
+                                html: "<small class='label label-error'> Status Code: " + jqXhr.status + "</small>" +
+                                    "<small class='label label-error'> Error: " + jqXhr.responseText + "</small>" +
+                                    "<small class='label label-error'>Status: " + textStatus + "</small>" +
+                                    "<small class='label label-error'>Throws: " + errorThrown + "</small>",
+                                type: "error"
+                            }).catch(swal.noop);
+                        }
+                    });
+                }).catch(swal.noop);
+            });
+
+            $("#edit-user").on("submit", function (event) {
+                event.preventDefault();
+                var $this = $(this);
+                var frmValues = $this.serialize();
+                if ($("#edit-user").valid()) {
+                    $.ajax({
+                        url: $this.attr('action'),
+                        type: $this.attr('method'),
+                        data: frmValues,
+                        success: function (response) {
+                            if (response.success) {
+                                $("#editing-modal").modal("toggle");
+                                swal({
+                                    title:  " <small>was added.</small>",
+                                    timer: 3000,
+                                    type: "success"
+                                }).catch(swal.noop);
+                                table.ajax.reload();
+                            } else {
+                                swal({
+                                    title: "Opps!",
+                                    html: "<small>" + response.responseText + "</small>",
+                                    type: "error"
+                                }).catch(swal.noop);
+                            }
+                        },
+                        error: function (jqXhr, textStatus, errorThrown) {
+                            swal({
+                                title: "Opps! <small>something went wrong try again later</small>.",
+                                html: "<small class='label label-error'> Status Code: " + jqXhr.status + "</small>" +
+                                    "<small class='label label-error'> Error: " + jqXhr.responseText + "</small>" +
+                                    "<small class='label label-error'>Status: " + textStatus + "</small>" +
+                                    "<small class='label label-error'>Throws: " + errorThrown + "</small>",
+                                type: "error"
+                            }).catch(swal.noop);
+                        }
+                    });
+                }
+            });
+
+            
+            /*
+            $('#table-userlist tbody').on('click', 'tr', function () {
+
+
+                var text = $(this).closest("tr").find("username").text();
+                //console.log(table.row(this).data() + "| text: " + text);
+                //console.log(table.row(this).data().UserProfile.Gender);
+            });
+            */
+
+
+            /*
+            $('#table-userlist #filter th').each(function (i) {
+                var title = $('#table-userlist #filter th').eq($(this).index()).text();
+                $(this).html('<input type="text" placeholder="Filter ' + title + '" data-index="' + i + '" />');
+            });
+            */
             // Filter event handler
+            /*
             $(table.table().container()).on('keyup', '#filter input', function () {
                 table
                     .column($(this).data('index'))
                     .search(this.value)
                     .draw();
             });
-
+            */
 
 
         });

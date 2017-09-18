@@ -13,8 +13,15 @@ namespace SysDev.Models
         public List<UserProfile> UserProfiles { get; set; }
 
         public List<ApplicationUser> Accounts { get; set; }
+
+        public UserProfile EditProfile { get; set; }
+
+        public ApplicationUser EditAccount { get; set; }
+
+        public List<IdentityRole> Roles { get; set; }
     }
 
+    //soon to delete
     public class AddUserViewModel : ViewModelBase
      { 
         public UserProfile Profile { get; set; }
