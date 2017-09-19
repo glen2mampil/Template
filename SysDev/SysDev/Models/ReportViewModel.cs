@@ -8,7 +8,9 @@ namespace SysDev.Models
     public class ReportViewModel : ViewModelBase
     {
         public List<AuditTrail> AuditTrails { get; set; }
-        public List<UserProfile> UserProfiles { get; set; }
+        public List<ApplicationUser> UserProfiles { get; set; }
+
+        public List<MasterDetail> Modules { get; set; }
     }
 
     

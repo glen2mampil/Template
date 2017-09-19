@@ -125,14 +125,16 @@ namespace SysDev.Controllers.Api
 
         // DELETE /api/user
         [HttpDelete]
-        public void DeleteUser(string id)
-        { 
+        public IHttpActionResult DeleteUser(string id)
+        {
             var user = _context.Users.SingleOrDefault(a => a.Id == id);
             if (user == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
             _context.Users.Remove(user);
             _context.SaveChanges();
+
+            return Ok();
         }
     }
 }

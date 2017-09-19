@@ -49,14 +49,16 @@ namespace SysDev.Controllers
         public ActionResult AuditTrail()
         {
             var audits = _context.AuditTrails.ToList();
-            var profile = _context.UserProfiles.ToList();
+            var profile = _context.Users.Include(p => p.UserProfile).ToList();
+            var modules = _context.MasterDetails.Include(m => m.MasterData).Where(m => m.MasterData.Name =="Modules").ToList();
 
             var reportView = new ReportViewModel
             {
                 AuditTrails = audits,
                 UserProfiles = profile,
                 Account = LoginUser(),
-                Permission = LoginUserPermission()
+                Permission = LoginUserPermission(),
+                Modules = modules
             };
 
             return View(reportView);

@@ -23,13 +23,6 @@ namespace SysDev.Controllers.Api
         public IEnumerable<AuditTrail> GetAuditTrails()
         {
 
-            /*
-             * return _context.AuditTrails
-                .Include(c => c.UserProfile)
-                .Include(c => c.MasterDetails)
-                .ToList().OrderByDescending(c => c.DateCreated)
-                .Select(Mapper.Map<AuditTrail, AuditTrailDto>); */
-
             return _context.AuditTrails
                 .Include(c => c.UserProfile)
                 .Include(c => c.Module)
