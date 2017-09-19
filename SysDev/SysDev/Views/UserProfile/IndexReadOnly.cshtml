@@ -4,7 +4,12 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.activePage = "Users";
 }
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+
+@section css{
+    <link rel="stylesheet" href="~/Content/components/bootstrap-daterangepicker/daterangepicker.css" />
+    <link rel="stylesheet" href="~/Content/components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+}
 <style>
     .color-palette {
         height: 35px;
@@ -40,12 +45,45 @@
 <!--User list table-->
 <div class="box">
     <div class="box-header">
+        
         <h3 class="box-title"></h3>
         @if (Model.Permission.AllowCreate == 1)
         {
             <a href="#editing-modal" class="btn btn-primary pull-right flat" id="user-create" data-toggle="modal"><i class="fa fa-user-plus"></i> </a>
         }
-    </div>
+        
+            <label class="col-md-12">Filter by:</label>
+            <hr />
+            <div class="form-group col-md-3">
+                Date created (Date rage)
+                <div class="input-group">
+                    <div class="input-group-addon">
+                        <i class="fa fa-calendar"></i>
+                    </div>
+                    <input type="text" class="form-control pull-right input-sm" id="reservation">
+                </div>
+                <!-- /.input group -->
+            </div>
+            <div class="col-md-3">
+                Address
+                <input type="text" class="form-control input-sm" id="filterby_address" />
+            </div>
+            <div class="col-md-3">
+                Status
+                <select id="filterby_status" class="form-control input-sm">
+                    <option value="">All</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                Gender
+                <select id="filterby_gender" class="form-control input-sm">
+                    <option value="">All</option>
+                </select>
+            </div>
+
+        </div>
+        <hr />
+
     <!-- /.box-header -->
     <div class="box-body">
         <table id="table-userlist" class="display table table-striped table-bordered table-hover table-condensed table-responsive" width="100%">
@@ -238,7 +276,8 @@
 @Scripts.Render("~/bundles/jqueryval")
 @section scripts
 {
-
+<script src="~/Content/components/moment/min/moment.min.js"></script>
+<script src="~/Content/components/bootstrap-daterangepicker/daterangepicker.js"></script>
     <script>
         $(document).ready(function () {
             var table = $("#table-userlist").DataTable({
@@ -254,6 +293,11 @@
                                var img = data.UserProfile.Gender === "Male" ?
                                    "<img src='/admin-lte/img/flat-face-male-o.png' class='user-image' alt='User Image' width='30px'>" :
                                    "<img src='/admin-lte/img/flat-face-female.png' class='user-image' alt='User Image' width='30px'>";
+
+                               var gender = data.UserProfile.Gender;
+                               if ($("#filterby_gender option[value='" + gender + "']").length < 1) {
+                                   $("#filterby_gender").append("<option value='" + gender + "'>" + gender + "</option>");
+                               }
 
                                return "<div width='20px'>" + img+" <p class='hidden'>"+ data.UserProfile.Gender+"</p></div>";
                            }
@@ -271,22 +315,36 @@
                             render: function (info, type, data) {
                                 var date = new Date(data.UserProfile.DateCreated);
                                 var options = {
-                                    weekday: "long", year: "numeric", month: "short",
-                                    day: "numeric", hour: "2-digit", minute: "2-digit"
+                                    //weekday: "long",
+                                    year: "numeric",
+                                    month: "short",
+                                    day: "numeric",
+                                    //hour: "2-digit",
+                                    //minute: "2-digit"
                                 };
-                                return "<small class=''>" + date.toLocaleTimeString("en-us", options) + "</small>";
+                                return "<small class=''>" + date.toLocaleString("en-us", options) + "</small>";
+                                //return "<small class=''>" + date.toLocaleTimeString("en-us", options) + "</small>";
                             }
 
                         },
                         {
                             render: function (info, type, data) {
-                                return "<p>" + data.UserProfile.Address + "</p>";
+                                var address = data.UserProfile.Address;
+                                
+
+                                return "<p>" + address + "</p>";
                             }
                         },
                         {
                             render: function (info, type, data) {
                                 var statusClass = data.Status === "Active" ? "label-success" : "label-danger";
-                                return "<a href='#' class='user-status label " + statusClass + "'>" + data.Status + "</a>";
+
+                                var status = data.Status;
+                                if ($("#filterby_status option[value='" + status + "']").length < 1) {
+                                    $("#filterby_status").append("<option value='" + status + "'>" + status + "</option>");
+                                }
+
+                                return "<a href='#' class='user-status label " + statusClass + "'>" + status + "</a>";
                             }
 
                         },
@@ -508,11 +566,19 @@
                             if (response.success) {
                                 $("#editing-modal").modal("toggle");
                                 swal({
-                                    title:  " <small>was added.</small>",
+                                    title: response.responseText,
                                     timer: 3000,
                                     type: "success"
                                 }).catch(swal.noop);
                                 table.ajax.reload();
+                                console.log("data= " + response.data);
+                                //console.log(table.columns(1).search("e, e"));
+                                //console.log($('#table-userlist tr > td:contains('+response.data+')').length);
+
+                               
+
+                                
+
                             } else {
                                 swal({
                                     title: "Opps!",
@@ -533,7 +599,33 @@
                         }
                     });
                 }
-            });
+
+
+            });
+
+            $('#filterr').on('change', function () {
+                table.columns(0).search(this.value).draw();
+            });
+
+            $('#filterby_address').on('keyup', function () {
+                table.columns(3).search(this.value).draw();
+            });
+
+            $('#filterby_module').on('change', function () {
+                if (this.value === "") {
+                    table.columns(0).search(this.value).draw();
+                } else {
+                    table.columns(0).search(this.value + "$", true, true, false).draw();
+                }
+            });
+            $('#filterby_status').on('change', function () {
+                if (this.value === "") {
+                    table.columns(4).search(this.value).draw();
+                } else {
+                    table.columns(4).search(this.value + "$", true, true, false).draw();
+                }
+               
+            });
 
             
             /*
@@ -562,8 +654,30 @@
                     .draw();
             });
             */
+            $('#reservation').daterangepicker();
+            $(".applyBtn").on('click', function () {
 
+                $.fn.dataTable.ext.search.push(
+                    function (settings, data, dataIndex) {
+                        var min1 = new Date($('#reservation').data('daterangepicker').startDate.format('MMM/DD/YYYY'));
+                        var max1 = new Date($('#reservation').data('daterangepicker').endDate.format('MMM DD, YYYY'));
 
+                        var startDate1 = new Date(data[2]);
+
+                        var startDate = startDate1.toLocaleDateString();
+                        var min = min1.toLocaleDateString();
+                        var max = max1.toLocaleDateString();
+
+                        if (min == null && max == null) { return true; }
+                        if (min == null && startDate <= max) { return true; }
+                        if (max == null && startDate >= min) { return true; }
+                        if (startDate <= max && startDate >= min) { return true; }
+                        return false;
+                    }
+                );
+                table.draw();
+
+            });
         });
     </script>
 }

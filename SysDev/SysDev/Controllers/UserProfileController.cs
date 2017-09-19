@@ -220,7 +220,7 @@ namespace SysDev.Controllers
                 ReportsController.AddAuditTrail(UserAction.Create,
                     "<strong>" +fullName + "</strong> has been added." ,
                     User.Identity.GetUserId(), Page.Users);
-                return Json(new { success = true, responseText = fullName + " <small>was added.</small>" }, JsonRequestBehavior.AllowGet);
+                return Json(new { success = true, responseText = fullName + " <small>was added.</small>", data = fullName }, JsonRequestBehavior.AllowGet);
             }
             else
             {
@@ -282,7 +282,7 @@ namespace SysDev.Controllers
         public ActionResult Delete(string id)
         {
             var account = _context.Users
-                .Include(a => a.UserName)
+                .Include(a => a.UserProfile)
                 .SingleOrDefault(p => p.Id == id);
 
             if (account == null)

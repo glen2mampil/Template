@@ -5,7 +5,11 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-
+@section css{
+    <link rel="stylesheet" href="~/Content/components/bootstrap-daterangepicker/daterangepicker.css" />
+    <link rel="stylesheet" href="~/Content/components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css" />
+    
+}
 
 
 
@@ -16,13 +20,18 @@
         <div class="box">
             
             <div class="box-header">
+               
                 <label class="col-md-12">Filter by:</label>
-                <hr />
-                <div class="col-md-3">
-                    Date Range
-                    <select id="filterr" class="form-control input-sm">
-                        <option value="">All</option>
-                    </select>
+                <hr/>
+                <div class="form-group col-md-3">
+                    Date range
+                    <div class="input-group">
+                        <div class="input-group-addon">
+                            <i class="fa fa-calendar"></i>
+                        </div>
+                        <input type="text" class="form-control pull-right input-sm" id="reservation">
+                    </div>
+                    <!-- /.input group -->
                 </div>
                 <div class="col-md-3">
                     Commit by
@@ -44,6 +53,8 @@
                 </div>
 
             </div>
+            
+            
             <hr />
 
             <!-- /.box-header -->
@@ -85,97 +96,105 @@
 
 @section scripts
 {
+    <script src="~/Content/components/moment/min/moment.min.js"></script>
+    <script src="~/Content/components/bootstrap-daterangepicker/daterangepicker.js"></script>
     <script>
-        $(document).ready(function () {
-            
+        $(document).ready(function() {
+
             var table = $("#audittrail-table").DataTable({
-                    ajax: {
-                        url: "/api/audittrails",
-                        dataSrc: ""
-                    },
-                    
-                    order: [[ 0, "desc" ]],
-                    columns: [
+                ajax: {
+                    url: "/api/audittrails",
+                    dataSrc: ""
+                },
 
-                        {
-                            data: "DateCreated",
-                            render: function (data, type, full) {
-                                var date = new Date(full.DateCreated);
-                                var options = {
-                                    weekday: "long", year: "numeric", month: "short",
-                                    day: "numeric", hour: "2-digit", minute: "2-digit"
-                                };
+                order: [[0, "asc"]],
+                columns: [
+                    {
+                        data: "DateCreated",
+                        render: function(data, type, full) {
+                            var date = new Date(full.DateCreated);
+                            var options = {
+                                //weekday: "long",
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                                //hour: "2-digit",
+                                //minute: "2-digit"
+                            };
 
-                                if ($("#filterr option[value='" + date.toLocaleTimeString("en-us", options) + "']").length < 1) {
-                                    $("#filterr").append("<option value='" + date.toLocaleTimeString("en-us", options) + "'>" + date.toLocaleTimeString("en-us", options) + "</option>");
-                                }
+                            //if ($("#filterr option[value='" + date.toLocaleTimeString("en-us", options) + "']").length < 1) {
+                            //    $("#filterr").append("<option value='" + date.toLocaleTimeString("en-us", options) + "'>" + date.toLocaleTimeString("en-us", options) + "</option>");
+                            //}
 
-                                return "<small class=''>" + date.toLocaleTimeString("en-us", options) + "</small>";
-                            }
-                            
-                        },
-                        {
-                            render: function (data, type, full, meta) {
-                                var fullName = full.UserProfile.FirstName + " " + full.UserProfile.LastName;
-                                if ($("#filterby_commit option[value='" + fullName + "']").length < 1) {
-                                    $("#filterby_commit").append("<option value='" + fullName + "'>" + fullName + "</option>");
-                                }
-                                return fullName;
-                            }
-
-                        }, {
-                            render: function (info, type, data, meta) {
-                                var moduleName = data.Module.Name;
-                                if ($("#filterby_module option[value='" + moduleName + "']").length < 1) {
-                                    $("#filterby_module").append("<option value='" + moduleName + "'>" + moduleName + "</option>");
-                                }
-                                
-                                return moduleName;
-                            }
-
-                        },
-                        {
-                            render: function (info, type, data, meta) {
-                                var action = data.Action;
-                                if ($("#filterby_action option[value='" + action + "']").length < 1) {
-                                    $("#filterby_action").append("<option value='" + action + "'>" + action + "</option>");
-                                }
-
-                                return action;
-                            }
-                        },
-                        {
-                            data: "Description"
-
+                            return "<small class=''>" + date.toLocaleString("en-us", options) + "</small>";
                         }
-                    
-                    ]
-                    
+
+                    },
+                    {
+                        render: function(data, type, full, meta) {
+                            var fullName = full.UserProfile.FirstName + " " + full.UserProfile.LastName;
+                            if ($("#filterby_commit option[value='" + fullName + "']").length < 1) {
+                                $("#filterby_commit")
+                                    .append("<option value='" + fullName + "'>" + fullName + "</option>");
+                            }
+                            return fullName;
+                        }
+
+                    }, {
+                        render: function(info, type, data, meta) {
+                            var moduleName = data.Module.Name;
+                            if ($("#filterby_module option[value='" + moduleName + "']").length < 1) {
+                                $("#filterby_module")
+                                    .append("<option value='" + moduleName + "'>" + moduleName + "</option>");
+                            }
+
+                            return moduleName;
+                        }
+
+                    },
+                    {
+                        render: function(info, type, data, meta) {
+                            var action = data.Action;
+                            if ($("#filterby_action option[value='" + action + "']").length < 1) {
+                                $("#filterby_action").append("<option value='" + action + "'>" + action + "</option>");
+                            }
+
+                            return action;
+                        }
+                    },
+                    {
+                        data: "Description"
+
+                    }
+                ]
+
             });
 
-            
-            $('#filterr').on('change', function () {
-                table.columns(0).search(this.value).draw();
-            });
 
-            $('#filterby_commit').on('change', function () {
-                table.columns(1).search(this.value).draw();
-            });
+            $('#filterr').on('change',
+                function() {
+                    table.columns(0).search(this.value).draw();
+                });
 
-            $('#filterby_module').on('change', function () {
-                table.columns(2).search(this.value).draw();
-            });
-            $('#filterby_action').on('change', function () {
-                table.columns(3).search(this.value).draw();
-            });
+            $('#filterby_commit').on('change',
+                function() {
+                    table.columns(1).search(this.value).draw();
+                });
+
+            $('#filterby_module').on('change',
+                function() {
+                    table.columns(2).search(this.value).draw();
+                });
+            $('#filterby_action').on('change',
+                function() {
+                    table.columns(3).search(this.value).draw();
+                });
 
             /*
             $('#SecondDropdownId').on('change', function () {
                 table.columns(7).search(this.value).draw();
             });
             */
-
-            
             /*
             $('#audittrail-table #filter th').each(function (i) {
                 var title = $('#audittrail-table #filter th').eq($(this).index()).text();
@@ -191,6 +210,40 @@
             });
             */
 
+            
+
+            $('#reservation').daterangepicker();
+
+            
+               
+
+            //not working
+            $(".applyBtn").on('click', function () {
+
+                $.fn.dataTable.ext.search.push(
+                    function (settings, data, dataIndex) {
+                        var min1 = new Date($('#reservation').data('daterangepicker').startDate.format('MMM/DD/YYYY'));
+                        var max1 = new Date($('#reservation').data('daterangepicker').endDate.format('MMM DD, YYYY'));
+
+                        var startDate1 = new Date(data[0]);
+
+                        var startDate = startDate1.toLocaleDateString();
+                        var min = min1.toLocaleDateString();
+                        var max = max1.toLocaleDateString();
+
+                        if (min == null && max == null) { return true; }
+                        if (min == null && startDate <= max) { return true; }
+                        if (max == null && startDate >= min) { return true; }
+                        if (startDate <= max && startDate >= min) { return true; }
+                        return false;
+                    }
+                );
+                table.draw();
+
+            });
+
+
+            
         });
     </script>
 }
