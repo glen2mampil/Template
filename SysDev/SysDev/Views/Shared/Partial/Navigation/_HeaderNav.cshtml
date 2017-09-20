@@ -169,7 +169,7 @@
                         <!-- Menu Footer-->
                         <li class="user-footer">
                             <div class="pull-left">
-                                <a href="#" id="changepass-btn" class="btn btn-default btn-flat" data-toggle="modal" data-target="#change-password">Reset Password</a>
+                                <a href="#" id="changepass-btn" class="btn btn-default btn-flat" data-toggle="modal" data-target="#change-password">Reset my password</a>
                                 
                                 
                             </div>
@@ -198,133 +198,133 @@
 
 <div class="modal fade" id="change-password" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-sm" role="document">
-    @using (Html.BeginForm("ChangePassword", "UserProfile", FormMethod.Post, new { role = "form", id="save-new-password" }))
+    @using (Html.BeginForm("", "", FormMethod.Post, new {role = "form", id = "save-new-password"}))
     {
         @Html.AntiForgeryToken()
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Modal title</h4>
             </div>
             <div class="modal-body" id="changepass-content-body">
 
                 
-                @Html.ValidationSummary("", new {@class = "text-danger"})
+                
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="col-md-12 form-group">
-                            <label>Old Password</label>
-                            <input type="password" id="oldPw" class="col-md-12 form-control" />
+                        @Html.ValidationSummary("", new { @class = "text-danger text-sm" })
+                        <div class="col-md-12 form-group " id="oldpassword">
+                            Current Password
+                            <input type="password" id="oldPw" class="col-md-12 form-control input-sm" required/>
                         </div>
-                        <div class="col-md-12 form-group">
-                            <label>Old Password</label>
-                            <input type="password" id="newPw" class="col-md-12 form-control" />
+                        <div class="col-md-12 form-group" id="newpassword">
+                            New Password
+                            <input type="password" id="newPw" class="col-md-12 form-control input-sm" required/>
                         </div>
-                        <div class="col-md-12 form-group">
-                            <label>Old Password</label>
-                            <input type="password" id="confirmPw" class="col-md-12 form-control" />
+                        <div class="col-md-12 form-group" id="confirmpassword">
+                            Confirm Password
+                            <input type="password" id="confirmPw" class="col-md-12 form-control input-sm" required/>
                         </div>
                     </div>
                 </div>
 
-                
+
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" id="change-pass-btn" value="Change password" class="btn btn-primary">Save changes</button>
+                <button type="submit" id="change-pass-btn" value="Change password" class="btn btn-primary">Save changes</button>
             </div>
+
         </div>
     }
     </div>
 </div>
-   <script>
-        $(document).ready(function () {
-            $("#change-pass-btn").click(function() {
-                alert("Password: " + $("#newPw").val());
-                var yourValue = $("#newPw").val();
-                swal('Please wait');
-                swal.showLoading();
-                $.ajax({
-                    url: "/UserProfile/ChangePassword/" + yourValue,
-                    type: "Post",
-                    data: {
-                        'newpassword': yourValue
-                    },
-                    success: function (response) {
+<script>
+
+    console.log("test: " + ("A" === "A"));
+
+
+
+
+
+    $(document).ready(function () {
+
+      
+
+        $('#change-password').on('hidden.bs.modal', function () {
+            $(this).find('form')[0].reset();
+            $(".validation-summary-valid").html("");
+        });
+
+        $("#save-new-password").on('submit',function (e) {
+            e.preventDefault();
+            $("#oldpassword").removeClass("has-error");
+            $("#newpassword").removeClass("has-error");
+            $("#confirmpassword").removeClass("has-error");
+            $(".validation-summary-valid").html("");
+            var newPassword = $("#newPw").val();
+            var confirmPassword = $("#confirmPw").val();
+            var oldPassword = $("#oldPw").val();
+          
+           
+            if (newPassword !== confirmPassword) {
+                $("#confirmpassword").addClass("has-error");
+                $(".validation-summary-valid").html("<p>New Password and Confirm Password does not match<p/>");
+
+                return 0;
+            }
+
+            //alert("Password: " + $("#newPw").val());
+            
+
+
+
+            //swal('Please wait');
+            //swal.showLoading();
+
+            $.ajax({
+                url: "/UserProfile/ChangePassword/" + newPassword + "?oldP=" + oldPassword,
+                type: "Post",
+                data: {
+                    'newPassword': newPassword,
+                    'oldPassword': oldPassword
+                },
+                success: function (response) {
+                 
+
+
+                    if (response.success) {
+                        swal({
+                            title: "<small>You Password was successfully change.</small>",
+                            timer: 3000,
+                            type: "success"
+                        }).catch(swal.noop);
                         $("#change-password").modal('toggle');
-                        if (response.success) {
-                            swal({
-                                title: "<small>You Password was successfully change.</small>",
-                                timer: 3000,
-                                type: "success"
-                            }).catch(swal.noop);
-                        } else {
-                            swal({
-                                title: "Opps!",
-                                html: "<small>" + response.responseText + "</small>",
-                                type: "error"
-                            }).catch(swal.noop);
-                        }
-                    },
-                    error: function (jqXhr, textStatus, errorThrown) {
-                        swal({
-                            title: "Opps! <small>something went wrong try again later</small>.",
-                            text: "<small class='label label-error'> Status Code: " + jqXhr.status + "</small>" +
-                                "<small class='label label-error'> Error: " + jqXhr.responseText + "</small>" +
-                                "<small class='label label-error'>Status: " + textStatus + "</small>" +
-                                "<small class='label label-error'>Throws: " + errorThrown + "</small>",
-                            type: "error"
-                        }).catch(swal.noop);
                     }
-                });
-            });
-            $("#save-new-password").submit(function (e) {
-                preventDefault();
-                console.log("HI!");
-                /*
-                var id = $("#newPw").val();
-                var yourValue = $("#newPw").val();
-                console.log("ID= :" + $("#newPw").val());
-
-                swal('Please wait');
-                swal.showLoading();
-                    $.ajax({
-                        url: "/UserProfile/ChangePassword/" + id,
-                        type: "Post",
-                        data: {
-                            'newpassword' : yourValue
-                        },
-                    success: function (response) {
-                        if (!response.success) {
-                            swal({
-                                title: "<small>You Password was successfully change.</small>",
-                                timer: 3000,
-                                type: "success"
-                            }).catch(swal.noop);
+                    else {
+                        $(".validation-summary-valid").html(response.responseText);
+                        console.log("response: " + response.responseText);
+                        if (response.field == "currentpw") {
+                            $("#oldpassword").addClass("has-error");
                         } else {
-                            swal({
-                                title: "Opps!",
-                                html: "<small>" + response.responseText + "</small>",
-                                type: "error"
-                            }).catch(swal.noop);
+                            $("#newpassword").addClass("has-error");
+                            $("#confirmpassword").addClass("has-error");
                         }
-                    },
-                    error: function (jqXhr, textStatus, errorThrown) {
-                        swal({
-                            title: "Opps! <small>something went wrong try again later</small>.",
-                            text: "<small class='label label-error'> Status Code: " + jqXhr.status + "</small>" +
-                                "<small class='label label-error'> Error: " + jqXhr.responseText + "</small>" +
-                                "<small class='label label-error'>Status: " + textStatus + "</small>" +
-                                "<small class='label label-error'>Throws: " + errorThrown + "</small>",
-                            type: "error"
-                        }).catch(swal.noop);
-                    }
-                });
-
-                */
+                     }
+                 },
+                error: function (jqXhr, textStatus, errorThrown) {
+                    swal({
+                        title: "Opps! <small>something went wrong try again later</small>.",
+                        text: "<small class='label label-error'> Status Code: " + jqXhr.status + "</small>" +
+                            "<small class='label label-error'> Error: " + jqXhr.responseText + "</small>" +
+                            "<small class='label label-error'>Status: " + textStatus + "</small>" +
+                            "<small class='label label-error'>Throws: " + errorThrown + "</small>",
+                        type: "error"
+                    }).catch(swal.noop);
+                }
             });
             
         });
-    </script>
+            
+    });
+</script>

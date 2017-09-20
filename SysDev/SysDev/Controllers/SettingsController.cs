@@ -201,7 +201,7 @@ namespace SysDev.Controllers
            
             if (duplicate != null)
             {
-                return Json(new { success = false, responseText = "Master Data named " + model.Name + " already exist" }, JsonRequestBehavior.AllowGet);
+                return Json(new { success = false, responseText = "Master Data " + model.Name + " already exist" }, JsonRequestBehavior.AllowGet);
             }
 
             string description = "";
@@ -243,7 +243,7 @@ namespace SysDev.Controllers
 
             if (duplicate != null)
             {
-                return Json(new { success = false, responseText = "Master Data named " + model.MasterDetail.Name + " already exist" }, JsonRequestBehavior.AllowGet);
+                return Json(new { success = false, responseText = "Master Data " + model.MasterDetail.Name + " already exist" }, JsonRequestBehavior.AllowGet);
             }
 
             if (model.MasterDetail.Id == 0)

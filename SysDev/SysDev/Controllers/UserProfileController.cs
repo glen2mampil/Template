@@ -8,6 +8,9 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using SysDev.Models;
 using System.Data.Entity;
+using System.Threading.Tasks;
+using System.Web;
+using Microsoft.AspNet.Identity.Owin;
 
 namespace SysDev.Controllers
 {
@@ -119,28 +122,60 @@ namespace SysDev.Controllers
             return Json(new { success = true, responseText = "Password successfuly Change!" }, JsonRequestBehavior.AllowGet);
         }
 
-        [HttpPost]
-        public ActionResult ChangePassword(string newpassword)
+
+        private ApplicationUserManager _userManager;
+        public ApplicationUserManager UserManager
         {
-            var user = LoginUser();
-            var account = _context.Users.SingleOrDefault(m => m.Id == user.Id);
-
-            if (account == null)
-                return HttpNotFound();
-
-            var password = newpassword;
-            var passwordHasher = new Microsoft.AspNet.Identity.PasswordHasher();
-
-            account.PasswordHash = passwordHasher.HashPassword(password);
-            _context.SaveChanges();
-
-            string fullName = account.UserProfile.FirstName + " " + account.UserProfile.LastName;
-            ReportsController.AddAuditTrail(UserAction.Update,
-                "<strong>" + fullName + "</strong> reset his/her password ",
-                User.Identity.GetUserId(), Page.Users);
-
-            return Json(new { success = true, responseText = "Password successfuly Change!" }, JsonRequestBehavior.AllowGet);
+            get
+            {
+                return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
+            }
+            private set
+            {
+                _userManager = value;
+            }
         }
+
+        [HttpPost]
+        public async Task<ActionResult> ChangePassword(string newPassword, string oldP)
+        {
+            
+            string id = User.Identity.GetUserId();
+
+            var result = await UserManager.ChangePasswordAsync(User.Identity.GetUserId(), oldP, newPassword);
+
+            if (result.Succeeded)
+            {
+                //var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+                //if (user != null)
+                //{
+                    //await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                //}
+
+                var account = _context.Users.Include(u => u.UserProfile).FirstOrDefault(p => p.Id == User.Identity.GetUserId());
+
+                string fullName = account.UserProfile.FirstName + " " + account.UserProfile.LastName;
+                ReportsController.AddAuditTrail(UserAction.Update,
+                    "<strong>" + fullName + "</strong> reset his/her password ",
+                    User.Identity.GetUserId(), Page.Users);
+
+                return Json(new { success = true, responseText = "Password successfuly Change!" }, JsonRequestBehavior.AllowGet);
+            }
+            AddErrors(result);
+            return Json(new { success = false, feild = "currentpw", responseText = errorMessage }, JsonRequestBehavior.AllowGet);
+        }
+
+        private string errorMessage = "";
+        private void AddErrors(IdentityResult result)
+        {
+            
+            foreach (var error in result.Errors)
+            {
+                errorMessage += error + " ";
+            }
+           
+        }
+
 
         public ActionResult UpdateStatus(string id)
         {

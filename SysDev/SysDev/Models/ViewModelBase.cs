@@ -9,8 +9,8 @@ namespace SysDev.Models
     {
         public ApplicationUser Account { get; set; }
         public string AccountRole { get; set; }
-
-        public Permission Permission { get; set; }      
+        public Permission Permission { get; set; }  
+        
     }
 
 }
