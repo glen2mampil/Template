@@ -27,57 +27,61 @@ namespace SysDev.Controllers.Api
         }
 
         // GET /api/audittrail/1
-        public IHttpActionResult GetAuditTrail(int id)
+        public IHttpActionResult GetMasterData(int id)
         {
-            var audit = _context.AuditTrails.SingleOrDefault(a => a.Id == id);
+            var mData = _context.MasterDatas.FirstOrDefault(m => m.Id == id);
 
-            if (audit == null)
+            if (mData == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            //return Mapper.Map<AuditTrail, AuditTrailDto>(audit);
-            return Ok(Mapper.Map<AuditTrail, AuditTrailDto>(audit));
+           
+            return Ok(Mapper.Map<MasterData, MasterDataDto>(mData));
         }
 
         // POST /api/auditrails
         [HttpPost]
-        public IHttpActionResult CreateAuditTrail(AuditTrailDto auditTrailDto)
+        public IHttpActionResult CreateAuditTrail(MasterDataDto masterDataDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            var auditTrail = Mapper.Map<AuditTrailDto, AuditTrail>(auditTrailDto);
-            _context.AuditTrails.Add(auditTrail);
+            var masterdata = Mapper.Map<MasterDataDto, MasterData>(masterDataDto);
+            _context.MasterDatas.Add(masterdata);
             _context.SaveChanges();
 
-            auditTrailDto.Id = auditTrail.Id;
+            masterDataDto.Id = masterdata.Id;
 
-            return Created(new Uri(Request.RequestUri + "/" + auditTrail.Id), auditTrailDto);
+            return Created(new Uri(Request.RequestUri + "/" + masterdata.Id), masterDataDto);
         }
 
         // PUT /api/audittrails/1
         [HttpPut]
-        public void UpdateAuditTrail(int id, AuditTrailDto auditTrailDto)
+        public IHttpActionResult UpdateMasterData(int id, MasterDataDto masterDataDto)
         {
             if (!ModelState.IsValid)
                 throw new HttpResponseException(HttpStatusCode.BadRequest);
 
-            var dbAudit = _context.AuditTrails.SingleOrDefault(a => a.Id == id);
+            var masterData = _context.AuditTrails.SingleOrDefault(a => a.Id == id);
 
-            if (dbAudit == null)
+            if (masterData == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
-            Mapper.Map(auditTrailDto, dbAudit);
+            Mapper.Map(masterDataDto, masterData);
             _context.SaveChanges();
+
+            return Ok("Information has been updated!");
         }
 
         [HttpDelete]
-        public void DeleteAuditTrail(int id)
+        public IHttpActionResult DeleteMasterData(int id)
         {
-            var dbAudit = _context.AuditTrails.SingleOrDefault(a => a.Id == id);
-            if (dbAudit == null)
+            var masterData = _context.MasterDatas.SingleOrDefault(a => a.Id == id);
+            if (masterData == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            _context.AuditTrails.Remove(dbAudit);
+            _context.MasterDatas.Remove(masterData);
             _context.SaveChanges();
+
+            return Ok(Mapper.Map<MasterData, MasterDataDto>(masterData));
         }
     }
 }

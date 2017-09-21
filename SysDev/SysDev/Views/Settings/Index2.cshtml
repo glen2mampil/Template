@@ -46,7 +46,7 @@
     <div class="col-md-6">
         <div class="box flat">
             <div class="box-header">
-                <h3 class="box-title lead">Master Data</h3>
+                <h3 class="box-title lead">Master Data</h3><a href="#settings-modal" class="pull-right text-gray" data-toggle="modal"><span><i class="fa fa-2x fa-plus"></i></span></a>
             </div>
             <!-- /.box-header -->
             <div class="box-body">
@@ -81,42 +81,101 @@
         <!-- /.box -->
     </div>
     <div class="col-md-6">
-        <div class="box">
+        <div class="box flat">
             <div class="box-header">
-                <h3 class="box-title">Master Details</h3>
+                <h3 class="box-title lead">Master Details</h3><a href="#settings-modal" class="pull-right text-gray" data-toggle="modal"><span><i class="fa fa-2x fa-plus"></i></span></a>
             </div>
             <!-- /.box-header -->
             <div class="box-body">
-                <table id="table-master-details" class="table table-hover" style="outline: 1px solid #ebeaea;">
-                    <thead>
-                    <tr>
-                        <th>Rendering engine</th>
-                        <th>Browser</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>Trident</td>
-                        <td>X</td>
-                    </tr>
-                    <tr>
-                        <td>Webkit</td>
-                        <td>A</td>
-                    </tr>
-                    <tr>
-                        <td>Webkit</td>
-                        <td>A</td>
-                    </tr>
+                <p>Filter by:</p>
+                <div class="col-md-8 no-padding">
+                    Search
+                    <input type="text" class="form-control input-sm" id="filterby_any_details" />
+                </div>
+                <div class="col-md-4 p-r-0">
+                    Status
+                    <select id="filterby_status_detail" class="form-control input-sm">
+                        <option value="">All</option>
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                    </select>
+                </div>
 
-                    </tbody>
+
+                <table id="table-master-detail" class="table table-hover full-width" style="outline: 1px solid #ebeaea;">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <td>status</td>
+                            <th width="100">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
                 </table>
             </div>
             <!-- /.box-body -->
         </div>
+        <!-- /.box -->
     </div>
 </div>
 
-    @section scripts {
+<div id="settings-modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "form-horizontal", role = "form", id = "edit-settings" }))
+            {
+
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+
+                <div class="modal-header">
+                    <h4 id="exampleModalLongTitle">
+                        @ViewBag.ModalTitle
+                        <a class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </a>
+                    </h4>
+                </div>
+                <div class="modal-body" id="modal-content">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.Name, new {@class = "control-label"})
+                                    @Html.TextBoxFor(m => m.Name, new {@class = "form-control col-md-12", required ="required"})
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.Value, new { @class = "control-label" })<label></label>
+                                    @Html.TextBoxFor(m => m.Value, new { @class = "form-control input-sm col-md-12", disabled ="disabled" })
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.Description, new {@class = "control-label"})
+                                    @Html.TextAreaFor(m => m.Description, new {@class = "form-control", row="", style="resize: none;"})
+                                </div>
+                            </div>
+                            
+                        </div>
+
+                        @Html.HiddenFor(m => m.MasterDataId)
+                        @Html.HiddenFor(m => m.MasterDetailId)
+                    </div>
+                </div> 
+                <div class="modal-footer">
+                    
+                    <button type="button" class="btn " data-dismiss="modal">Cancel</button>
+                    <button type="submit" id="save" class="btn btn-primary">Save</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+@Scripts.Render("~/bundles/jqueryval")
+@section scripts {
         <script>
             $(document).ready(function () {
                 var tableData = $("#table-master-data").DataTable({
@@ -150,12 +209,11 @@
                         {
                             visible: false,
                             data: "Status"
-                            
                         },
                         {
                             render: function (data, type, full, meta) {
                                 var deleteBtn = "<p class='text-right'><a href='#' class='label label-danger btnDelete'><i class='fa fa-trash m-r-10'></i> Delete</a></p>";
-                                var editBtn = "<p class='m-t-15 text-right'><a href='#myModal' class='label label-primary btnEdit' data-toggle='modal'><i class='fa fa-pencil m-r-5'></i> Modify</a></p>";
+                                var editBtn = "<p class='m-t-15 text-right'><a href='#settings-modal' class='label label-primary btnModify' data-toggle='modal'><i class='fa fa-pencil m-r-5'></i> Modify</a></p>";
 
                                 return deleteBtn + editBtn;
                             }
@@ -170,7 +228,61 @@
 
                     alert(data);
                 });
+                $("#table-master-data tbody").on('click', '.btnModify', function (e) {
+                    var row = $(this).parent().closest("tr");
+                    var data = tableData.row(row).data();
 
+                    $("#Name").val(data.Name);
+                    $("#Value").val(data.Value);
+                    $("#Description").val(data.Description);
+                    $("#MasterDataId").val(data.Id);
+                    console.log(data);
+                });
+                $("#edit-settings").on("submit", function (event) {
+                    event.preventDefault();
+                    var $this = $(this);
+                    var frmValues = $this.serialize();
+                    alert("HI!");
+                   
+                    if ($("#edit-settings").valid()) {
+                        $.ajax({
+                            url: "Settings/SaveMasterData/",
+                            type: "Post",
+                            data: $(this).serialize(),
+                            success: function (result) {
+
+                                if (result.success === false) {
+
+                                    swal({
+                                        title: "Opps!",
+                                        html: "<small>" + result.responseText + "</small>",
+                                        timer: 3000,
+                                        type: "error"
+                                    }).catch(swal.noop);
+                                } else {
+                                    swal({
+                                        title: "<small>Master Data</small> " + $("#Name").val() + " <small>has been " + action + "</small>.",
+                                        timer: 3000,
+                                        type: "success"
+                                    }).catch(swal.noop);
+                                    $("#settings-modal").modal("toggle");
+                                }
+                            },
+                            error: function (jqXhr, textStatus, errorThrown) {
+                                swal({
+                                    title: "Opps! <small>something went wrong tyr again later</small>.",
+                                    html: "<small class='label label-error'> Status Code: " + jqXhr.status + "</small>" +
+                                        "<small class='label label-error'> Error: " + jqXhr.responseText + "</small>" +
+                                        "<small class='label label-error'>Status: " + textStatus + "</small>" +
+                                        "<small class='label label-error'>Throws: " + errorThrown + "</small>",
+                                    type: "error"
+                                }).catch(swal.noop);
+                            }
+                        });
+                    }
+
+
+                });
                 $('#filterby_status').on('change', function () {
                     if (this.value === "") {
                         tableData.columns(1).search(this.value).draw();
@@ -178,10 +290,59 @@
                         tableData.columns(1).search(this.value + "$", true, true, false).draw();
                     }
                 });
-
                 $('#filterby_any').on('keyup', function () {
                     tableData.columns(0).search(this.value).draw();
                 });
+
+
+                $('#settings-modal').on('hidden.bs.modal', function() {
+                    $(this).find('form').trigger('reset');
+                });
+
+
+                var tableDetails = $("#table-master-detail").DataTable({
+                    ajax: {
+                        url: "/api/masterdetails",
+                        dataSrc: ""
+                    },
+                    searching: true,
+                    lengthChange: false,
+                    //order: [[0, "desc"]],
+                    columns: [
+                        {
+                            render: function (data, type, full) {
+                                var date = new Date(full.DateTimeCreated);
+                                var options = {
+                                    weekday: "long",
+                                    year: "numeric",
+                                    month: "short",
+                                    day: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit"
+                                };
+                                var status = full.Status === "Active" ? "label-success" : "label-error";
+                                var title = "<p class='lead text-black no-margin'><a href='#' class='mdata-title'>" + full.Name + "</a></p>";
+                                var dateCreated = "<p class='text-muted no-margin'><small>" + date.toLocaleString("en-us", options) + "</small>" +
+                                    " - <span class='mdata-status label " + status + "'>" + full.Status + "</span></p>";
+                                var description = "<p class='no-margin'>" + full.Description + "</p>";
+                                return title + dateCreated + description;
+                            }
+                        },
+                        {
+                            visible: false,
+                            data: "Status"
+                        },
+                        {
+                            render: function (data, type, full, meta) {
+                                var deleteBtn = "<p class='text-right'><a href='#' class='label label-danger btnDelete'><i class='fa fa-trash m-r-10'></i> Delete</a></p>";
+                                var editBtn = "<p class='m-t-15 text-right'><a href='#settings-modal' class='label label-primary btnModify' data-toggle='modal'><i class='fa fa-pencil m-r-5'></i> Modify</a></p>";
+
+                                return deleteBtn + editBtn;
+                            }
+                        }
+                    ]
+                });
+                
             });
         </script>
     }

@@ -9,6 +9,15 @@ namespace SysDev.Models
     {
         public List<MasterData> MasterDatas { get; set; }
         public List<MasterDetail> MasterDetails { get; set; }
+
+        public MasterData MasterData { get; set; }
+        public MasterDetail MasterDetail { get; set; }
+
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public string Value { get; set; }
+        public int MasterDataId { get; set; }
+        public int MasterDetailId { get; set; }
     }
     public class DataDetailsViewModel
     {
