@@ -44,45 +44,72 @@
 
 <!--User list table-->
 <div class="box">
+    <!-- filter -->
     <div class="box-header">
-        
+
         <h3 class="box-title"></h3>
         @if (Model.Permission.AllowCreate == 1)
         {
             <a href="#editing-modal" class="btn btn-primary pull-right flat" id="user-create" data-toggle="modal"><i class="fa fa-user-plus"></i> </a>
         }
-        
-            <label class="col-md-12">Filter by:</label>
-            <hr />
-            <div class="form-group col-md-3">
-                Date created (Date rage)
-                <div class="input-group">
-                    <div class="input-group-addon">
-                        <i class="fa fa-calendar"></i>
-                    </div>
-                    <input type="text" class="form-control pull-right input-sm" id="reservation">
-                </div>
-                <!-- /.input group -->
-            </div>
-            <div class="col-md-3">
-                Address
-                <input type="text" class="form-control input-sm" id="filterby_address" />
-            </div>
-            <div class="col-md-3">
-                Status
-                <select id="filterby_status" class="form-control input-sm">
-                    <option value="">All</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                Gender
-                <select id="filterby_gender" class="form-control input-sm">
-                    <option value="">All</option>
-                </select>
-            </div>
 
+        <label class="col-md-12">Filter by:</label>
+        <hr/>
+        @*
+        <div class="form-group col-md-3">
+            Date created (Date rage)
+            <div class="input-group">
+                <div class="input-group-addon">
+                    <i class="fa fa-calendar"></i>
+                </div>
+                <input type="text" class="form-control pull-right input-sm" id="reservation">
+            </div>
+            <!-- /.input group -->
         </div>
-        <hr />
+        *@
+        <div class="form-group col-md-2">
+            From:
+            <div class="input-group">
+                <div class="input-group-addon">
+                    <i class="fa fa-calendar"></i>
+                </div>
+                <input type="text" class="form-control input-sm pull-right" id="date_from">
+            </div>
+            <!-- /.input group -->
+        </div>
+        <div class="form-group col-md-2">
+            To:
+            <div class="input-group">
+                <div class="input-group-addon">
+                    <i class="fa fa-calendar"></i>
+                </div>
+                <input type="text" class="form-control input-sm pull-right" id="date_to">
+            </div>
+            <!-- /.input group -->
+        </div>
+        <div class="col-md-4">
+            Address
+            <input type="text" class="form-control input-sm" id="filterby_address"/>
+        </div>
+        <div class="col-md-2">
+            Status
+            <select id="filterby_status" class="form-control input-sm">
+                <option value="">All</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            Gender
+            <select id="filterby_gender" class="form-control input-sm">
+                <option value="">All</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select>
+        </div>
+
+    </div>
+    <hr/>
 
     <!-- /.box-header -->
     <div class="box-body">
@@ -97,7 +124,7 @@
                 <th width="200" class="text-center">Actions</th>
             </tr>
             </thead>
-            
+
         </table>
     </div>
     <!-- /.box-body -->
@@ -227,10 +254,18 @@
                                 </div>
                                 <div class="col-md-12 form-group">
                                     @Html.LabelFor(m => m.EditProfile.ContactNo, new { @class = "label text-black control-label" })
-                                    @Html.TextBoxFor(m => m.EditProfile.ContactNo, new { @class = "form-control input-sm" })
+                                    
+                                    
+                                    
+                                    <div class="input-group">
+                                        <span class="input-group-addon">+63</span>
+                                        <!-- <input id="EditProfile_ContactNo" type="text" class="form-control input-sm" placeholder="10 digit of your mobile no."> -->
+                                        @Html.TextBoxFor(m => m.EditProfile.ContactNo, new { @class = "form-control input-sm", placeholder = "10 digit of your mobile no." })
+                                    </div>
                                     @Html.ValidationMessageFor(m => m.EditProfile.ContactNo, "", new { @class = "has-error label text-red control-label" })
                                 </div>
-                                
+
+
                                 <div class="col-md-12 form-group">
                                     @Html.LabelFor(m => m.EditAccount.Email, new { @class = "label text-black control-label" })
                                     @Html.TextBoxFor(m => m.EditAccount.Email, new { type = "email", placeholder = "example@domain.com", @class = "form-control input-sm" })
@@ -243,10 +278,10 @@
                                 </div>
                                 <div class="col-md-12 form-group">
                                     @Html.LabelFor(m => m.EditAccount.Roles, new { @class = "label text-black control-label" })
-                                    
+
                                     @Html.ValidationMessageFor(m => m.EditAccount.Roles, "", new { @class = "has-error label text-red control-label" })
                                     @*Html.TextBoxFor(m => m.Profile.MaritalStatus, new {@class = "form-control input-sm"})*@
-                                    
+
                                     <select class="form-control input-sm" id="roles" name="Roles">
                                         <option value=""> -- Select Role --</option>
                                         @foreach (var role in Model.Roles)
@@ -276,8 +311,9 @@
 @Scripts.Render("~/bundles/jqueryval")
 @section scripts
 {
-<script src="~/Content/components/moment/min/moment.min.js"></script>
-<script src="~/Content/components/bootstrap-daterangepicker/daterangepicker.js"></script>
+    <script src="~/Content/components/moment/min/moment.min.js"></script>
+    <script src="~/Content/components/bootstrap-daterangepicker/daterangepicker.js"></script>
+    <script src="~/Content/components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
     <script>
         $(document).ready(function () {
             var table = $("#table-userlist").DataTable({
@@ -294,10 +330,7 @@
                                    "<img src='/admin-lte/img/flat-face-male-o.png' class='user-image' alt='User Image' width='30px'>" :
                                    "<img src='/admin-lte/img/flat-face-female.png' class='user-image' alt='User Image' width='30px'>";
 
-                               var gender = data.UserProfile.Gender;
-                               if ($("#filterby_gender option[value='" + gender + "']").length < 1) {
-                                   $("#filterby_gender").append("<option value='" + gender + "'>" + gender + "</option>");
-                               }
+                               
 
                                return "<div width='20px'>" + img+" <p class='hidden'>"+ data.UserProfile.Gender+"</p></div>";
                            }
@@ -448,6 +481,7 @@
                             btnStatus.removeClass(btnStatus.hasClass("label-success") ? 'label-success' : 'label-danger');
                             btnStatus.text(requestStatus === "Active" ? "Active" : "Inactive");
                             btnStatus.addClass(btnStatus.text() === "Active" ? "label-success" : "label-danger");
+                            table.ajax.reload();
                         }
                     });
                 }).catch(swal.noop);
@@ -576,7 +610,7 @@
                                 //console.log($('#table-userlist tr > td:contains('+response.data+')').length);
 
                                
-
+                                $("#editing-modal").find('form')[0].reset();
                                 
 
                             } else {
@@ -611,7 +645,7 @@
                 table.columns(3).search(this.value).draw();
             });
 
-            $('#filterby_module').on('change', function () {
+            $('#filterby_gender').on('change', function () {
                 if (this.value === "") {
                     table.columns(0).search(this.value).draw();
                 } else {
@@ -654,6 +688,49 @@
                     .draw();
             });
             */
+
+            // ---------------------- [ Date Picker for filter]-----
+            $("#date_from").datepicker({
+                autoclose: true
+            });
+            $("#date_to").datepicker({
+                autoclose: true
+            });
+            var date_from = "";
+            var date_to = "";
+            $.fn.dataTable.ext.search.push(
+                function (settings, data, dataIndex) {
+                    var min = date_from;
+                    var max = new Date(date_to);
+                    var startDate = new Date(data[2]);
+
+                    if (date_to === "") {
+                        max = new Date(Date.now());
+                    }
+                    if (date_from !== "") {
+                        min = new Date(date_from);
+                    }
+
+                    //console.log( "dateStart: " + startDate + " | min: " + min + " | max: " + max + " | test:" + (max >= startDate));
+
+                    if (min == null && max == null) { return false; }
+                    if (min == null && startDate <= max) { return true; }
+                    if (max == null && startDate >= min) { return true; }
+                    if (startDate <= max && startDate >= min) { return true; }
+                    return false;
+                }
+            );
+            $("#date_from").change(function () {
+                //console.log("Date_from Change : " + new Date(this.value).toLocaleDateString() + " | " + date_from);
+                date_from = this.value;
+                table.draw();
+            });
+            $("#date_to").change(function () {
+                //console.log("Date_from Change : " + new Date(this.value).toLocaleDateString() + " | " + date_from);
+                date_to = this.value;
+                table.draw();
+            });
+            /*
             $('#reservation').daterangepicker();
             $(".applyBtn").on('click', function () {
 
@@ -678,6 +755,7 @@
                 table.draw();
 
             });
+            */
         });
     </script>
 }

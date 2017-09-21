@@ -1,0 +1,187 @@
+﻿@model SysDev.Models.SettingsViewModel
+@{
+    ViewBag.Title = "Settings 2";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.ActivePage = "Settings";
+}
+@section css{
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+    <link rel="stylesheet" href="~/Content/Styles/Helpers.css" />
+    <style>
+        .color-palette {
+            height: 35px;
+            line-height: 35px;
+            text-align: center;
+        }
+
+        .color-palette-set {
+            margin-bottom: 15px;
+        }
+
+        .color-palette span {
+            display: none;
+            font-size: 12px;
+        }
+
+        .color-palette:hover span {
+            display: block;
+        }
+
+        .color-palette-box h4 {
+            position: absolute;
+            top: 100%;
+            left: 25px;
+            margin-top: -40px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 12px;
+            display: block;
+            z-index: 7;
+        }
+    </style>
+}
+
+
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="box flat">
+            <div class="box-header">
+                <h3 class="box-title lead">Master Data</h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <p>Filter by:</p>
+                <div class="col-md-8 no-padding">
+                    Search
+                    <input type="text" class="form-control input-sm" id="filterby_any" />
+                </div>
+                <div class="col-md-4 p-r-0">
+                    Status
+                    <select id="filterby_status" class="form-control input-sm">
+                        <option value="">All</option>
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                    </select>
+                </div>
+                
+
+                <table id="table-master-data" class="table table-hover full-width" style="outline: 1px solid #ebeaea;">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <td>status</td>
+                        <th width="100">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
+    </div>
+    <div class="col-md-6">
+        <div class="box">
+            <div class="box-header">
+                <h3 class="box-title">Master Details</h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <table id="table-master-details" class="table table-hover" style="outline: 1px solid #ebeaea;">
+                    <thead>
+                    <tr>
+                        <th>Rendering engine</th>
+                        <th>Browser</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>Trident</td>
+                        <td>X</td>
+                    </tr>
+                    <tr>
+                        <td>Webkit</td>
+                        <td>A</td>
+                    </tr>
+                    <tr>
+                        <td>Webkit</td>
+                        <td>A</td>
+                    </tr>
+
+                    </tbody>
+                </table>
+            </div>
+            <!-- /.box-body -->
+        </div>
+    </div>
+</div>
+
+    @section scripts {
+        <script>
+            $(document).ready(function () {
+                var tableData = $("#table-master-data").DataTable({
+                    ajax: {
+                        url: "/api/masterdatas",
+                        dataSrc: ""
+                    },
+                    searching: true,
+                    lengthChange: false,
+                    //order: [[0, "desc"]],
+                    columns: [
+                        {
+                            render: function (data, type, full) {
+                                var date = new Date(full.DateTimeCreated);
+                                var options = {
+                                    weekday: "long",
+                                    year: "numeric",
+                                    month: "short",
+                                    day: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit"
+                                };
+                                var status = full.Status === "Active" ? "label-success" : "label-error";
+                                var title = "<p class='lead text-black no-margin'><a href='#' class='mdata-title'>" + full.Name + "</a></p>";
+                                var dateCreated = "<p class='text-muted no-margin'><small>" + date.toLocaleString("en-us", options) + "</small>" +
+                                    " - <span class='mdata-status label " + status + "'>" + full.Status + "</span></p>";
+                                var description = "<p class='no-margin'>" + full.Description + "</p>";
+                                return title + dateCreated + description;
+                            }
+                        },
+                        {
+                            visible: false,
+                            data: "Status"
+                            
+                        },
+                        {
+                            render: function (data, type, full, meta) {
+                                var deleteBtn = "<p class='text-right'><a href='#' class='label label-danger btnDelete'><i class='fa fa-trash m-r-10'></i> Delete</a></p>";
+                                var editBtn = "<p class='m-t-15 text-right'><a href='#myModal' class='label label-primary btnEdit' data-toggle='modal'><i class='fa fa-pencil m-r-5'></i> Modify</a></p>";
+
+                                return deleteBtn + editBtn;
+                            }
+                        }
+                    ]
+                });
+
+                $("#table-master-data_filter").hide();
+                $("#table-master-data tbody").on('click', '.mdata-title', function (e) {
+                    var row = $(this).parent().closest("tr");
+                    var data = tableData.row(row).data();
+
+                    alert(data);
+                });
+
+                $('#filterby_status').on('change', function () {
+                    if (this.value === "") {
+                        tableData.columns(1).search(this.value).draw();
+                    } else {
+                        tableData.columns(1).search(this.value + "$", true, true, false).draw();
+                    }
+                });
+
+                $('#filterby_any').on('keyup', function () {
+                    tableData.columns(0).search(this.value).draw();
+                });
+            });
+        </script>
+    }

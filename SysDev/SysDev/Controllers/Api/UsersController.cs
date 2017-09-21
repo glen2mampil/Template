@@ -34,6 +34,7 @@ namespace SysDev.Controllers.Api
 
         }
             
+
         // GET /api/users/1
         public IHttpActionResult GetUser(string id)
         {
@@ -122,6 +123,7 @@ namespace SysDev.Controllers.Api
             //Mapper.Map(auditTrailDto, dbAudit);
             //_context.SaveChanges();
         }
+
 
         // DELETE /api/user
         [HttpDelete]

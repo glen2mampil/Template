@@ -11,6 +11,7 @@ using System.Data.Entity;
 using System.Threading.Tasks;
 using System.Web;
 using Microsoft.AspNet.Identity.Owin;
+using SysDev.App_Start;
 
 namespace SysDev.Controllers
 {
@@ -33,7 +34,6 @@ namespace SysDev.Controllers
         {
             string id = User.Identity.GetUserId();
             var account = _context.Users.Include(a => a.UserProfile).FirstOrDefault(p => p.Id == id);
-            //var users = _context.UserProfiles.ToList();
             return account;
         }
 
@@ -58,7 +58,7 @@ namespace SysDev.Controllers
                 Roles = roles,
                 Permission = LoginUserPermission()
             };
-            if (User.IsInRole("SuperAdmin"))
+            if (User.IsInRole(RoleName.SuperAdmin))
             {
                 return View("IndexReadOnly",useraccount);
                 //return View(useraccount);

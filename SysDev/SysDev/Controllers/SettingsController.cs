@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using SysDev.Models;
+using SysDev.App_Start;
 
 namespace SysDev.Controllers
 {
@@ -51,7 +52,7 @@ namespace SysDev.Controllers
                 Permission = LoginUserPermission()
             };
 
-            return View(viewModel);
+            return View("Index2",viewModel);
         }
 
         public ActionResult ViewMasterData()
@@ -104,7 +105,6 @@ namespace SysDev.Controllers
                 ViewBag.ModalTitle = "Edit MasterDetails";
                 return View("CreateDetail",viewModel);
             }
-
             return View();
         }
 

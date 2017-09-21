@@ -3,8 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace SysDev.Models
+namespace SysDev.App_Start
 {
+    public class ApplicationConfig
+    {
+
+    }
+
+    public class RoleName
+    {
+        public const string SuperAdmin = "SuperAdmin";
+    }
+
     public class Page
     {
         public const string Users = "Users";
