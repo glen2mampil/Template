@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -8,34 +7,35 @@ using System.Web.Http;
 using AutoMapper;
 using SysDev.Dtos;
 using SysDev.Models;
+using System.Data.Entity;
 
 namespace SysDev.Controllers.Api
 {
-    public class MasterDatasController : ApiController
+    public class MasterDetailsController : ApiController
     {
         private ApplicationDbContext _context;
 
-        public MasterDatasController()
+        public MasterDetailsController()
         {
             _context = new ApplicationDbContext();
         }
 
         // GET /api/masterdatas
-        public IEnumerable<MasterData> GetMasterDatas()
+        public IEnumerable<MasterDetail> GetMasterDetails()
         {
-            return _context.MasterDatas.OrderBy(data => data.Name).ToList();
+            return _context.MasterDetails.Include(m => m.MasterData).OrderBy(m => m.Name).ToList();
         }
 
         // GET /api/audittrail/1
-        public IHttpActionResult GetMasterData(int id)
+        public IEnumerable<MasterDetail> GetMasterDetail(int id)
         {
-            var mData = _context.MasterDatas.FirstOrDefault(m => m.Id == id);
+            var mData = _context.MasterDetails.Include(m => m.MasterData).Where(m => m.MasterDataId == id);
 
             if (mData == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
-           
-            return Ok(Mapper.Map<MasterData, MasterDataDto>(mData));
+            
+            return mData;
         }
 
         // POST /api/auditrails
@@ -72,16 +72,16 @@ namespace SysDev.Controllers.Api
         }
 
         [HttpDelete]
-        public IHttpActionResult DeleteMasterData(int id)
+        public IHttpActionResult DeleteMasterDetails(int id)
         {
-            var masterData = _context.MasterDatas.SingleOrDefault(a => a.Id == id);
-            if (masterData == null)
+            var masterDetail = _context.MasterDetails.SingleOrDefault(a => a.Id == id);
+            if (masterDetail == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
-            var name = masterData.Name;
-            _context.MasterDatas.Remove(masterData);
+
+            _context.MasterDetails.Remove(masterDetail);
             _context.SaveChanges();
 
-            return Ok(name + " has been remove.");
+            return Ok( masterDetail.Name + " has been remove.");
         }
     }
 }

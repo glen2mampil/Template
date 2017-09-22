@@ -20,7 +20,7 @@ namespace SysDev.Dtos
         public DateTime DateTimeUpdated { get; set; }
     }
 
-    public class MasterDetail
+    public class MasterDetailDto
     {
         public int Id { get; set; }
         public string Name { get; set; }

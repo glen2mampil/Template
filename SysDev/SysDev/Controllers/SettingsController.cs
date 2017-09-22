@@ -195,34 +195,38 @@ namespace SysDev.Controllers
             return View(viewModel);
         }
 
-        public ActionResult SaveMasterData(MasterData model)
+        public ActionResult SaveMasterData(SettingsViewModel model)
         {
-            var duplicate = _context.MasterDatas.FirstOrDefault(m => m.Name.Equals(model.Name, StringComparison.OrdinalIgnoreCase));
-           
-            if (duplicate != null)
-            {
-                return Json(new { success = false, responseText = "Master Data " + model.Name + " already exist" }, JsonRequestBehavior.AllowGet);
-            }
+            
 
             string description = "";
-            if (model.Id == 0)
+            if (model.MasterDataId == 0)
             {
-                model.DateTimeCreated = DateTime.Now;
-                model.DateTimeUpdated = DateTime.Now;
-                model.Status = "Active";
-                _context.MasterDatas.Add(model);
-                //_context.SaveChanges();
+                var duplicate = _context.MasterDatas.FirstOrDefault(m => m.Name.Equals(model.Name, StringComparison.OrdinalIgnoreCase));
+                if (duplicate != null)
+                {
+                    return Json(new { success = false, responseText = "Master Data " + model.Name + " already exist" }, JsonRequestBehavior.AllowGet);
+                }
+
+                _context.MasterDatas.Add(new MasterData
+                {
+                    Name = model.Name,
+                    Description = model.Description,
+                    Status = "Active",
+                    OrderNumber = 0,
+                    DateTimeCreated = DateTime.Now,
+                    DateTimeUpdated = DateTime.Now
+                });
 
                 description = "[Master Data] <strong>" + model.Name + "</strong> has been added";
                 ReportsController.AddAuditTrail(UserAction.Create, description, User.Identity.GetUserId(), Page.Settings);
             }
             else
             {
-                var mData = _context.MasterDatas.SingleOrDefault(d => d.Id == model.Id);
+                var mData = _context.MasterDatas.SingleOrDefault(d => d.Id == model.MasterDataId);
                 if (mData != null)
                 {
                     mData.Name = model.Name;
-
                     mData.Description = model.Description;
                     mData.DateTimeUpdated = DateTime.Now;
                     
@@ -237,46 +241,50 @@ namespace SysDev.Controllers
             //return RedirectToAction("Index", "Settings");
         }
 
-        public ActionResult SaveMasterDetail(NewMasterDetailsViewModel model)
+        public ActionResult SaveMasterDetail(SettingsViewModel model)
         {
-            var duplicate = _context.MasterDetails.FirstOrDefault(m => m.Name.Equals(model.MasterDetail.Name, StringComparison.OrdinalIgnoreCase));
-
-            if (duplicate != null)
+            string description = "";
+            if (model.MasterDetailId == 0)
             {
-                return Json(new { success = false, responseText = "Master Data " + model.MasterDetail.Name + " already exist" }, JsonRequestBehavior.AllowGet);
-            }
+                var duplicate = _context.MasterDetails.FirstOrDefault(m => m.Name.Equals(model.Name, StringComparison.OrdinalIgnoreCase));
 
-            if (model.MasterDetail.Id == 0)
-            {
-                var masterData = _context.MasterDatas.SingleOrDefault(m => m.Id == model.MasterData.Id);
+                if (duplicate != null)
+                    return Json(new { success = false, responseText = "Master Detail " + model.Name + " already exist" }, JsonRequestBehavior.AllowGet);
+
+                var masterData = _context.MasterDatas.SingleOrDefault(m => m.Id == model.MasterDataId);
                 var masterDetail = new MasterDetail
                 {
                     MasterData = masterData,
                     MasterDataId = masterData.Id,
-                    Name = model.MasterDetail.Name,
-                    Description = model.MasterDetail.Description,
+                    Name = model.Name,
+                    Description = model.Description,
                     DateTimeCreated = DateTime.Now,
                     DateTimeUpdated = DateTime.Now,
                     Status = "Active",
-                    Value = model.MasterDetail.Name
+                    Value = model.Name
                 };
                 _context.MasterDetails.Add(masterDetail);
+                description = "[Master Detail] <strong>" + model.Name + "</strong> has been added";
+                ReportsController.AddAuditTrail(UserAction.Create, description, User.Identity.GetUserId(), Page.Settings);
             }
             else
             {
-                var mData = _context.MasterDetails.SingleOrDefault(d => d.Id == model.MasterDetail.Id);
+                var mData = _context.MasterDetails.SingleOrDefault(d => d.Id == model.MasterDetailId);
                 if (mData != null)
                 {
-                    mData.Name = model.MasterDetail.Name;
+                    mData.Name = model.Name;
 
-                    mData.Description = model.MasterDetail.Description;
+                    mData.Description = model.Description;
                     mData.DateTimeUpdated = DateTime.Now;
                 }
+                description = "[Master Detail] <strong>" + model.Name + "</strong>'s information has been updated.";
+                ReportsController.AddAuditTrail(UserAction.Update, description, User.Identity.GetUserId(), Page.Settings);
 
             }
             _context.SaveChanges();
 
-            return RedirectToAction("Index", "Settings");
+            return Json(new { success = true, responseText = "" }, JsonRequestBehavior.AllowGet);
+
         }
     }
 }

@@ -218,6 +218,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\Api\AuditTrailsController.cs" />
     <Compile Include="Controllers\Api\MasterDatasController.cs" />
+    <Compile Include="Controllers\Api\MasterDetailsController.cs" />
     <Compile Include="Controllers\Api\UsersController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
