@@ -37,11 +37,21 @@ namespace SysDev.Controllers
             return account;
         }
 
-        protected Permission LoginUserPermission()
+        public static ApplicationUser LoginUser(string id)
+        {
+            var context = new ApplicationDbContext();
+            
+            return context.Users.Include(u => u.Role).Include(u => u.UserProfile).FirstOrDefault(u => u.Id == id); 
+        }
+
+
+        protected List<Permission> LoginUserPermission()
         {
             var role = User.IsInRole("SuperAdmin") ? "SuperAdmin" : "Employee";
-            var userPermission = _context.Permissions.SingleOrDefault(m => m.IdentityRole.Name == role && m.MasterDetail.Name =="Users");
-            return userPermission;
+            var userPermission = _context.Permissions.Where(m => m.IdentityRole.Name == role && m.MasterDetail.Name == "Users").ToList();
+
+            return _context.Permissions.Include(p => p.MasterDetail).Where(p => p.Role.Name == "Super Admin").ToList();
+            //return userPermission;
         }
 
         // GET: UserProfile
@@ -54,7 +64,7 @@ namespace SysDev.Controllers
             {
                 UserProfiles = users,
                 Accounts = accounts,
-                Account = LoginUser(),
+                Account = LoginUser(User.Identity.GetUserId()),
                 Roles = roles,
                 Permission = LoginUserPermission()
             };
@@ -146,14 +156,7 @@ namespace SysDev.Controllers
 
             if (result.Succeeded)
             {
-                //var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
-                //if (user != null)
-                //{
-                    //await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
-                //}
-
                 var account = _context.Users.Include(u => u.UserProfile).FirstOrDefault(p => p.Id == User.Identity.GetUserId());
-
                 string fullName = account.UserProfile.FirstName + " " + account.UserProfile.LastName;
                 ReportsController.AddAuditTrail(UserAction.Update,
                     "<strong>" + fullName + "</strong> reset his/her password ",
@@ -179,21 +182,17 @@ namespace SysDev.Controllers
 
         public ActionResult UpdateStatus(string id)
         {
-            
             var account = _context.Users.SingleOrDefault(a => a.Id == id);
             var user = _context.UserProfiles.SingleOrDefault(u => u.Id == account.UserProfileId);
-
             if (account != null && user != null)
             {
                 account.Status = (account.Status == "Active" ? "Inactive" : "Active");
                 _context.SaveChanges();
-
                 string fullName = user.FirstName + " " + user.LastName;
                 ReportsController.AddAuditTrail(UserAction.Update,
                     "<strong>" + fullName + "</strong> was set to " + account.Status,
                     User.Identity.GetUserId(), Page.Users);
                 return Json(new { success = true, responseText = user + " has set to " + account.Status }, JsonRequestBehavior.AllowGet);
-
             }
             return Json(new { success = false, responseText = "Nothings happen, Try again later." }, JsonRequestBehavior.AllowGet);
         }
@@ -218,20 +217,12 @@ namespace SysDev.Controllers
         [HttpPost]
         public ActionResult Save(UserProfileViewModel model)
         {
-            //return Json(new { success = false, responseText = "Your message successfuly sent!" }, JsonRequestBehavior.AllowGet);
         
             if (model.EditProfile.Id == 0 && model.EditAccount.Id == null)
             {
                 model.EditProfile.DateCreated = DateTime.Now.ToString("MMM-dd-yyyy hh:mm tt");
                 _context.UserProfiles.Add(model.EditProfile);
                 _context.SaveChanges();
-
-                //Temp code
-                //var roleStore = new RoleStore<IdentityRole>(_context);
-                //var roleManager = new RoleManager<IdentityRole>(roleStore);
-                //roleManager.Create(new IdentityRole("CanManageUsers"));
-                
-
 
                 var userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(_context));
                
@@ -245,7 +236,6 @@ namespace SysDev.Controllers
                 };
 
                 var chkUser = userManager.Create(user, "password1");
-                //Add default User to Role Admin   
                 if (chkUser.Succeeded)
                 {
                     var result1 = userManager.AddToRole(user.Id, "Employee");
@@ -259,13 +249,9 @@ namespace SysDev.Controllers
             }
             else
             {
-                
-                
-
                 try
                 {
                     var profile = _context.UserProfiles.SingleOrDefault(p => p.Id == model.EditProfile.Id);
-                    //TryUpdateModel(prifle);
                     if (profile != null)
                     {
                         profile.FirstName = model.EditProfile.FirstName;
@@ -323,13 +309,13 @@ namespace SysDev.Controllers
             if (account == null)
                 return HttpNotFound();
 
-            //var profile = _context.UserProfiles.SingleOrDefault(p=> p.Id == account.UserProfileId);
-            //if (profile == null)
-            //    return HttpNotFound();
+            var profile = _context.UserProfiles.SingleOrDefault(p=> p.Id == account.UserProfileId);
+            if (profile == null)
+                return HttpNotFound();
 
             string fullName = account.UserProfile.FirstName + " " + account.UserProfile.LastName;
 
-            _context.Users.Remove(account);
+            _context.UserProfiles.Remove(profile);
             _context.SaveChanges();
 
             ReportsController.AddAuditTrail(UserAction.Delete,

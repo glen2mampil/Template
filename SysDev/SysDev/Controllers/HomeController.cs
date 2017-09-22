@@ -30,10 +30,10 @@ namespace SysDev.Controllers
             //var users = _context.UserProfiles.ToList();
             return account;
         }
-        protected Permission LoginUserPermission()
+        protected List<Permission> LoginUserPermission()
         {
             var role = User.IsInRole("SuperAdmin") ? "SuperAdmin" : "Employee";
-            var userPermission = _context.Permissions.SingleOrDefault(m => m.IdentityRole.Name == role && m.MasterDetail.Name == "Users");
+            var userPermission = _context.Permissions.Where(m => m.IdentityRole.Name == role && m.MasterDetail.Name == "Users").ToList();
             return userPermission;
         }
 

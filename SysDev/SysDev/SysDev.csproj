@@ -252,6 +252,26 @@
     <Compile Include="Migrations\201709180409488_AddedMasterDetailNavigationInAuditTrail.Designer.cs">
       <DependentUpon>201709180409488_AddedMasterDetailNavigationInAuditTrail.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201709220319020_ModifiedPermissionModel.cs" />
+    <Compile Include="Migrations\201709220319020_ModifiedPermissionModel.Designer.cs">
+      <DependentUpon>201709220319020_ModifiedPermissionModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709220332077_ModifiedPermissionModelv1.cs" />
+    <Compile Include="Migrations\201709220332077_ModifiedPermissionModelv1.Designer.cs">
+      <DependentUpon>201709220332077_ModifiedPermissionModelv1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709220355345_ModifiedUserModel.cs" />
+    <Compile Include="Migrations\201709220355345_ModifiedUserModel.Designer.cs">
+      <DependentUpon>201709220355345_ModifiedUserModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709220411533_ModifiedUserModelv1.cs" />
+    <Compile Include="Migrations\201709220411533_ModifiedUserModelv1.Designer.cs">
+      <DependentUpon>201709220411533_ModifiedUserModelv1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709220433277_ModifiedUserModelv2.cs" />
+    <Compile Include="Migrations\201709220433277_ModifiedUserModelv2.Designer.cs">
+      <DependentUpon>201709220433277_ModifiedUserModelv2.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\DashboardViewModel.cs" />
@@ -692,6 +712,21 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201709180409488_AddedMasterDetailNavigationInAuditTrail.resx">
       <DependentUpon>201709180409488_AddedMasterDetailNavigationInAuditTrail.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709220319020_ModifiedPermissionModel.resx">
+      <DependentUpon>201709220319020_ModifiedPermissionModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709220332077_ModifiedPermissionModelv1.resx">
+      <DependentUpon>201709220332077_ModifiedPermissionModelv1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709220355345_ModifiedUserModel.resx">
+      <DependentUpon>201709220355345_ModifiedUserModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709220411533_ModifiedUserModelv1.resx">
+      <DependentUpon>201709220411533_ModifiedUserModelv1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709220433277_ModifiedUserModelv2.resx">
+      <DependentUpon>201709220433277_ModifiedUserModelv2.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

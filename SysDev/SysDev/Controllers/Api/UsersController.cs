@@ -41,7 +41,7 @@ namespace SysDev.Controllers.Api
             
             var user = _context.Users
                 .Include(u => u.UserProfile)
-                .Include(u => u.Roles)
+                .Include(u => u.Role)
                 .Include(u => u.Logins)
                 .SingleOrDefault(a => a.Id == id);
 
@@ -56,7 +56,7 @@ namespace SysDev.Controllers.Api
                 .Where(p => p.IdentityRole.Name == role);
 
             //return Mapper.Map<AuditTrail, AuditTrailDto>(audit);
-            return Ok(permission);
+            return Ok(user);
         }
 
         // POST /api/auditrails

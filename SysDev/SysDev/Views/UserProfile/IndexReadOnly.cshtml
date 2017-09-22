@@ -1,8 +1,18 @@
-﻿@model SysDev.Models.UserProfileViewModel
+﻿
+@model SysDev.Models.UserProfileViewModel
 @{
     ViewBag.Title = "Users";
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.activePage = "Users";
+
+    var permission = Model.Permission.Find(p => p.MasterDetail.Name == "Users");
+
+    bool canCreate = permission.AllowCreate == 1 ? true : false;
+    bool canEdit = permission.AllowEdit == 1 ? true : false;
+    bool canDelete = permission.AllowDelete == 1 ? true : false;
+    bool canView = permission.AllowView == 1 ? true : false;
+    bool canGenerateReport = permission.AllowGenerateReport == 1 ? true : false;
+
 }
 
 @section css{
@@ -10,63 +20,21 @@
     <link rel="stylesheet" href="~/Content/components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
 }
-<style>
-    .color-palette {
-        height: 35px;
-        line-height: 35px;
-        text-align: center;
-    }
 
-    .color-palette-set {
-        margin-bottom: 15px;
-    }
 
-    .color-palette span {
-        display: none;
-        font-size: 12px;
-    }
 
-    .color-palette:hover span {
-        display: block;
-    }
-
-    .color-palette-box h4 {
-        position: absolute;
-        top: 100%;
-        left: 25px;
-        margin-top: -40px;
-        color: rgba(255, 255, 255, 0.8);
-        font-size: 12px;
-        display: block;
-        z-index: 7;
-    }
-</style>
 
 <!--User list table-->
 <div class="box">
     <!-- filter -->
     <div class="box-header">
-
         <h3 class="box-title"></h3>
-        @if (Model.Permission.AllowCreate == 1)
-        {
-            <a href="#editing-modal" class="btn btn-primary pull-right flat" id="user-create" data-toggle="modal"><i class="fa fa-user-plus"></i> </a>
-        }
-
+            @if (canCreate)
+            {
+                <a href="#editing-modal" class="btn btn-primary pull-right flat" id="user-create" data-toggle="modal"><i class="fa fa-user-plus"></i> </a>
+            }
         <label class="col-md-12">Filter by:</label>
         <hr/>
-        @*
-        <div class="form-group col-md-3">
-            Date created (Date rage)
-            <div class="input-group">
-                <div class="input-group-addon">
-                    <i class="fa fa-calendar"></i>
-                </div>
-                <input type="text" class="form-control pull-right input-sm" id="reservation">
-            </div>
-            <!-- /.input group -->
-        </div>
-        *@
         <div class="form-group col-md-2">
             From:
             <div class="input-group">
@@ -316,6 +284,9 @@
     <script src="~/Content/components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
     <script>
         $(document).ready(function () {
+            var canEdit = "@canEdit" === "True" ? true : false ;
+            var canDelete = "@canDelete" === "True" ? true : false ;
+
             var table = $("#table-userlist").DataTable({
                     ajax: {
                         url: "/api/users",
@@ -330,7 +301,7 @@
                                    "<img src='/admin-lte/img/flat-face-male-o.png' class='user-image' alt='User Image' width='30px'>" :
                                    "<img src='/admin-lte/img/flat-face-female.png' class='user-image' alt='User Image' width='30px'>";
 
-                               
+
 
                                return "<div width='20px'>" + img+" <p class='hidden'>"+ data.UserProfile.Gender+"</p></div>";
                            }
@@ -363,7 +334,7 @@
                         {
                             render: function (info, type, data) {
                                 var address = data.UserProfile.Address;
-                                
+
 
                                 return "<p>" + address + "</p>";
                             }
@@ -383,10 +354,18 @@
                         },
                         {
                             render: function (info, type, data) {
-                                var editBtn = "<a href='#editing-modal' class='label label-primary user-edit' data-toggle='modal'><i class='fa fa-pencil'></i> Edit</a>";
-                                var resetPw = "<a href='#' class='label label-primary user-resetpass'> Reset Password</a>";
-                                var deleteBtn = "<a href='#' class='label label-danger user-delete'><i class='fa fa-close'></i> Delete</a>";
-                                return editBtn + " | " + resetPw + " | " + deleteBtn;
+                                
+                                var cell = "";
+                                if (canEdit) {
+                                    cell += "<a href='#editing-modal' class='label label-primary user-edit' data-toggle='modal'><i class='fa fa-pencil'></i> Edit</a>";
+                                    cell += " | <a href='#' class='label label-primary user-resetpass'> Reset Password</a>";
+                                }
+                                if (canDelete) {
+                                    cell += " | <a href='#' class='label label-danger user-delete'><i class='fa fa-close'></i> Delete</a>";
+                                }
+
+
+                                return cell;
                             }
                         }
                     ]
@@ -442,8 +421,8 @@
                 $("#roles").remove();
 
 
-                
-                
+
+
 
 
                 //console.log(userData.UserProfile.FirstName);
@@ -609,9 +588,9 @@
                                 //console.log(table.columns(1).search("e, e"));
                                 //console.log($('#table-userlist tr > td:contains('+response.data+')').length);
 
-                               
+
                                 $("#editing-modal").find('form')[0].reset();
-                                
+
 
                             } else {
                                 swal({
@@ -658,10 +637,10 @@
                 } else {
                     table.columns(4).search(this.value + "$", true, true, false).draw();
                 }
-               
+
             });
 
-            
+
             /*
             $('#table-userlist tbody').on('click', 'tr', function () {
 

@@ -14,6 +14,9 @@ namespace SysDev.Models
         public int UserProfileId { get; set; }
         public UserProfile UserProfile { get; set; }
 
+        public int RoleId { get; set; }
+        public MasterDetail Role { get; set; }
+
         [Required]
         [EmailAddress(ErrorMessage = "Invalid Email Address")]
         [RegularExpression("^[a-zA-Z0-9_\\.-]+@([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$", ErrorMessage = "E-mail is not valid")]
@@ -92,6 +95,10 @@ namespace SysDev.Models
         public int Id { get; set; }
         public string IdentityRoleId { get; set; }
         public IdentityRole IdentityRole { get; set; }
+
+        public int RoleId { get; set; }
+        public MasterDetail Role { get; set; }
+        
 
         public int MasterDetailId { get; set; }
         public MasterDetail MasterDetail { get; set; }
