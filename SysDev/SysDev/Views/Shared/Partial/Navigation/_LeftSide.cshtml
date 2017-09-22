@@ -1,4 +1,12 @@
-﻿<aside class="main-sidebar">
+﻿@using SysDev.App_Start;
+@model SysDev.Models.ViewModelBase
+@{
+    bool viewUsers = Model.Permission.Find(p => p.Module.Name == Module.Users).AllowView == 1 ? true : false;
+    bool viewSettings = Model.Permission.Find(p => p.Module.Name == Module.Settings).AllowView == 1 ? true : false;
+
+
+}
+<aside class="main-sidebar">
     <!-- sidebar: style can be found in sidebar.less -->
     <section class="sidebar">
         <!-- Sidebar user panel (optional) -->
@@ -69,7 +77,11 @@
                     </span>
                 </a>
                 <ul class="treeview-menu">
-                    <li class="@userList">@Html.ActionLink("Users", "Index", "UserProfile")</li>
+                    @if (viewUsers)
+                    {
+                        <li class="@userList">@Html.ActionLink("Users", "Index", "UserProfile")</li>
+                    }
+                    
                     <li class="@ViewBag.Lvl2ActivePage">@Html.ActionLink("User Permissions", "Index", "Permission")</li>
                 </ul>
             </li>

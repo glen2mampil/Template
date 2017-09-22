@@ -24,19 +24,6 @@ namespace SysDev.Controllers
             _context.Dispose();
         }
 
-        protected ApplicationUser LoginUser()
-        {
-            string id = User.Identity.GetUserId();
-            var account = _context.Users.Include(a => a.UserProfile).FirstOrDefault(p => p.Id == id);
-            return account;
-        }
-
-        protected List<Permission> LoginUserPermission()
-        {
-            var role = User.IsInRole("SuperAdmin") ? "SuperAdmin" : "Employee";
-            var userPermission = _context.Permissions.Where(m => m.IdentityRole.Name == role && m.MasterDetail.Name == "Users").ToList();
-            return userPermission;
-        }
 
         // GET: Settings
         public ActionResult Index()
@@ -44,12 +31,15 @@ namespace SysDev.Controllers
             var datas = _context.MasterDatas.ToList();
             var details = _context.MasterDetails.ToList();
 
+            var currentAccount = UserProfileController.LoginUser(User.Identity.GetUserId());
+            var pernission = UserProfileController.GetUserPermission(currentAccount);
+
             var viewModel = new SettingsViewModel
             {
                 MasterDatas = datas,
                 MasterDetails = details,
-                Account = LoginUser(),
-                Permission = LoginUserPermission()
+                Account = currentAccount,
+                Permission = pernission
             };
 
             return View("Index2",viewModel);
@@ -120,7 +110,7 @@ namespace SysDev.Controllers
                     _context.SaveChanges();
 
                     string description = "[Master Data] <strong>" + masterData.Name + "</strong> was set to " + status;
-                    ReportsController.AddAuditTrail(UserAction.Update, description, User.Identity.GetUserId(), Page.Settings);
+                    ReportsController.AddAuditTrail(UserAction.Update, description, User.Identity.GetUserId(), Module.Settings);
                     return Json(new { success = true, responseText = description }, JsonRequestBehavior.AllowGet);
                 }
             }
@@ -134,7 +124,7 @@ namespace SysDev.Controllers
                     _context.SaveChanges();
 
                     string description = "[Master Detail] <strong>" + masterDetail.Name + "</strong> was set to " + status;
-                    ReportsController.AddAuditTrail(UserAction.Update, description, User.Identity.GetUserId(), Page.Settings);
+                    ReportsController.AddAuditTrail(UserAction.Update, description, User.Identity.GetUserId(), Module.Settings);
                     return Json(new { success = true, responseText = description }, JsonRequestBehavior.AllowGet);
                 }
             }
@@ -155,7 +145,7 @@ namespace SysDev.Controllers
                 _context.SaveChanges();
 
                 string description = "[Master Data] <strong>" + masterData.Name + "</strong> was deleted ";
-                ReportsController.AddAuditTrail(UserAction.Delete, description, User.Identity.GetUserId(), Page.Settings);
+                ReportsController.AddAuditTrail(UserAction.Delete, description, User.Identity.GetUserId(), Module.Settings);
                 return Json(new { success = true, responseText = description }, JsonRequestBehavior.AllowGet);
 
             }
@@ -169,7 +159,7 @@ namespace SysDev.Controllers
                 _context.SaveChanges();
 
                 string description = "[Master Detail] <strong>" + masterDetail.Name + "</strong> was deleted";
-                ReportsController.AddAuditTrail(UserAction.Delete, description, User.Identity.GetUserId(), Page.Settings);
+                ReportsController.AddAuditTrail(UserAction.Delete, description, User.Identity.GetUserId(), Module.Settings);
                 return Json(new { success = true, responseText = description }, JsonRequestBehavior.AllowGet);
             }
             return RedirectToAction("Index", "Settings");
@@ -219,7 +209,7 @@ namespace SysDev.Controllers
                 });
 
                 description = "[Master Data] <strong>" + model.Name + "</strong> has been added";
-                ReportsController.AddAuditTrail(UserAction.Create, description, User.Identity.GetUserId(), Page.Settings);
+                ReportsController.AddAuditTrail(UserAction.Create, description, User.Identity.GetUserId(), Module.Settings);
             }
             else
             {
@@ -232,7 +222,7 @@ namespace SysDev.Controllers
                     
                 }
                 description = "[Master Data] <strong>" + model.Name + "</strong>'s information has been updated.";
-                ReportsController.AddAuditTrail(UserAction.Update, description, User.Identity.GetUserId(), Page.Settings);
+                ReportsController.AddAuditTrail(UserAction.Update, description, User.Identity.GetUserId(), Module.Settings);
             }
             _context.SaveChanges();
 
@@ -265,7 +255,7 @@ namespace SysDev.Controllers
                 };
                 _context.MasterDetails.Add(masterDetail);
                 description = "[Master Detail] <strong>" + model.Name + "</strong> has been added";
-                ReportsController.AddAuditTrail(UserAction.Create, description, User.Identity.GetUserId(), Page.Settings);
+                ReportsController.AddAuditTrail(UserAction.Create, description, User.Identity.GetUserId(), Module.Settings);
             }
             else
             {
@@ -278,7 +268,7 @@ namespace SysDev.Controllers
                     mData.DateTimeUpdated = DateTime.Now;
                 }
                 description = "[Master Detail] <strong>" + model.Name + "</strong>'s information has been updated.";
-                ReportsController.AddAuditTrail(UserAction.Update, description, User.Identity.GetUserId(), Page.Settings);
+                ReportsController.AddAuditTrail(UserAction.Update, description, User.Identity.GetUserId(), Module.Settings);
 
             }
             _context.SaveChanges();

@@ -100,8 +100,8 @@ namespace SysDev.Models
         public MasterDetail Role { get; set; }
         
 
-        public int MasterDetailId { get; set; }
-        public MasterDetail MasterDetail { get; set; }
+        public int ModuleId { get; set; }
+        public MasterDetail Module { get; set; }
 
         public int AllowView { get; set; }
         public int AllowCreate { get; set; }

@@ -19,6 +19,9 @@ namespace SysDev.Controllers
     public class UserProfileController : Controller
     {
         private ApplicationDbContext _context;
+        public static List<Permission> CurrentUserPermission { get; set; }
+        public static ApplicationUser CurrentUser { get; set; }
+
 
         public UserProfileController()
         {
@@ -28,30 +31,24 @@ namespace SysDev.Controllers
         protected override void Dispose(bool disposing)
         {
             _context.Dispose();
+            CurrentUser = LoginUser(User.Identity.GetUserId());
+            CurrentUserPermission = GetUserPermission(CurrentUser);
         }
 
-        protected ApplicationUser LoginUser()
-        {
-            string id = User.Identity.GetUserId();
-            var account = _context.Users.Include(a => a.UserProfile).FirstOrDefault(p => p.Id == id);
-            return account;
-        }
 
         public static ApplicationUser LoginUser(string id)
         {
             var context = new ApplicationDbContext();
-            
-            return context.Users.Include(u => u.Role).Include(u => u.UserProfile).FirstOrDefault(u => u.Id == id); 
+            CurrentUser = context.Users.Include(u => u.Role).Include(u => u.UserProfile).FirstOrDefault(u => u.Id == id);
+            return CurrentUser;
         }
 
 
-        protected List<Permission> LoginUserPermission()
+        public static List<Permission> GetUserPermission(ApplicationUser user)
         {
-            var role = User.IsInRole("SuperAdmin") ? "SuperAdmin" : "Employee";
-            var userPermission = _context.Permissions.Where(m => m.IdentityRole.Name == role && m.MasterDetail.Name == "Users").ToList();
-
-            return _context.Permissions.Include(p => p.MasterDetail).Where(p => p.Role.Name == "Super Admin").ToList();
-            //return userPermission;
+            var context = new ApplicationDbContext();
+            CurrentUserPermission = context.Permissions.Include(p => p.Module).Include(p => p.Role).Where(p => p.Role.Name == user.Role.Name).ToList();
+            return CurrentUserPermission;
         }
 
         // GET: UserProfile
@@ -60,55 +57,30 @@ namespace SysDev.Controllers
             List<UserProfile> users = _context.UserProfiles.ToList();
             List<IdentityRole> roles = _context.Roles.ToList();
             var accounts = _context.Users.Include(a => a.UserProfile).ToList();
+
+
+            var currentUser = LoginUser(User.Identity.GetUserId());
+            var currentPermission = GetUserPermission(currentUser);
+            List<MasterDetail> userRoles = _context.MasterDetails.Include(m => m.MasterData).Where(m => m.MasterData.Name == Module.Roles).ToList();
+
+            
+
             var useraccount = new UserProfileViewModel
             {
                 UserProfiles = users,
                 Accounts = accounts,
-                Account = LoginUser(User.Identity.GetUserId()),
+                Account = currentUser,
                 Roles = roles,
-                Permission = LoginUserPermission()
+                Permission = CurrentUserPermission,
+                UserRole = userRoles
+                
             };
-            if (User.IsInRole(RoleName.SuperAdmin))
-            {
-                return View("IndexReadOnly",useraccount);
-                //return View(useraccount);
-            }
+            
+            if(CurrentUser.Role.Name.Equals(RoleName.SuperAdmin, StringComparison.OrdinalIgnoreCase))
+                return View("IndexReadOnly", useraccount);
+           
+
             return View("NotAllowed", useraccount);
-        }
-
-        public ActionResult List()
-        {
-            var users = _context.UserProfiles.ToList();
-            var accounts = _context.Users.ToList();
-            var useraccount = new UserProfileViewModel
-            {
-                UserProfiles = users,
-                Accounts = accounts,
-                Account = LoginUser(),
-                AccountRole = ""
-            };
-            return View(useraccount);
-        }
-
-        public ActionResult Details(int id)
-        {
-            var profile = _context.UserProfiles.SingleOrDefault(p => p.Id == id);
-            var account = _context.Users.FirstOrDefault(a => a.UserProfileId == profile.Id);
-
-            if (profile == null)
-                return HttpNotFound();
-
-            var viewModel = new UserProfileViewModel
-            {
-                Account = account
-            };
-
-            return View(viewModel);
-        }
-
-        public ActionResult Create()
-        {
-            return View();
         }
 
         public ActionResult ResetPassword(string id)
@@ -127,7 +99,7 @@ namespace SysDev.Controllers
             string fullName = account.UserProfile.FirstName + " " + account.UserProfile.LastName;
             ReportsController.AddAuditTrail(UserAction.Update,
                 "<strong>" + fullName + "</strong>'s password was reseted ",
-                User.Identity.GetUserId(), Page.Users);
+                User.Identity.GetUserId(), Module.Users);
 
             return Json(new { success = true, responseText = "Password successfuly Change!" }, JsonRequestBehavior.AllowGet);
         }
@@ -160,7 +132,7 @@ namespace SysDev.Controllers
                 string fullName = account.UserProfile.FirstName + " " + account.UserProfile.LastName;
                 ReportsController.AddAuditTrail(UserAction.Update,
                     "<strong>" + fullName + "</strong> reset his/her password ",
-                    User.Identity.GetUserId(), Page.Users);
+                    User.Identity.GetUserId(), Module.Users);
 
                 return Json(new { success = true, responseText = "Password successfuly Change!" }, JsonRequestBehavior.AllowGet);
             }
@@ -191,27 +163,10 @@ namespace SysDev.Controllers
                 string fullName = user.FirstName + " " + user.LastName;
                 ReportsController.AddAuditTrail(UserAction.Update,
                     "<strong>" + fullName + "</strong> was set to " + account.Status,
-                    User.Identity.GetUserId(), Page.Users);
+                    User.Identity.GetUserId(), Module.Users);
                 return Json(new { success = true, responseText = user + " has set to " + account.Status }, JsonRequestBehavior.AllowGet);
             }
             return Json(new { success = false, responseText = "Nothings happen, Try again later." }, JsonRequestBehavior.AllowGet);
-        }
-
-        public ActionResult Edit(int id)
-        {
-            var profile = _context.UserProfiles.SingleOrDefault(p => p.Id == id);
-            var account = _context.Users.SingleOrDefault(p => p.UserProfileId == id);
-
-            if (profile == null)
-                return HttpNotFound();
-
-            var prof = new AddUserViewModel
-            {
-                Profile = profile,
-                Account = account
-            };
-
-            return View(prof);
         }
 
         [HttpPost]
@@ -225,14 +180,17 @@ namespace SysDev.Controllers
                 _context.SaveChanges();
 
                 var userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(_context));
-               
+                string role = Request.Form["UserRoles"].ToString();
+
                 var user = new ApplicationUser
                 {
                     UserName = model.EditAccount.UserName,
                     UserProfileId = model.EditProfile.Id,
                     UserProfile = model.EditProfile,
                     Email = model.EditAccount.Email,
-                    Status = "Active"
+                    Status = "Active",
+                    //RoleId  = 2067
+                    RoleId = Int32.Parse(role)
                 };
 
                 var chkUser = userManager.Create(user, "password1");
@@ -244,7 +202,7 @@ namespace SysDev.Controllers
                 string fullName = model.EditProfile.FirstName + " " + model.EditProfile.LastName;
                 ReportsController.AddAuditTrail(UserAction.Create,
                     "<strong>" +fullName + "</strong> has been added." ,
-                    User.Identity.GetUserId(), Page.Users);
+                    User.Identity.GetUserId(), Module.Users);
                 return Json(new { success = true, responseText = fullName + " <small>was added.</small>", data = fullName }, JsonRequestBehavior.AllowGet);
             }
             else
@@ -293,7 +251,7 @@ namespace SysDev.Controllers
                 string fullName = model.EditProfile.FirstName + " " + model.EditProfile.LastName;
                 ReportsController.AddAuditTrail(UserAction.Update,
                     "<strong>" + fullName + "</strong>'s information has been updated.",
-                    User.Identity.GetUserId(), Page.Users);
+                    User.Identity.GetUserId(), Module.Users);
                 return Json(new { success = true, responseText = fullName + " <small>has been Updated.</small>" }, JsonRequestBehavior.AllowGet);
             }
 
@@ -320,7 +278,7 @@ namespace SysDev.Controllers
 
             ReportsController.AddAuditTrail(UserAction.Delete,
                 "<strong>" + fullName + "</strong> has been Deleted.",
-                User.Identity.GetUserId(), Page.Users);
+                User.Identity.GetUserId(), Module.Users);
 
             return Json(new { success = true, responseText = "<small>User </small>" + fullName + "<small> has been removed.</small>" }, JsonRequestBehavior.AllowGet);
         }

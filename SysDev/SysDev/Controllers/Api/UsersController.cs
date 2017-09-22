@@ -51,8 +51,8 @@ namespace SysDev.Controllers.Api
             var role = User.IsInRole("SuperAdmin")? "SuperAdmin" : "Employee";
 
             var permission = _context.Permissions
-                .Include(p => p.MasterDetail)
-                .Include(p => p.IdentityRole)
+                .Include(p => p.Module)
+                .Include(p => p.Role)
                 .Where(p => p.IdentityRole.Name == role);
 
             //return Mapper.Map<AuditTrail, AuditTrailDto>(audit);

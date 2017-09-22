@@ -12,15 +12,16 @@ namespace SysDev.App_Start
 
     public class RoleName
     {
-        public const string SuperAdmin = "SuperAdmin";
+        public const string SuperAdmin = "Super Admin";
     }
 
-    public class Page
+    public class Module
     {
         public const string Users = "Users";
         public const string UserPermission = "User Permission";
         public const string Settings = "Settings";
         public const string AuditTrail = "Audit Trail";
+        public const string Roles = "Roles";
     }
 
     public class UserAction

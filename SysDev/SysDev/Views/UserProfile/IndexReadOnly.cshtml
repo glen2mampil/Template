@@ -1,21 +1,22 @@
-﻿
+﻿@using SysDev.App_Start
 @model SysDev.Models.UserProfileViewModel
 @{
     ViewBag.Title = "Users";
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.activePage = "Users";
 
-    var permission = Model.Permission.Find(p => p.MasterDetail.Name == "Users");
-
-    bool canCreate = permission.AllowCreate == 1 ? true : false;
-    bool canEdit = permission.AllowEdit == 1 ? true : false;
-    bool canDelete = permission.AllowDelete == 1 ? true : false;
-    bool canView = permission.AllowView == 1 ? true : false;
-    bool canGenerateReport = permission.AllowGenerateReport == 1 ? true : false;
-
+    var user = Model.Permission.Find(p => p.Module.Name == "Users");
+    
+    bool canCreate = user.AllowCreate == 1 ? true : false;
+    bool canEdit = user.AllowEdit == 1 ? true : false;
+    bool canDelete = user.AllowDelete == 1 ? true : false;
+    bool canView = user.AllowView == 1 ? true : false;
+    bool canGenerateReport = user.AllowGenerateReport == 1 ? true : false;
+    
+    
 }
 
-@section css{
+@section css{   
     <link rel="stylesheet" href="~/Content/components/bootstrap-daterangepicker/daterangepicker.css" />
     <link rel="stylesheet" href="~/Content/components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
@@ -249,10 +250,12 @@
 
                                     @Html.ValidationMessageFor(m => m.EditAccount.Roles, "", new { @class = "has-error label text-red control-label" })
                                     @*Html.TextBoxFor(m => m.Profile.MaritalStatus, new {@class = "form-control input-sm"})*@
-
-                                    <select class="form-control input-sm" id="roles" name="Roles">
+                                    
+                                    
+                                  
+                                    <select class="form-control input-sm" id="UserRoles" name="UserRoles">
                                         <option value=""> -- Select Role --</option>
-                                        @foreach (var role in Model.Roles)
+                                        @foreach (var role in Model.UserRole)
                                         {
                                             <option value="@role.Id">@role.Name</option>
                                         }
@@ -284,6 +287,10 @@
     <script src="~/Content/components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
     <script>
         $(document).ready(function () {
+
+
+            
+
             var canEdit = "@canEdit" === "True" ? true : false ;
             var canDelete = "@canDelete" === "True" ? true : false ;
 

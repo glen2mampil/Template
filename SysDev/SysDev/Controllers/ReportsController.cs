@@ -24,21 +24,7 @@ namespace SysDev.Controllers
             _context.Dispose();
         }
 
-        protected ApplicationUser LoginUser()
-        {
-            string id = User.Identity.GetUserId();
-            var account = _context.Users.Include(a => a.UserProfile).FirstOrDefault(p => p.Id == id);
-            //var users = _context.UserProfiles.ToList();
-            return account;
-        }
-
-        protected List<Permission> LoginUserPermission()
-        {
-            var role = User.IsInRole("SuperAdmin") ? "SuperAdmin" : "Employee";
-            var userPermission = _context.Permissions.Where(m => m.IdentityRole.Name == role && m.MasterDetail.Name == "Users").ToList();
-            return userPermission;
-        }
-
+       
         // GET: Reports
         public ActionResult Index() 
         {
@@ -52,12 +38,15 @@ namespace SysDev.Controllers
             var profile = _context.Users.Include(p => p.UserProfile).ToList();
             var modules = _context.MasterDetails.Include(m => m.MasterData).Where(m => m.MasterData.Name =="Modules").ToList();
 
+            var currentUser = UserProfileController.LoginUser(User.Identity.GetUserId());
+            var currentUserPermission = UserProfileController.GetUserPermission(currentUser);
+
             var reportView = new ReportViewModel
             {
                 AuditTrails = audits,
                 UserProfiles = profile,
-                Account = LoginUser(),
-                Permission = LoginUserPermission(),
+                Account = currentUser,
+                Permission = currentUserPermission,
                 Modules = modules
             };
 

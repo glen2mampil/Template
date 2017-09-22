@@ -24,21 +24,8 @@ namespace SysDev.Controllers
             _context.Dispose();
         }
 
-        protected ApplicationUser LoginUser()
-        {
-            string id = User.Identity.GetUserId();
-            var account = _context.Users.Include(a => a.UserProfile).FirstOrDefault(p => p.Id == id);
-            //var users = _context.UserProfiles.ToList();
-            return account;
-        }
-
-        protected List<Permission> LoginUserPermission()
-        {
-            var role = User.IsInRole("SuperAdmin") ? "SuperAdmin" : "Employee";
-            var userPermission = _context.Permissions.Where(m => m.IdentityRole.Name == role && m.MasterDetail.Name == "Users").ToList();
-            return userPermission;
-        }
-
+       
+        
         // GET: Permission
         public ActionResult Index()
         {
@@ -46,13 +33,16 @@ namespace SysDev.Controllers
             var permissions = _context.Permissions.ToList();
             var masterDetails = _context.MasterDetails.ToList();
 
+            var account = UserProfileController.LoginUser(User.Identity.GetUserId());
+            var permission = UserProfileController.GetUserPermission(account);
+
             var viewModel = new UserPermissionViewModel
             {
                 Permissions = permissions,
                 Roles = roles,
                 MasterDetails = masterDetails,
-                Account = LoginUser(),
-                Permission = LoginUserPermission()
+                Account = account,
+                Permission = permission
             };
 
             return View(viewModel);

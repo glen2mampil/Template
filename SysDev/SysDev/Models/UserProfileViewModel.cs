@@ -19,6 +19,8 @@ namespace SysDev.Models
         public ApplicationUser EditAccount { get; set; }
 
         public List<IdentityRole> Roles { get; set; }
+
+        public List<MasterDetail> UserRole { get; set; }
     }
 
     //soon to delete
