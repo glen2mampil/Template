@@ -146,7 +146,7 @@
                             }
                             
                             <p>
-                                @Model.Account.UserProfile.FirstName @Model.Account.UserProfile.LastName - @Model.AccountRole
+                                @Model.Account.UserProfile.FirstName @Model.Account.UserProfile.LastName - @Model.Account.Role.Name
                                 <small>Member since @Model.Account.UserProfile.DateCreated</small>
                             </p>
                         </li>
@@ -169,7 +169,7 @@
                         <!-- Menu Footer-->
                         <li class="user-footer">
                             <div class="pull-left">
-                                <a href="#" id="changepass-btn" class="btn btn-default btn-flat" data-toggle="modal" data-target="#change-password">Reset my password</a>
+                                <a href="#" id="changepass-btn" class="btn btn-default btn-flat" data-toggle="modal" data-target="#change-password">Change my password</a>
                                 
                                 
                             </div>
@@ -240,22 +240,11 @@
     </div>
 </div>
 <script>
-
-    console.log("test: " + ("A" === "A"));
-
-
-
-
-
     $(document).ready(function () {
-
-      
-
         $('#change-password').on('hidden.bs.modal', function () {
             $(this).find('form')[0].reset();
             $(".validation-summary-valid").html("");
         });
-
         $("#save-new-password").on('submit',function (e) {
             e.preventDefault();
             $("#oldpassword").removeClass("has-error");
@@ -265,23 +254,11 @@
             var newPassword = $("#newPw").val();
             var confirmPassword = $("#confirmPw").val();
             var oldPassword = $("#oldPw").val();
-          
-           
             if (newPassword !== confirmPassword) {
                 $("#confirmpassword").addClass("has-error");
                 $(".validation-summary-valid").html("<p>New Password and Confirm Password does not match<p/>");
-
                 return 0;
             }
-
-            //alert("Password: " + $("#newPw").val());
-            
-
-
-
-            //swal('Please wait');
-            //swal.showLoading();
-
             $.ajax({
                 url: "/UserProfile/ChangePassword/" + newPassword + "?oldP=" + oldPassword,
                 type: "Post",
@@ -290,9 +267,6 @@
                     'oldPassword': oldPassword
                 },
                 success: function (response) {
-                 
-
-
                     if (response.success) {
                         swal({
                             title: "<small>You Password was successfully change.</small>",
@@ -303,8 +277,7 @@
                     }
                     else {
                         $(".validation-summary-valid").html(response.responseText);
-                        console.log("response: " + response.responseText);
-                        if (response.field == "currentpw") {
+                        if (response.field === "currentpw") {
                             $("#oldpassword").addClass("has-error");
                         } else {
                             $("#newpassword").addClass("has-error");
@@ -315,16 +288,12 @@
                 error: function (jqXhr, textStatus, errorThrown) {
                     swal({
                         title: "Opps! <small>something went wrong try again later</small>.",
-                        text: "<small class='label label-error'> Status Code: " + jqXhr.status + "</small>" +
-                            "<small class='label label-error'> Error: " + jqXhr.responseText + "</small>" +
-                            "<small class='label label-error'>Status: " + textStatus + "</small>" +
-                            "<small class='label label-error'>Throws: " + errorThrown + "</small>",
+                        text: "<p><small class='label label-error'> Status Code: " + jqXhr.status + "</small>" +
+                            "<small class='label label-error'> Error: " + jqXhr.responseText + "</small></p>",
                         type: "error"
                     }).catch(swal.noop);
                 }
             });
-            
         });
-            
     });
 </script>

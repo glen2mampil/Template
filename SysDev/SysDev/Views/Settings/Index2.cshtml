@@ -294,8 +294,8 @@
                     //order: [[0, "desc"]],
                     columns: [
                         {
-                            render: function (data, type, full) {
-                                var date = new Date(full.DateTimeCreated);
+                            render: function (info, type, data) {
+                                var date = new Date(data.DateTimeCreated);
                                 var options = {
                                     weekday: "long",
                                     year: "numeric",
@@ -304,11 +304,11 @@
                                     hour: "2-digit",
                                     minute: "2-digit"
                                 };
-                                var status = full.Status === "Active" ? "label-success" : "label-danger";
-                                var title = "<p class='lead text-black no-margin'><a href='#' class='mdata-title'>" + full.Name + "</a></p>";
+                                var status = data.Status === "Active" ? "label-success" : "label-danger";
+                                var title = "<p class='lead text-black no-margin'><a href='#' class='mdata-title'>" + data.Name + "</a></p>";
                                 var dateCreated = "<p class='text-muted no-margin'><small>" + date.toLocaleString("en-us", options) + "</small>" +
-                                    " - <a href='#' class='mdata-status label " + status + "'>" + full.Status + "</a></p>";
-                                var description = "<p class='no-margin'>" + full.Description + "</p>";
+                                    " - <a href='#' class='mdata-status label " + status + "'>" + data.Status + "</a></p>";
+                                var description = "<p class='no-margin'>" + data.Description + "</p>";
                                 return title + dateCreated + description;
                             }
                         },
@@ -320,6 +320,10 @@
                             render: function (data, type, full, meta) {
                                 var deleteBtn = "<p class='text-right'><a href='#' class='label label-danger btnDelete'><i class='fa fa-trash m-r-10'></i> Delete</a></p>";
                                 var editBtn = "<p class='m-t-15 text-right'><a href='#settings-modal' class='label label-default btnModify' data-toggle='modal'><i class='fa fa-pencil m-r-5'></i> Modify</a></p>";
+                                if (full.Name === "Modules" || full.Name === "Roles") {
+                                    return editBtn;
+                                }
+
 
                                 return deleteBtn + editBtn;
                             }

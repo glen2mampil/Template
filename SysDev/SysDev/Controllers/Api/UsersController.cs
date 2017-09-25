@@ -28,7 +28,7 @@ namespace SysDev.Controllers.Api
         {
             return _context.Users
                 .Include(u => u.UserProfile)
-                .Include(u => u.Roles)
+                .Include(u => u.Role)
                 .OrderBy(u => u.UserProfile.LastName)
                 .ToList();
 

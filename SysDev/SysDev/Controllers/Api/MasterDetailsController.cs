@@ -8,6 +8,7 @@ using AutoMapper;
 using SysDev.Dtos;
 using SysDev.Models;
 using System.Data.Entity;
+using SysDev.App_Start;
 
 namespace SysDev.Controllers.Api
 {
@@ -30,12 +31,13 @@ namespace SysDev.Controllers.Api
         public IEnumerable<MasterDetail> GetMasterDetail(int id)
         {
             var mData = _context.MasterDetails.Include(m => m.MasterData).Where(m => m.MasterDataId == id);
+            var mdata2 = _context.MasterDetails.Include(m => m.MasterData).Where(m => m.MasterData.Name == Module.Roles).OrderBy(m => m.Name).ToList();
 
             if (mData == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
             
-            return mData;
+            return mdata2;
         }
 
         // POST /api/auditrails

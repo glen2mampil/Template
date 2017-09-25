@@ -15,13 +15,13 @@ using SysDev.App_Start;
 
 namespace SysDev.Controllers
 {
-    
+    [Authorize]
     public class UserProfileController : Controller
     {
         private ApplicationDbContext _context;
+        
         public static List<Permission> CurrentUserPermission { get; set; }
         public static ApplicationUser CurrentUser { get; set; }
-
 
         public UserProfileController()
         {
@@ -31,18 +31,15 @@ namespace SysDev.Controllers
         protected override void Dispose(bool disposing)
         {
             _context.Dispose();
-            CurrentUser = LoginUser(User.Identity.GetUserId());
-            CurrentUserPermission = GetUserPermission(CurrentUser);
         }
-
 
         public static ApplicationUser LoginUser(string id)
         {
             var context = new ApplicationDbContext();
             CurrentUser = context.Users.Include(u => u.Role).Include(u => u.UserProfile).FirstOrDefault(u => u.Id == id);
+            GetUserPermission(CurrentUser);
             return CurrentUser;
         }
-
 
         public static List<Permission> GetUserPermission(ApplicationUser user)
         {
@@ -54,31 +51,23 @@ namespace SysDev.Controllers
         // GET: UserProfile
         public ActionResult Index()
         {
-            List<UserProfile> users = _context.UserProfiles.ToList();
-            List<IdentityRole> roles = _context.Roles.ToList();
-            var accounts = _context.Users.Include(a => a.UserProfile).ToList();
-
-
-            var currentUser = LoginUser(User.Identity.GetUserId());
-            var currentPermission = GetUserPermission(currentUser);
-            List<MasterDetail> userRoles = _context.MasterDetails.Include(m => m.MasterData).Where(m => m.MasterData.Name == Module.Roles).ToList();
-
+            LoginUser(User.Identity.GetUserId());
+            var userRoles = _context.MasterDetails.Include(m => m.MasterData).Where(m => m.MasterData.Name == Module.Roles).OrderBy(m => m.Name).ToList();
             
 
             var useraccount = new UserProfileViewModel
             {
-                UserProfiles = users,
-                Accounts = accounts,
-                Account = currentUser,
-                Roles = roles,
+                Account = CurrentUser,
                 Permission = CurrentUserPermission,
                 UserRole = userRoles
-                
             };
             
-            if(CurrentUser.Role.Name.Equals(RoleName.SuperAdmin, StringComparison.OrdinalIgnoreCase))
-                return View("IndexReadOnly", useraccount);
-           
+            Permission module = CurrentUserPermission.Find(p => p.Module.Name == "Users");
+
+            if (module.AllowView == 1)
+            {
+                return View(useraccount);
+            }
 
             return View("NotAllowed", useraccount);
         }
@@ -92,7 +81,6 @@ namespace SysDev.Controllers
                 return HttpNotFound();
 
             var passwordHasher = new Microsoft.AspNet.Identity.PasswordHasher();
-
             account.PasswordHash = passwordHasher.HashPassword("password1");
             _context.SaveChanges();
 
@@ -121,36 +109,31 @@ namespace SysDev.Controllers
         [HttpPost]
         public async Task<ActionResult> ChangePassword(string newPassword, string oldP)
         {
-            
             string id = User.Identity.GetUserId();
-
             var result = await UserManager.ChangePasswordAsync(User.Identity.GetUserId(), oldP, newPassword);
 
             if (result.Succeeded)
             {
-                var account = _context.Users.Include(u => u.UserProfile).FirstOrDefault(p => p.Id == User.Identity.GetUserId());
+                var account = _context.Users.Include(u => u.UserProfile).FirstOrDefault(p => p.Id == id);
                 string fullName = account.UserProfile.FirstName + " " + account.UserProfile.LastName;
                 ReportsController.AddAuditTrail(UserAction.Update,
                     "<strong>" + fullName + "</strong> reset his/her password ",
                     User.Identity.GetUserId(), Module.Users);
-
+                   
                 return Json(new { success = true, responseText = "Password successfuly Change!" }, JsonRequestBehavior.AllowGet);
             }
             AddErrors(result);
-            return Json(new { success = false, feild = "currentpw", responseText = errorMessage }, JsonRequestBehavior.AllowGet);
+            return Json(new { success = false, field = "currentpw", responseText = errorMessage }, JsonRequestBehavior.AllowGet);
         }
 
         private string errorMessage = "";
         private void AddErrors(IdentityResult result)
         {
-            
             foreach (var error in result.Errors)
             {
                 errorMessage += error + " ";
             }
-           
         }
-
 
         public ActionResult UpdateStatus(string id)
         {
@@ -172,7 +155,7 @@ namespace SysDev.Controllers
         [HttpPost]
         public ActionResult Save(UserProfileViewModel model)
         {
-        
+            string role = Request.Form["UserRoles"].ToString();
             if (model.EditProfile.Id == 0 && model.EditAccount.Id == null)
             {
                 model.EditProfile.DateCreated = DateTime.Now.ToString("MMM-dd-yyyy hh:mm tt");
@@ -180,8 +163,6 @@ namespace SysDev.Controllers
                 _context.SaveChanges();
 
                 var userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(_context));
-                string role = Request.Form["UserRoles"].ToString();
-
                 var user = new ApplicationUser
                 {
                     UserName = model.EditAccount.UserName,
@@ -189,73 +170,51 @@ namespace SysDev.Controllers
                     UserProfile = model.EditProfile,
                     Email = model.EditAccount.Email,
                     Status = "Active",
-                    //RoleId  = 2067
                     RoleId = Int32.Parse(role)
                 };
 
                 var chkUser = userManager.Create(user, "password1");
+
                 if (chkUser.Succeeded)
                 {
-                    var result1 = userManager.AddToRole(user.Id, "Employee");
-
+                    string fullname = model.EditProfile.FirstName + " " + model.EditProfile.LastName;
+                    ReportsController.AddAuditTrail(UserAction.Create,
+                        "<strong>" + fullname + "</strong> has been added.",
+                        User.Identity.GetUserId(), Module.Users);
+                    return Json(new { success = true, responseText = fullname + " <small>was added.</small>", data = fullname }, JsonRequestBehavior.AllowGet);
                 }
-                string fullName = model.EditProfile.FirstName + " " + model.EditProfile.LastName;
-                ReportsController.AddAuditTrail(UserAction.Create,
-                    "<strong>" +fullName + "</strong> has been added." ,
-                    User.Identity.GetUserId(), Module.Users);
-                return Json(new { success = true, responseText = fullName + " <small>was added.</small>", data = fullName }, JsonRequestBehavior.AllowGet);
+                return Json(new { success = false, responseText = "<small>Looks like we have problem in saving new user. please try again later</small>"}, JsonRequestBehavior.AllowGet);
             }
-            else
+
+            var profile = _context.UserProfiles.SingleOrDefault(p => p.Id == model.EditProfile.Id);
+            if (profile != null)
             {
-                try
-                {
-                    var profile = _context.UserProfiles.SingleOrDefault(p => p.Id == model.EditProfile.Id);
-                    if (profile != null)
-                    {
-                        profile.FirstName = model.EditProfile.FirstName;
-                        profile.LastName = model.EditProfile.LastName;
-                        profile.MiddleName = model.EditProfile.MiddleName;
-                        profile.Gender = model.EditProfile.Gender;
-                        profile.ContactNo = model.EditProfile.ContactNo;
-                        profile.Address = model.EditProfile.Address;
-                        profile.CompanyId = model.EditProfile.CompanyId;
-                        profile.CompanyName = model.EditProfile.CompanyName;
-                        profile.MaritalStatus = model.EditProfile.MaritalStatus;
-                    }
-
-
-                    var account = _context.Users.SingleOrDefault(a => a.UserProfileId == model.EditProfile.Id);
-                    if (account != null)
-                    {
-                        account.Email = model.EditAccount.Email;
-                        account.UserName = model.EditAccount.UserName;
-                    }
-                    _context.SaveChanges();
-                }
-                catch (DbEntityValidationException ex)
-                {
-                    var errorMessages = ex.EntityValidationErrors
-                        .SelectMany(x => x.ValidationErrors)
-                        .Select(x => x.ErrorMessage);
-
-                    // Join the list to a single string.
-                    var fullErrorMessage = string.Join("; ", errorMessages);
-
-                    // Combine the original exception message with the new one.
-                    var exceptionMessage = string.Concat(ex.Message, " The validation errors are: ", fullErrorMessage);
-
-                    throw new DbEntityValidationException(exceptionMessage, ex.EntityValidationErrors);
-                    //return Json(new { success = false, responseText = "Error @" + ((System.Data.Entity.Validation.DbEntityValidationException)ex).EntityValidationErrors }, JsonRequestBehavior.AllowGet);
-                    
-                }
-                string fullName = model.EditProfile.FirstName + " " + model.EditProfile.LastName;
-                ReportsController.AddAuditTrail(UserAction.Update,
-                    "<strong>" + fullName + "</strong>'s information has been updated.",
-                    User.Identity.GetUserId(), Module.Users);
-                return Json(new { success = true, responseText = fullName + " <small>has been Updated.</small>" }, JsonRequestBehavior.AllowGet);
+                profile.FirstName = model.EditProfile.FirstName;
+                profile.LastName = model.EditProfile.LastName;
+                profile.MiddleName = model.EditProfile.MiddleName;
+                profile.Gender = model.EditProfile.Gender;
+                profile.ContactNo = model.EditProfile.ContactNo;
+                profile.Address = model.EditProfile.Address;
+                profile.CompanyId = model.EditProfile.CompanyId;
+                profile.CompanyName = model.EditProfile.CompanyName;
+                profile.MaritalStatus = model.EditProfile.MaritalStatus;
             }
 
-            //return RedirectToAction("Index", "UserProfile");
+
+            var account = _context.Users.SingleOrDefault(a => a.UserProfileId == model.EditProfile.Id);
+            if (account != null)
+            {
+                account.Email = model.EditAccount.Email;
+                account.UserName = model.EditAccount.UserName;
+                account.RoleId = Int32.Parse(role);
+            }
+            _context.SaveChanges();
+
+            string fullName = model.EditProfile.FirstName + " " + model.EditProfile.LastName;
+            ReportsController.AddAuditTrail(UserAction.Update,
+                "<strong>" + fullName + "</strong>'s information has been updated.",
+                User.Identity.GetUserId(), Module.Users);
+            return Json(new { success = true, responseText = fullName + " <small>has been Updated.</small>" }, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult Delete(string id)
