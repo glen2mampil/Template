@@ -31,13 +31,12 @@ namespace SysDev.Controllers.Api
         public IEnumerable<MasterDetail> GetMasterDetail(int id)
         {
             var mData = _context.MasterDetails.Include(m => m.MasterData).Where(m => m.MasterDataId == id);
-            var mdata2 = _context.MasterDetails.Include(m => m.MasterData).Where(m => m.MasterData.Name == Module.Roles).OrderBy(m => m.Name).ToList();
 
             if (mData == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
             
-            return mdata2;
+            return mData;
         }
 
         // POST /api/auditrails

@@ -336,10 +336,11 @@
                     var row = $(this).parent().closest("tr");
                     var data = tableData.row(row).data();
                     tableDetails.ajax.url('/api/masterdetails/' + data.Id).load();
+                    console.log('/api/masterdetails/' + data.Id);
                     $("#master-datail-pane").removeClass("hide");
                     $("#MasterDataId").val(data.Id);
                     $("#table-masterdetail-title").html("Master Details of <strong>" + data.Name +"</strong>");
-                    console.log($("#MasterDataId").val());
+                    //console.log($("#MasterDataId").val());
                 });
                 $("#table-master-data tbody").on('click', '.btnModify', function (e) {
                     var row = $(this).parent().closest("tr");
