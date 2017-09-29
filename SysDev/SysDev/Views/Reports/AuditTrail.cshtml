@@ -1,0 +1,121 @@
+﻿@model SysDev.Models.ReportViewModel
+
+@{
+    ViewBag.Title = "Audit Trail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section css{
+    <link rel="stylesheet" href="~/Content/components/bootstrap-daterangepicker/daterangepicker.css" />
+    <link rel="stylesheet" href="~/Content/components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css" />
+}
+
+<div class="row">
+    <div class="col-xs-12">
+       
+        <div class="box">
+            
+            <div class="box-header">
+               
+                <label class="col-md-12">Filter by:</label>
+                <hr />
+                <div class="form-group col-md-2">
+                    From:
+                    <div class="input-group">
+                        <div class="input-group-addon">
+                            <i class="fa fa-calendar"></i>
+                        </div>
+                        <input type="text" class="form-control input-sm pull-right" id="date_from">
+                    </div>
+                    <!-- /.input group -->
+                </div>
+                <div class="form-group col-md-2">
+                    To:
+                    <div class="input-group">
+                        <div class="input-group-addon">
+                            <i class="fa fa-calendar"></i>
+                        </div>
+                        <input type="text" class="form-control input-sm pull-right" id="date_to">
+                    </div>
+                    <!-- /.input group -->
+                </div>
+                
+
+                <div class="col-md-3">
+                    Commit by
+                    <select id="filterby_commit" class="form-control input-sm">
+                        <option value="">All</option>
+                        @foreach (var account in Model.UserProfiles)
+                        {
+                            <option value="@account.UserProfile.FirstName @account.UserProfile.LastName">@account.UserProfile.FirstName @account.UserProfile.LastName</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    Module
+                    <select id="filterby_module" class="form-control input-sm">
+                        <option value="">All</option>
+                        @foreach (var module in Model.Modules)
+                        {
+                            <option value="@module.Name">@module.Name</option>   
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    Action
+                    <select id="filterby_action" class="form-control input-sm">
+                        <option value="">All</option>
+                        <option value="Create">Create</option>
+                        <option value="Update">Update</option>
+                        <option value="Delete">Delete</option>
+                        <option value="Report">Gernerate Report</option>
+                    </select>
+                </div>
+
+            </div>
+            <hr />
+            <!-- /.box-header -->
+            <div class="box-body">
+                <table id="audittrail-table" class="table table-bordered table-hover table-striped">
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Commit by</th>
+                        <th>Module</th>
+                        <th>Action</th>
+                        <th>Description</th>
+                    </tr>
+                    </thead>
+                    
+                    
+                    <tbody>
+
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <th>Date</th>
+                        <th>Commit by</th>
+                        <th>Module</th>
+                        <th>Action</th>
+                        <th>Description</th>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
+    </div>
+    <!-- /.col -->
+</div>
+
+
+
+@section scripts
+{
+    <script src="~/Content/components/moment/min/moment.min.js"></script>
+    <script src="~/Content/components/bootstrap-daterangepicker/daterangepicker.js"></script>
+    <script src="~/Content/components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    
+}
+@Scripts.Render("~/syslib/reports/js")

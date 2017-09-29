@@ -20,12 +20,40 @@ namespace SysDev
                         "~/Scripts/modernizr-*"));
 
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include(
-                      "~/Scripts/bootstrap.js",
-                      "~/Scripts/respond.js"));
+                "~/Scripts/bootstrap.js",
+                "~/Scripts/respond.js",
+                "~/Scripts/datatables/jquery.datatables.js",
+                "~/Scripts/dataTables/datatables.bootstrap.js"
+                ));
+
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
-                      "~/Content/bootstrap.css",
-                      "~/Content/site.css"));
+                "~/Content/bootstrap.css",
+                "~/admin-lte/css/AdminLTE.css",
+                "~/admin-lte/css/skins/skin-blue.css",
+                "~/Content/font-awesome.min.css",
+                "~/Content/sweetalert2/dist/sweetalert2.min.css",
+                "~/Content/plugins/iCheck/square/blue.css",
+                "~/Content/dataTables/css/datatables.bootstrap.css",
+                "~/Content/Site.css"));
+
+            bundles.Add(new ScriptBundle("~/lib/js").Include(
+                "~/Content/sweetalert2/dist/sweetalert2.min.js",
+                "~/Content/plugins/iCheck/icheck.min.js",
+                "~/Content/components/fastclick/lib/fastclick.js",
+                "~/Content/components/jquery-slimscroll/jquery.slimscroll.min.js",
+                "~/admin-lte/js/app.js"));
+
+
+            bundles.Add(new ScriptBundle("~/syslib/reports/js").Include(
+                "~/Scripts/SystemModules/AuditTrail.js"
+                ));
+
+            bundles.Add(new ScriptBundle("~/syslib/userprofile/js").Include(
+                "~/Scripts/SystemModules/UserProfile.js"
+            ));
+
+
         }
     }
 }

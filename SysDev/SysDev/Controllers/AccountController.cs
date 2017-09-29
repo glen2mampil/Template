@@ -12,16 +12,18 @@ using SysDev.Models;
 
 namespace SysDev.Controllers
 {
-    [Authorize]
+    
     public class AccountController : Controller
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
-
+        private ApplicationDbContext _context;
         public AccountController()
         {
+            _context = new ApplicationDbContext();
         }
 
+        
         public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager )
         {
             UserManager = userManager;
@@ -73,12 +75,22 @@ namespace SysDev.Controllers
                 return View(model);
             }
 
+            
+
             // This doesn't count login failures towards account lockout
             // To enable password failures to trigger account lockout, change to shouldLockout: true
-            var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
+            var result = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, shouldLockout: false);
+            
             switch (result)
             {
                 case SignInStatus.Success:
+                    var accountStatus = _context.Users.FirstOrDefault(u => u.UserName == model.UserName);
+                    if (accountStatus != null && accountStatus.Status.Equals("Inactive", StringComparison.OrdinalIgnoreCase))
+                    {
+                        ModelState.AddModelError("", "Your account has been deactivated, Please contact the Administrator.");
+                        AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+                        return View(model);
+                    }
                     return RedirectToLocal(returnUrl);
                 case SignInStatus.LockedOut:
                     return View("Lockout");
@@ -419,7 +431,7 @@ namespace SysDev.Controllers
                     _signInManager = null;
                 }
             }
-
+            _context.Dispose();
             base.Dispose(disposing);
         }
 

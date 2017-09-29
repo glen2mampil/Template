@@ -1,0 +1,66 @@
+﻿@model SysDev.Models.SettingsViewModel
+@{
+    ViewBag.Title = "Settings";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.ActivePage = "Settings";
+}
+<div class="row">
+    <div class="col-md-12">
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="box flat">
+                        <div class="box-header">
+                            <h3 class="box-title">Master Data</h3>
+
+                            <div class="box-tools">
+                                <a id="btnCreate" class="pull-right" data-toggle="modal" href="#myModal"><i class="fa fa-plus fa-2x"></i></a>
+                            </div>
+                        </div>
+                        <!-- /.box-header -->
+                        <div id="table-holder">
+                            
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                    <!-- /.box -->
+                </div>
+            </div>
+        </div>
+        
+        
+        <div class="col-md-6" id="table-masterdetails">
+            
+        </div>
+    </div>
+</div>
+
+<div id="myModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content" id="modal-content">
+
+        </div>
+    </div>
+</div>
+
+
+@section scripts
+{
+    <script>
+        $(document).ready(new function() {
+            $("#table-holder").fadeOut(800, function () {
+                $("#table-holder").load("/Settings/ViewMasterData").fadeIn().delay(2000);
+            });
+        });
+
+
+        $('#btnCreate').click(function (e) {
+            $("#modal-content").load("/Settings/Create");
+        });
+        $('#btnCreateDetails').click(function (e) {
+            $("#modal-content").load("/Settings/Create");
+        });
+        
+        
+    </script>
+}

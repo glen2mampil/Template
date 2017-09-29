@@ -1,0 +1,89 @@
+﻿
+@model SysDev.Models.NewMasterDetailsViewModel
+@{
+    ViewBag.Title = "Edit";
+    Layout = null;
+}
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "form-horizontal", role = "form", id = "save-masterDetail" }))
+{
+
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+
+    <div class="modal-header">
+        <h4 id="exampleModalLongTitle">
+            @ViewBag.ModalTitle
+            <a class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </a>
+        </h4>
+    </div>
+    <div class="modal-body" id="modal-content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="col-md-12 form-group">
+                    @Html.LabelFor(m => m.MasterDetail.Name , new { @class = "label text-black control-label", })
+                    @Html.TextBoxFor(m => m.MasterDetail.Name, new { @class = "form-control input-sm" })
+                </div>
+                <div class="col-md-12 form-group">
+                    @Html.LabelFor(m => m.MasterDetail.Description, new { @class = "label text-black control-label" })
+                    @Html.TextBoxFor(m => m.MasterDetail.Description, new { @class = "form-control input-sm" })
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="modal-footer">
+        @Html.HiddenFor(m => m.MasterData.Id)
+        @Html.HiddenFor(m => m.MasterDetail.Id)
+        <p id="dialog-alert"></p>
+        <button type="button" class="btn " data-dismiss="modal">Cancel</button>
+        <button type="submit" id="save" class="btn btn-primary">Save changes</button>
+    </div>
+}
+
+<script>
+     $('#save-masterDetail').submit(function (e) {
+         e.preventDefault();
+         var action = $("#MasterDetail_Id").val() === "" ? "Added" : "Updated";
+         $.ajax({
+             url: "/Settings/SaveMasterDetail/",
+             type: "Post",
+             data: $(this).serialize(),
+             success: function (result) {
+                 if (result.success === false) {
+
+                     swal({
+                         title: "Opps!",
+                         html: "<small>"+ result.responseText+"</small>",
+                         timer: 3000,
+                         type: "error"
+                     }).catch(swal.noop);
+                 } else {
+                     swal({
+                         title: "<small>Master Data</small> " + $("#Name").val() + " <small>has been " + action + "</small>.",
+                         timer: 3000,
+                         type: "success"
+                     }).catch(swal.noop);
+                     $("#myModal").modal("toggle");
+                     $("#masterDataTable").fadeOut(800, function () {
+                         $("#masterDataTable").load("/Settings/ViewMasterData").fadeIn().delay(2000);
+                     });
+                 }
+             },
+             error: function (jqXhr, textStatus, errorThrown) {
+                 swal({
+                     title: "Opps! <small>something went wrong tyr again later</small>.",
+                     text: "<small class='label label-error'> Status Code: " + jqXhr.status + "</small>" +
+                         "<small class='label label-error'> Error: " + jqXhr.responseText + "</small>" +
+                         "<small class='label label-error'>Status: " + textStatus + "</small>" +
+                         "<small class='label label-error'>Throws: " + errorThrown + "</small>",
+                     type: "error"
+                 }).catch(swal.noop);
+             }
+         });
+     });
+
+</script>

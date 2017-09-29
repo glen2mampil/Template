@@ -1,0 +1,102 @@
+﻿<aside class="main-sidebar">
+    <!-- sidebar: style can be found in sidebar.less -->
+    <section class="sidebar">
+        <!-- Sidebar user panel (optional) -->
+        <div class="user-panel">
+            <div class="pull-left image">
+                @if (@Model.Account.UserProfile.Gender == "Male")
+                {
+                    <img src="~/admin-lte/img/flat-face-male-o.png" class="img-circle" alt="User Image">
+                }
+                else
+                {
+                    <img src="~/admin-lte/img/flat-face-male-o.png" class="img-circle" alt="User Image">
+                }
+            </div>
+            <div class="pull-left info">
+                <p>@Model.Account.UserProfile.FirstName @Model.Account.UserProfile.LastName</p>
+                <!-- Status -->
+                <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
+            </div>
+        </div>
+        <!-- search form (Optional) -->
+        <form action="#" method="get" class="sidebar-form">
+            <div class="input-group">
+                <input type="text" name="q" class="form-control" placeholder="Search...">
+                <span class="input-group-btn">
+                    <button type="submit" name="search" id="search-btn" class="btn btn-flat">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </span>
+            </div>
+        </form>
+        <!-- /.search form -->
+        <!-- Sidebar Menu -->
+        <ul class="sidebar-menu" data-widget="tree">
+            <li class="header">NAVIGATION</li>
+            <!-- Optionally, you can add icons to the links -->
+
+            @{
+                string activePage = ViewBag.ActivePage, lvl2ActivePage = ViewBag.Lvl2ActivePage;
+                string dashboard = null, settings = null;
+                string users = null, userList = null, userPermission = null;
+                switch (activePage)
+                {
+                    case "DashBoard":
+                        dashboard = "active";
+                        break;
+                    case "Users":
+                        users = "active";
+                        userList = lvl2ActivePage == "userlist" ? "active" : "";
+                        userPermission = lvl2ActivePage == "userspermission" ? "active" : "";
+                        break;
+                    case "Settings":
+                        settings = "active";
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            <li class="@dashboard">
+                <a href="@Url.Action("Index", "Home")"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a>
+            </li>
+            <li class="treeview @users">
+                <a href="#">
+                    <i class="fa fa-users"></i> <span>Manage User</span>
+                    <span class="pull-right-container">
+                        <i class="fa fa-angle-left pull-right"></i>
+                    </span>
+                </a>
+                <ul class="treeview-menu">
+                    <li class="@userList">@Html.ActionLink("Users", "Index", "UserProfile")</li>
+                    <li class="@ViewBag.Lvl2ActivePage">@Html.ActionLink("User Permissions", "Index", "Permission")</li>
+                </ul>
+            </li>
+            <li class="@settings">
+                <a href="@Url.Action("Index", "Settings")"><i class="fa fa-sliders"></i> <span>Settings</span></a>
+            </li>
+            <li class="treeview">
+                <a href="#">
+                    <i class="fa fa-area-chart"></i> <span>Reports</span>
+                    <span class="pull-right-container">
+                        <i class="fa fa-angle-left pull-right"></i>
+                    </span>
+                </a>
+                @if (Model.Permission.AllowGenerateReport == 1)
+                {
+                    <ul class="treeview-menu">
+                        <li><a href="#">@Html.ActionLink("Audit Trail", "AuditTrail", "Reports")</a></li>
+                    </ul> 
+                }
+                
+            </li>
+
+
+        </ul>
+        <!-- /.sidebar-menu -->
+    </section>
+    <!-- /.sidebar -->
+</aside>
+
+
