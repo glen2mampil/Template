@@ -5100,9 +5100,9 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>2061</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:8083/</IISUrl>
+          <IISUrl>http://localhost:10001/</IISUrl>
           <OverrideIISAppRootUrl>True</OverrideIISAppRootUrl>
-          <IISAppRootUrl>http://localhost:8083/</IISAppRootUrl>
+          <IISAppRootUrl>http://localhost:10001/</IISAppRootUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
